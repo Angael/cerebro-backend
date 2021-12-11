@@ -1,6 +1,7 @@
 import { Knex } from 'knex';
 
 const UID_LEN = 36;
+const PATH_LEN = 256;
 
 export async function up(knex: Knex): Promise<void> {
   return knex.schema
@@ -27,7 +28,7 @@ export async function up(knex: Knex): Promise<void> {
       table.foreign('item_id').references('item.id');
 
       table.string('filename', 256).notNullable();
-      table.string('path', 1024).unique().notNullable();
+      table.string('path', PATH_LEN).unique().notNullable();
       table.string('type', 32).notNullable(); //s3_video | s3_image | url_image | text | link
       table.bigInteger('size').unsigned();
     })
@@ -38,7 +39,7 @@ export async function up(knex: Knex): Promise<void> {
 
       table.datetime('created_at').defaultTo(knex.fn.now());
       table.string('type', 32).notNullable(); // xs, sm, md, animated
-      table.string('path', 1024).unique().notNullable();
+      table.string('path', PATH_LEN).unique().notNullable();
       table.integer('size').unsigned();
       table.integer('width').unsigned();
       table.integer('height').unsigned();
@@ -62,6 +63,8 @@ export async function up(knex: Knex): Promise<void> {
       table.integer('height').unsigned();
     })
     .createTable('seen_time', (table) => {
+      table.increments();
+
       table.string('account_uid', UID_LEN);
       table.foreign('account_uid').references('account.uid');
 
@@ -69,11 +72,12 @@ export async function up(knex: Knex): Promise<void> {
       table.foreign('item_id').references('item.id');
 
       table.integer('count').unsigned().defaultTo(0);
+
       table
         .datetime('updated_at')
         .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 
-      table.primary(['account_uid', 'item_id']);
+      table.unique(['account_uid', 'item_id']);
     })
     .createTable('wall', (table) => {
       table.increments('id');
@@ -87,25 +91,26 @@ export async function up(knex: Knex): Promise<void> {
         .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
     })
     .createTable('wall_item', (table) => {
+      table.increments();
       table.integer('wall_id').unsigned();
       table.foreign('wall_id').references('wall.id');
 
       table.integer('item_id').unsigned();
       table.foreign('item_id').references('item.id');
 
-      table.primary(['wall_id', 'item_id']);
+      table.unique(['wall_id', 'item_id']);
     });
 }
 
 export async function down(knex: Knex): Promise<void> {
   return knex.schema
-    .dropTable('account')
-    .dropTable('item')
-    .dropTable('file')
-    .dropTable('thumbnail')
-    .dropTable('s3_video')
-    .dropTable('s3_image')
-    .dropTable('seen_time')
-    .dropTable('wall')
-    .dropTable('wall_item'); //TODO make dropps for tables
+    .dropTableIfExists('account')
+    .dropTableIfExists('item')
+    .dropTableIfExists('file')
+    .dropTableIfExists('thumbnail')
+    .dropTableIfExists('s3_video')
+    .dropTableIfExists('s3_image')
+    .dropTableIfExists('seen_time')
+    .dropTableIfExists('wall')
+    .dropTableIfExists('wall_item'); //TODO make dropps for tables
 }

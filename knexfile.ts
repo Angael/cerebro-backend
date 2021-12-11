@@ -8,6 +8,7 @@ require('dotenv').config({ path: 'env/.env.' + NODE_ENV });
 
 module.exports = {
   development: {
+    // debug: true,
     client: 'mysql',
     connection: {
       host: process.env.DB_HOST,
@@ -18,6 +19,7 @@ module.exports = {
   },
 
   production: {
+    // debug: true,
     client: 'mysql',
     connection: {
       host: process.env.DB_HOST,
