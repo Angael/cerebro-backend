@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -10,6 +10,7 @@ import {
 } from 'nest-winston';
 import { AccountModule } from './account/account.module';
 import * as winston from 'winston';
+import { FirebaseAuthMiddleware } from './firebase/firebase-auth-middleware';
 
 @Module({
   imports: [
@@ -54,4 +55,11 @@ import * as winston from 'winston';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(FirebaseAuthMiddleware).forRoutes({
+      path: '*',
+      method: RequestMethod.ALL,
+    });
+  }
+}

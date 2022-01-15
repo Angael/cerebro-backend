@@ -35,4 +35,7 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 .env*
+/env/fileupdownload-9d68f-firebase-adminsdk-r12jp-483cc95599.json
 /notes/
+/file-uploads/
+/_temp/
