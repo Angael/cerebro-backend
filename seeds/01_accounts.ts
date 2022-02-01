@@ -2,10 +2,7 @@ import { Knex } from 'knex';
 import { AccountType, IAccount } from '../src/models/IAccount';
 
 const getUid = (num) =>
-  Array.from({ length: 30 }).reduce(
-    (acc, v, i) => `${acc}${num}`,
-    '',
-  ) as string;
+  Array.from({ length: 30 }).reduce((acc, v, i) => `${acc}${num}`, '') as string;
 
 export async function seed(knex: Knex): Promise<void> {
   console.log('[accounts seed]');
@@ -28,6 +25,12 @@ export async function seed(knex: Knex): Promise<void> {
       email: 'standard@test.test',
       name: 'standard username',
       type: AccountType.standard,
+    },
+    {
+      uid: 'Se561raFjoSjJY5Q7kZtwoIHk4H2',
+      email: 'user@user.com',
+      name: 'Test user',
+      type: AccountType.admin,
     },
   ];
 

@@ -46,4 +46,7 @@ export interface IS3_image {
 
   width: number;
   height: number;
+
+  isAnimated: boolean;
+  hash: string;
 }

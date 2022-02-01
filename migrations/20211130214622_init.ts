@@ -43,6 +43,7 @@ export async function up(knex: Knex): Promise<void> {
       table.integer('size').unsigned();
       table.integer('width').unsigned();
       table.integer('height').unsigned();
+      table.boolean('isAnimated');
     })
     .createTable('s3_video', (table) => {
       table.increments('id');
@@ -61,6 +62,8 @@ export async function up(knex: Knex): Promise<void> {
       table.foreign('file_id').references('file.id');
       table.integer('width').unsigned();
       table.integer('height').unsigned();
+      table.boolean('isAnimated');
+      table.string('hash', 32);
     })
     .createTable('seen_time', (table) => {
       table.increments();
@@ -104,13 +107,13 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   return knex.schema
-    .dropTableIfExists('account')
-    .dropTableIfExists('item')
-    .dropTableIfExists('file')
-    .dropTableIfExists('thumbnail')
     .dropTableIfExists('s3_video')
     .dropTableIfExists('s3_image')
-    .dropTableIfExists('seen_time')
+    .dropTableIfExists('file')
+    .dropTableIfExists('thumbnail')
+    .dropTableIfExists('wall_item') //TODO make dropps for tables
     .dropTableIfExists('wall')
-    .dropTableIfExists('wall_item'); //TODO make dropps for tables
+    .dropTableIfExists('seen_time')
+    .dropTableIfExists('item')
+    .dropTableIfExists('account');
 }

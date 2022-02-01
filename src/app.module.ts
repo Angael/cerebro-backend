@@ -33,7 +33,7 @@ import { FirebaseAuthMiddleware } from './firebase/firebase-auth-middleware';
     WinstonModule.forRoot({
       transports: [
         new winston.transports.Console({
-          level: 'info',
+          level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
           format: winston.format.combine(
             winston.format.timestamp(),
             nestWinstonModuleUtilities.format.nestLike(),

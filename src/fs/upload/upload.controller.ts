@@ -9,6 +9,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { Request } from 'express';
+const { performance } = require('perf_hooks');
+
 import { UploadService } from './upload.service';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -32,22 +34,21 @@ export class UploadController {
 
   @Post('file')
   @UseInterceptors(FileInterceptor('file', multerOptions))
-  async uploadFiles(
+  async uploadFile(
     @Req() request: Request,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<any> {
+    var startTime = performance.now();
+
     if (!request.user) {
       throw new UnauthorizedException();
     }
 
-    console.log(request.user);
-    console.log({ file });
-
     const fileType = this.uploadService.getFileType(file);
 
-    if (fileType === FileType.s3_image) {
-    } else if (fileType === FileType.s3_video) {
-    }
+    await this.uploadService.handleFile(file, request.user);
+    var endTime = performance.now();
+    this.logger.info(`uploadFile - ${endTime - startTime} ms`);
     return;
   }
 }
