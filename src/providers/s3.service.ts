@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import AWS from 'aws-sdk';
+import fs from 'fs-extra';
 
 @Injectable()
 export class S3Service {
@@ -60,5 +61,28 @@ export class S3Service {
 
   getS3(): AWS.S3 {
     return this.s3;
+  }
+
+  simpleUploadFile({ key, filePath }: { key: string; filePath: string }): Promise<void> {
+    const s3 = this.s3;
+
+    const params: AWS.S3.PutObjectRequest = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: key,
+      Body: fs.createReadStream(filePath),
+      ACL: 'public-read',
+    };
+
+    return new Promise((res, rej) =>
+      s3.upload(params, (s3Err, data) => {
+        if (s3Err) {
+          this.logger.error(`Failed to upload to s3`, filePath);
+          rej(s3Err);
+        } else {
+          this.logger.verbose(`Uploaded to s3`, data.Key);
+          res();
+        }
+      }),
+    );
   }
 }

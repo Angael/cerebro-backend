@@ -111,7 +111,7 @@ export async function down(knex: Knex): Promise<void> {
     .dropTableIfExists('s3_image')
     .dropTableIfExists('file')
     .dropTableIfExists('thumbnail')
-    .dropTableIfExists('wall_item') //TODO make dropps for tables
+    .dropTableIfExists('wall_item')
     .dropTableIfExists('wall')
     .dropTableIfExists('seen_time')
     .dropTableIfExists('item')

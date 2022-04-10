@@ -2,12 +2,12 @@ import { Inject, Injectable } from '@nestjs/common';
 import sharp from 'sharp';
 import imghash from 'imghash';
 import fs from 'fs-extra';
-
-import { DbService } from '../../providers/db.service';
 import firebase from 'firebase-admin';
-import { S3Service } from '../../providers/s3.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+
+import { DbService } from '../../providers/db.service';
+import { S3Service } from '../../providers/s3.service';
 import { FileType, IFile, IItem, IS3_image, ItemCategory } from '../../models/IItem';
 
 @Injectable()
@@ -34,8 +34,8 @@ export class ImageService {
           this.logger.error(`Failed to upload to s3`, file.originalname);
           rej(s3Err);
         } else {
-          this.logger.verbose(`Uploaded to s3`, data.Location);
-          res(data.Location);
+          this.logger.verbose(`Uploaded to s3`, data.Key);
+          res(data.Key);
         }
       }),
     );
@@ -68,13 +68,6 @@ export class ImageService {
           size: file.size,
         } as IFile);
 
-      console.log({
-        file_id: file_id[0],
-        width: item.width,
-        height: item.height,
-        hash: item.hash,
-        isAnimated: item.isAnimated,
-      });
       await db('s3_image')
         .transacting(trx)
         .insert({
@@ -88,7 +81,7 @@ export class ImageService {
     // return db.select('uid', 'email', 'created_at', 'name').from('account');
   }
 
-  async analyzeImage(file: Express.Multer.File): Promise<{
+  async analyze(file: Express.Multer.File): Promise<{
     width: number;
     height: number;
     hash: string;
@@ -122,9 +115,7 @@ export class ImageService {
     file: Express.Multer.File,
     author: firebase.auth.DecodedIdToken,
   ): Promise<void> {
-    console.log(file.buffer, file.stream, file.path);
-
-    const { width, height, hash, isAnimated } = await this.analyzeImage(file);
+    const { width, height, hash, isAnimated } = await this.analyze(file);
 
     const key = await this.saveToS3(file, author);
 

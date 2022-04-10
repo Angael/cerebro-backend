@@ -15,7 +15,7 @@ import { UploadService } from './upload.service';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { multerOptions, storage } from './multerConfig';
+import { multerOptions } from './multer-configs/multerConfig';
 import { FileType } from '../../models/IItem';
 
 @Controller('fs/upload')
@@ -38,7 +38,7 @@ export class UploadController {
     @Req() request: Request,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<any> {
-    var startTime = performance.now();
+    const startTime = performance.now();
 
     if (!request.user) {
       throw new UnauthorizedException();
@@ -47,8 +47,10 @@ export class UploadController {
     const fileType = this.uploadService.getFileType(file);
 
     await this.uploadService.handleFile(file, request.user);
-    var endTime = performance.now();
-    this.logger.info(`uploadFile - ${endTime - startTime} ms`);
+
+    const endTime = performance.now();
+    this.logger.verbose(`uploadFile - ${endTime - startTime} ms`);
+
     return;
   }
 }
