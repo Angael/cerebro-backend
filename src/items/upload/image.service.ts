@@ -8,7 +8,7 @@ import { Logger } from 'winston';
 
 import { DbService } from '../../providers/db.service';
 import { S3Service } from '../../providers/s3.service';
-import { FileType, IFile, IItem, IS3_image, ItemCategory } from '../../models/IItem';
+import { FileType, IFile, IItem, IImage, ItemCategory } from '../../models/IItem';
 
 @Injectable()
 export class ImageService {
@@ -64,7 +64,7 @@ export class ImageService {
           item_id: item_id[0],
           filename: file.originalname,
           path: item.key,
-          type: FileType.s3_image,
+          type: FileType.image,
           size: file.size,
         } as IFile);
 
@@ -76,7 +76,7 @@ export class ImageService {
           height: item.height,
           hash: item.hash,
           isAnimated: item.isAnimated,
-        } as IS3_image);
+        } as IImage);
     });
     // return db.select('uid', 'email', 'created_at', 'name').from('account');
   }

@@ -5,9 +5,15 @@ export enum ItemCategory {
 }
 
 export enum FileType {
-  s3_video = 's3_video',
-  s3_image = 's3_image',
+  video = 'video',
+  image = 'image',
   other = 'other',
+}
+
+export enum ThumbnailSize {
+  xs = 'xs',
+  sm = 'sm',
+  md = 'md',
 }
 
 export interface IItem {
@@ -20,6 +26,19 @@ export interface IItem {
   created_at?: string; // ISO
 }
 
+export interface IThumbnail {
+  id?: number;
+  item_id: number;
+
+  created_at: string;
+  type: ThumbnailSize;
+  path: string;
+  size: number; // bytes
+  width: number;
+  height: number;
+  isAnimated: boolean;
+}
+
 export interface IFile {
   id?: number;
   item_id: number;
@@ -30,7 +49,7 @@ export interface IFile {
   size: number;
 }
 
-export interface IS3_video {
+export interface IVideo {
   id?: number;
   file_id: number;
 
@@ -40,13 +59,12 @@ export interface IS3_video {
   height: number;
 }
 
-export interface IS3_image {
+export interface IImage {
   id?: number;
   file_id: number;
 
   width: number;
   height: number;
-
   isAnimated: boolean;
   hash: string;
 }

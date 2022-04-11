@@ -1,18 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { DbService } from '../../providers/db.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { FileType, IFile, IItem, IS3_image, IS3_video } from '../../models/IItem';
-import { s3PathToUrl } from '../../utils/s3PathToUrl';
+
+import { DbService } from '../providers/db.service';
+import { IFile, IItem, IImage, IVideo } from '../models/IItem';
+import { s3PathToUrl } from '../utils/s3PathToUrl';
+import { IFrontItem } from '../models/for-frontend/IFrontItem';
 
 @Injectable()
-export class ListService {
+export class ItemsService {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
     private readonly dbService: DbService,
   ) {}
 
-  async getAll() {
+  async getAll(): IFrontItem[] {
     const db = this.dbService.getDb();
 
     const items: Partial<IItem>[] = await db.select('id', 'category', 'created_at').from('item');
@@ -23,12 +25,12 @@ export class ListService {
       .whereIn('item_id', itemsIds);
 
     const fileIds = files.map((f) => f.id);
-    const images: Partial<IS3_image>[] = await db
+    const images: Partial<IImage>[] = await db
       .select('id', 'file_id', 'isAnimated', 'width', 'height', 'hash')
       .from('s3_image')
       .whereIn('file_id', fileIds);
 
-    const videos: Partial<IS3_video>[] = await db
+    const videos: Partial<IVideo>[] = await db
       .select('id', 'file_id', 'duration', 'bitrate', 'width', 'height')
       .from('s3_video')
       .whereIn('file_id', fileIds);

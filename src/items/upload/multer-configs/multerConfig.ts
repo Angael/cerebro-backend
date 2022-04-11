@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import { extname } from 'path';
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
-import { MAX_UPLOAD_SIZE, UPLOADS_DIR } from '../../../consts';
+import { MAX_UPLOAD_SIZE, UPLOADS_DIR } from '../../../utils/consts';
 
 fs.mkdirs(UPLOADS_DIR);
 

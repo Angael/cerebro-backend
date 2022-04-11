@@ -1,15 +1,13 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import * as Joi from 'joi';
+import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule } from '@nestjs/config';
-import { FsModule } from './fs/fs.module';
-import * as Joi from 'joi';
-import {
-  utilities as nestWinstonModuleUtilities,
-  WinstonModule,
-} from 'nest-winston';
+import { ItemsModule } from './items/items.module';
 import { AccountModule } from './account/account.module';
-import * as winston from 'winston';
 import { FirebaseAuthMiddleware } from './firebase/firebase-auth-middleware';
 
 @Module({
@@ -17,9 +15,7 @@ import { FirebaseAuthMiddleware } from './firebase/firebase-auth-middleware';
     ConfigModule.forRoot({
       envFilePath: 'env/.env.' + process.env.NODE_ENV,
       validationSchema: Joi.object({
-        NODE_ENV: Joi.string()
-          .valid('development', 'production')
-          .default('development'),
+        NODE_ENV: Joi.string().valid('development', 'production').default('development'),
         DB_HOST: Joi.string().required(),
         DB_NAME: Joi.string().required(),
         DB_USER: Joi.string().required(),
@@ -49,7 +45,7 @@ import { FirebaseAuthMiddleware } from './firebase/firebase-auth-middleware';
         }),
       ],
     }),
-    FsModule,
+    ItemsModule,
     AccountModule,
   ],
   controllers: [AppController],

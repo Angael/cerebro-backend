@@ -1,10 +1,10 @@
 import { exec } from 'child_process';
-import { IS3_video } from '../../../models/IItem';
+import { IVideo } from '../../../models/IItem';
 const ffprobePath = require('@ffprobe-installer/ffprobe').path;
 
 export const getVidInfo = (
   path: string,
-): Promise<Pick<IS3_video, 'duration' | 'bitrate' | 'width' | 'height'>> =>
+): Promise<Pick<IVideo, 'duration' | 'bitrate' | 'width' | 'height'>> =>
   new Promise((resolve, _reject) => {
     console.log(ffprobePath);
     exec(`${ffprobePath} -hide_banner -i "${path}"`, {}, (_error, _stdout, stderr) => {
