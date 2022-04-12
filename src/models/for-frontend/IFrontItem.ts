@@ -6,8 +6,9 @@ type Thumbnail = {
   isAnimated: boolean;
 };
 
+// Keep in sync in frontend-backend !!   Make monorepo to share ts types?
 export type IFrontItem = {
-  id: string;
+  id: number;
   account_uid: string;
   category: ItemCategory;
   private: boolean;

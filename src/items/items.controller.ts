@@ -29,8 +29,13 @@ export class ItemsController {
 
   // List all items
   @Get()
-  listAll() {
-    return this.listService.getAll();
+  async listAll() {
+    const startTime = performance.now();
+    const items = await this.listService.getAll();
+    const endTime = performance.now();
+    this.logger.verbose(`listAll - ${endTime - startTime} ms`);
+
+    return items;
   }
 
   // @Get(':drive')
