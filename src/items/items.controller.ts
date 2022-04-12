@@ -2,9 +2,7 @@ import {
   Controller,
   Get,
   Inject,
-  Param,
   Post,
-  Query,
   Req,
   UnauthorizedException,
   UploadedFile,
@@ -18,6 +16,7 @@ import { performance } from 'perf_hooks';
 import { UploadService } from './upload/upload.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import sleep from 'sleep-promise';
 
 @Controller('items')
 export class ItemsController {
@@ -31,7 +30,12 @@ export class ItemsController {
   @Get()
   async listAll() {
     const startTime = performance.now();
+
+    if (process.env.NODE_ENV === 'development') {
+      await sleep(500);
+    }
     const items = await this.listService.getAll();
+
     const endTime = performance.now();
     this.logger.verbose(`listAll - ${endTime - startTime} ms`);
 
