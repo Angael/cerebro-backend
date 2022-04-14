@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Inject,
+  Param,
   Post,
   Req,
   UnauthorizedException,
@@ -29,17 +30,17 @@ export class ItemsController {
   // List all items
   @Get()
   async listAll() {
-    const startTime = performance.now();
-
-    if (process.env.NODE_ENV === 'development') {
-      await sleep(500);
-    }
     const items = await this.listService.getAll();
 
-    const endTime = performance.now();
-    this.logger.verbose(`listAll - ${endTime - startTime} ms`);
-
     return items;
+  }
+
+  @Get('item/:id')
+  async getItem(@Param('id') id: number) {
+    console.log({ id }, typeof id);
+    const item = await this.listService.getItem(id);
+
+    return item;
   }
 
   // @Get(':drive')

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
@@ -6,7 +6,8 @@ import { DbService } from '../providers/db.service';
 import { IFile, IItem, IImage, IVideo, IThumbnail } from '../models/IItem';
 import { s3PathToUrl } from '../utils/s3PathToUrl';
 import { IFrontItem } from '../models/for-frontend/IFrontItem';
-import { joinItemQueries } from './helpers';
+import { joinItemQueries } from './helpers/joinItemQueries';
+import { makeItemQueries } from './helpers/makeItemQueries';
 
 @Injectable()
 export class ItemsService {
@@ -19,30 +20,32 @@ export class ItemsService {
     const db = this.dbService.getDb();
 
     const items: IItem[] = await db.select('id', 'category', 'created_at').from('item');
-    const itemsIds = items.map((item) => item.id);
 
-    const thumbnails: IThumbnail[] = await db
-      .select('id', 'item_id', 'type', 'path', 'isAnimated')
-      .from('thumbnail')
-      .whereIn('item_id', itemsIds);
-
-    const files: IFile[] = await db
-      .select('id', 'item_id', 'filename', 'path', 'size')
-      .from('file')
-      .whereIn('item_id', itemsIds);
-
-    const fileIds = files.map((f) => f.id);
-    const images: IImage[] = await db
-      .select('id', 'file_id', 'isAnimated', 'width', 'height', 'hash')
-      .from('s3_image')
-      .whereIn('file_id', fileIds);
-
-    const videos: IVideo[] = await db
-      .select('id', 'file_id', 'duration', 'bitrate', 'width', 'height')
-      .from('s3_video')
-      .whereIn('file_id', fileIds);
+    const { images, thumbnails, videos, files } = await makeItemQueries(db, items);
 
     return joinItemQueries(items, files, images, videos, thumbnails, process.env);
+  }
+
+  async getItem(id: number): Promise<IFrontItem> {
+    const db = this.dbService.getDb();
+
+    const items: IItem[] = await db
+      .select('id', 'category', 'created_at')
+      .from('item')
+      .where({ id });
+
+    const { images, thumbnails, videos, files } = await makeItemQueries(db, items);
+
+    const joined = joinItemQueries(items, files, images, videos, thumbnails, process.env);
+
+    if (joined.length === 1) {
+      return joined[0];
+    } else if (joined.length > 1) {
+      this.logger.error('Got multiple items for id.', { id });
+      throw new Error('Found multiple items');
+    } else {
+      throw new NotFoundException('Item not found');
+    }
   }
 
   getUserItems() {

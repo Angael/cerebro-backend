@@ -1,6 +1,6 @@
-import { IFile, IImage, IItem, IThumbnail, IVideo } from '../models/IItem';
-import { IFrontItem } from '../models/for-frontend/IFrontItem';
-import { s3PathToUrl } from '../utils/s3PathToUrl';
+import { IFile, IImage, IItem, IThumbnail, IVideo } from '../../models/IItem';
+import { IFrontItem } from '../../models/for-frontend/IFrontItem';
+import { s3PathToUrl } from '../../utils/s3PathToUrl';
 
 type FileData = IFrontItem['fileData'];
 type Video = IFrontItem['video'];

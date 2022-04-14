@@ -46,6 +46,9 @@ export class UploadService {
         await this.videoService.handleUpload(file, user);
       }
     } catch (e) {
+      // noinspection ES6MissingAwait
+      fs.unlink(file.path);
+
       this.logger.error(e);
       throw new Error(e);
     }
