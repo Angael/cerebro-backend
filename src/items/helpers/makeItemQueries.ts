@@ -10,7 +10,7 @@ export const makeItemQueries = async (db: Knex, items: IItem[]) => {
     .whereIn('item_id', itemsIds);
 
   const files: IFile[] = await db
-    .select('id', 'item_id', 'filename', 'path', 'size')
+    .select('id', 'item_id', 'filename', 'path', 'type', 'size')
     .from('file')
     .whereIn('item_id', itemsIds);
 
