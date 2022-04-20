@@ -10,7 +10,7 @@ import firebase from 'firebase-admin';
 import { VideoService } from './video.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { MAX_UPLOAD_SIZE } from '../../utils/consts';
+import { MAX_UPLOAD_SIZE, UPLOADS_DIR } from '../../utils/consts';
 
 @Injectable()
 export class UploadService {
@@ -19,7 +19,10 @@ export class UploadService {
     private readonly dbService: DbService,
     private readonly imageService: ImageService,
     private readonly videoService: VideoService,
-  ) {}
+  ) {
+    console.log('making UPLOADS_DIR folder');
+    fs.mkdir(UPLOADS_DIR, { recursive: true });
+  }
 
   getFileType(file: Express.Multer.File): FileType {
     const { mimetype } = file;

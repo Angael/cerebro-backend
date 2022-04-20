@@ -6,8 +6,10 @@ import { UploadService } from './upload/upload.service';
 import { VideoService } from './upload/video.service';
 import { ImageService } from './upload/image.service';
 import { S3Service } from '../providers/s3.service';
+import { ThumbnailsModule } from './thumbnails/thumbnails.module';
 
 @Module({
+  imports: [ThumbnailsModule],
   controllers: [ItemsController],
   providers: [ItemsService, DbService, UploadService, VideoService, ImageService, S3Service],
 })
