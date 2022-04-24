@@ -3,13 +3,12 @@ import knex, { Knex } from 'knex';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
-// Singleton
+// Singleton, not needed though because global module makes this service be a singleton
 let db: Knex;
 
 @Injectable()
 export class DbService {
   constructor(@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger) {
-    this.logger.verbose(`db constructor`);
     if (!db) {
       this.logger.verbose(`knex starting`);
       db = knex({
