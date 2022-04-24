@@ -10,12 +10,6 @@ export enum FileType {
   other = 'other',
 }
 
-export enum ThumbnailSize {
-  xs = 'xs',
-  sm = 'sm',
-  md = 'md',
-}
-
 export interface IItem {
   id?: number;
   account_uid: string;
@@ -24,19 +18,6 @@ export interface IItem {
   private: boolean;
   processed?: boolean;
   created_at?: string; // ISO
-}
-
-export interface IThumbnail {
-  id?: number;
-  item_id: number;
-
-  created_at: string;
-  type: ThumbnailSize;
-  path: string;
-  size: number; // bytes
-  width: number;
-  height: number;
-  isAnimated: boolean;
 }
 
 export interface IFile {

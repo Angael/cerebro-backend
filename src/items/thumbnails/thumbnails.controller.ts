@@ -26,7 +26,7 @@ export class ThumbnailsController {
 
   @Post('run')
   async run() {
-    const a = await this.thumbnailsService.generateThumbnail();
+    const a = await this.thumbnailsService.generateThumbnails();
 
     return a;
   }

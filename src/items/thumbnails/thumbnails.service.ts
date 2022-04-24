@@ -6,11 +6,17 @@ import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 
 import { DbService } from '../../providers/db.service';
-import { DOWNLOADS_DIR } from '../../utils/consts';
+import { DOWNLOADS_DIR, THUMBNAILS_DIR } from '../../utils/consts';
 import { S3Service } from '../../providers/s3.service';
 import { download } from './downloadFile';
-import { IFile, IItem } from '../../models/IItem';
+import { FileType, IFile, IItem } from '../../models/IItem';
 import { s3PathToUrl } from '../../utils/s3PathToUrl';
+import { SharpThumbnailService } from './sharpThumbnail.service';
+import { getNameFromS3Path, makeS3Path } from '../../utils/makeS3Path';
+import { UploadThumbnailService } from './uploadThumbnail.service';
+import { ItemsService } from '../items.service';
+import { IThumbnailBeforeUpload } from '../../models/IThumbnail';
+import { changeExtension } from '../../utils/changeExtension';
 
 @Injectable()
 export class ThumbnailsService {
@@ -18,9 +24,13 @@ export class ThumbnailsService {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
     private readonly s3Service: S3Service,
     private readonly dbService: DbService,
+    private readonly itemsService: ItemsService,
+    private readonly sharpThumbnailService: SharpThumbnailService,
+    private readonly uploadThumbnails: UploadThumbnailService,
   ) {
     console.log('making DOWNLOADS_DIR folder');
     fs.mkdir(DOWNLOADS_DIR, { recursive: true });
+    fs.mkdir(THUMBNAILS_DIR, { recursive: true });
   }
 
   async getItemForThumbnails(): Promise<(IItem & IFile) | undefined> {
@@ -60,13 +70,40 @@ export class ThumbnailsService {
     }
   }
 
-  async generateThumbnail() {
+  async generateThumbnails() {
     const fileItem = await this.getItemForThumbnails();
     if (!fileItem) {
       return;
     }
 
     const savedPath = await this.downloadFile(fileItem);
-    return savedPath;
+
+    // TODO: Try catch
+    if (fileItem.type === FileType.image) {
+      const generatedThumbs = await this.sharpThumbnailService.run(fileItem, savedPath);
+
+      const thumbnails: IThumbnailBeforeUpload[] = generatedThumbs.map((t) => ({
+        thumbnail: {
+          ...t.dimensions,
+          item_id: fileItem.item_id,
+          isAnimated: t.isAnimated, // TODO: Lie? It can I think result in animated thumbnail
+          path: makeS3Path(
+            fileItem.account_uid,
+            t.dimensions.type,
+            changeExtension(getNameFromS3Path(fileItem.path), 'webp'),
+          ),
+          size: t.size,
+        },
+        diskPath: t.diskPath,
+      }));
+
+      const result = await this.uploadThumbnails.uploadThumbnails(thumbnails);
+    }
+
+    await this.itemsService.markItemProcessed(fileItem.item_id);
+
+    // TODO: fs unlink() na koncu, ale nie w kontrolerze !
+
+    return;
   }
 }

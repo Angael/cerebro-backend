@@ -1,10 +1,11 @@
 import { Knex } from 'knex';
-import { IFile, IImage, IItem, IThumbnail, IVideo } from '../../models/IItem';
+import { IFile, IImage, IItem, IVideo } from '../../models/IItem';
+import { IThumbnailRow } from '../../models/IThumbnail';
 
 export const makeItemQueries = async (db: Knex, items: IItem[]) => {
   const itemsIds = items.map((item) => item.id);
 
-  const thumbnails: IThumbnail[] = await db
+  const thumbnails: IThumbnailRow[] = await db
     .select('id', 'item_id', 'type', 'path', 'isAnimated')
     .from('thumbnail')
     .whereIn('item_id', itemsIds);

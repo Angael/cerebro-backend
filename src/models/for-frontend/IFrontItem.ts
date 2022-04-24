@@ -1,4 +1,5 @@
-import { FileType, IFile, IImage, IItem, ItemCategory, IVideo, ThumbnailSize } from '../IItem';
+import { FileType, IFile, IImage, IItem, ItemCategory, IVideo } from '../IItem';
+import { ThumbnailSize } from '../IThumbnail';
 
 type Thumbnail = {
   url: string;

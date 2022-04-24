@@ -1,14 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import sharp from 'sharp';
 import imghash from 'imghash';
-import fs from 'fs-extra';
 import firebase from 'firebase-admin';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
 import { DbService } from '../../providers/db.service';
 import { S3Service } from '../../providers/s3.service';
-import { FileType, IFile, IItem, IImage, ItemCategory } from '../../models/IItem';
+import { FileType, IFile, IImage, IItem, ItemCategory } from '../../models/IItem';
+import { makeS3Path, replaceFileWithHash } from '../../utils/makeS3Path';
+import { ThumbnailSize } from '../../models/IThumbnail';
 
 @Injectable()
 export class ImageService {
@@ -18,27 +19,11 @@ export class ImageService {
     private readonly s3Service: S3Service,
   ) {}
 
-  async saveToS3(file: Express.Multer.File, author: firebase.auth.DecodedIdToken): Promise<any> {
-    const s3 = this.s3Service.getS3();
-
-    const params: AWS.S3.PutObjectRequest = {
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `u/${author.uid}/source/${file.originalname}`,
-      Body: fs.createReadStream(file.path),
-      ACL: 'public-read',
-    };
-
-    return new Promise((res, rej) =>
-      s3.upload(params, (s3Err, data) => {
-        if (s3Err) {
-          this.logger.error(`Failed to upload to s3`, file.originalname);
-          rej(s3Err);
-        } else {
-          this.logger.verbose(`Uploaded to s3`, data.Key);
-          res(data.Key);
-        }
-      }),
-    );
+  async saveToS3(file: Express.Multer.File, key: string): Promise<any> {
+    return this.s3Service.simpleUploadFile({
+      key,
+      filePath: file.path,
+    });
   }
 
   async insertIntoDb(
@@ -78,7 +63,6 @@ export class ImageService {
           isAnimated: item.isAnimated,
         } as IImage);
     });
-    // return db.select('uid', 'email', 'created_at', 'name').from('account');
   }
 
   async analyze(file: Express.Multer.File): Promise<{
@@ -117,8 +101,17 @@ export class ImageService {
   ): Promise<void> {
     const { width, height, hash, isAnimated } = await this.analyze(file);
 
-    const key = await this.saveToS3(file, author);
+    const key = makeS3Path(
+      author.uid,
+      ThumbnailSize.source,
+      replaceFileWithHash(file.originalname),
+    );
+    await this.saveToS3(file, key);
 
-    await this.insertIntoDb({ key, width, height, hash, isAnimated }, file, author);
+    try {
+      await this.insertIntoDb({ key, width, height, hash, isAnimated }, file, author);
+    } catch (e) {
+      // TODO remove file from s3
+    }
   }
 }

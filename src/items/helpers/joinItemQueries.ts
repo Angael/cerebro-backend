@@ -1,6 +1,7 @@
-import { IFile, IImage, IItem, IThumbnail, IVideo } from '../../models/IItem';
+import { IFile, IImage, IItem, IVideo } from '../../models/IItem';
 import { IFrontItem } from '../../models/for-frontend/IFrontItem';
 import { s3PathToUrl } from '../../utils/s3PathToUrl';
+import { IThumbnailRow } from '../../models/IThumbnail';
 
 type FileData = IFrontItem['fileData'];
 type Video = IFrontItem['video'];
@@ -13,7 +14,7 @@ export const joinItemQueries = (
   files: IFile[],
   images: IImage[],
   videos: IVideo[],
-  _thumbnails: IThumbnail[],
+  _thumbnails: IThumbnailRow[],
   envProcess: Object,
 ): IFrontItem[] => {
   return items.map((item) => {

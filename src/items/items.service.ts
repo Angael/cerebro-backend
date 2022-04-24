@@ -3,11 +3,12 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
 import { DbService } from '../providers/db.service';
-import { IFile, IItem, IImage, IVideo, IThumbnail } from '../models/IItem';
+import { IFile, IItem, IImage, IVideo } from '../models/IItem';
 import { s3PathToUrl } from '../utils/s3PathToUrl';
 import { IFrontItem } from '../models/for-frontend/IFrontItem';
 import { joinItemQueries } from './helpers/joinItemQueries';
 import { makeItemQueries } from './helpers/makeItemQueries';
+import { IThumbnailRow } from '../models/IThumbnail';
 
 @Injectable()
 export class ItemsService {
@@ -54,6 +55,18 @@ export class ItemsService {
     return db.select('uid', 'email', 'created_at', 'name').from('account');
   }
 
+  async markItemProcessed(itemId: IItem['id']): Promise<any> {
+    const db = this.dbService.getDb();
+
+    return db.transaction(async (trx) => {
+      const item_id = await db('item')
+        .transacting(trx)
+        .where({ id: itemId })
+        .update({
+          processed: true,
+        } as IItem);
+    });
+  }
   // getDriveItems() {
   //   const db = this.dbService.getDb();
   //
