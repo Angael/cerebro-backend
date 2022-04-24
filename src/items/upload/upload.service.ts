@@ -52,7 +52,10 @@ export class UploadService {
       this.logger.error(e);
       throw new Error(e);
     }
-    await fs.unlink(file.path);
+
+    fs.unlink(file.path).catch((e) => {
+      setTimeout(() => fs.unlink(file.path), 60 * 1000);
+    });
 
     return;
   }
