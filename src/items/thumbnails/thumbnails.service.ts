@@ -77,10 +77,8 @@ export class ThumbnailsService {
     }
 
     try {
-      // download file
       const downloadedPath = DOWNLOADS_DIR + '/' + uuidv4() + extension;
       await download(s3PathToUrl(process.env, file.path), downloadedPath);
-      console.log({ downloadedPath });
       return downloadedPath;
     } catch (e) {
       this.logger.error(e);
