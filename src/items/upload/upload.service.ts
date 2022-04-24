@@ -1,16 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
-import sharp from 'sharp';
-import imghash from 'imghash';
 import fs from 'fs-extra';
 
 import { DbService } from '../../providers/db.service';
-import { FileType, IImage } from '../../models/IItem';
+import { FileType } from '../../models/IItem';
 import { ImageService } from './image.service';
 import firebase from 'firebase-admin';
 import { VideoService } from './video.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { MAX_UPLOAD_SIZE, UPLOADS_DIR } from '../../utils/consts';
+import { betterUnlink } from '../../utils/betterUnlink';
 
 @Injectable()
 export class UploadService {
@@ -53,9 +52,7 @@ export class UploadService {
       throw new Error(e);
     }
 
-    fs.unlink(file.path).catch((e) => {
-      setTimeout(() => fs.unlink(file.path), 60 * 1000);
-    });
+    betterUnlink(file.path);
 
     return;
   }

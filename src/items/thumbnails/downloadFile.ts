@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import https from 'https';
+import { betterUnlink } from '../../utils/betterUnlink';
 
 export const download = (url: string, dest: string) =>
   new Promise((res, rej) => {
@@ -8,12 +9,11 @@ export const download = (url: string, dest: string) =>
       .get(url, function (response) {
         response.pipe(file);
         file.on('finish', function () {
-          file.close(res); // close() is async, call cb after close completes.
+          file.close(res);
         });
       })
       .on('error', function (err) {
-        // Handle errors
-        fs.unlink(dest); // Delete the file async. (But we don't check the result)
+        betterUnlink(dest);
         rej(err.message);
       });
   });

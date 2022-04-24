@@ -6,6 +6,9 @@ const resizeWithSameAspectRatio = (_w: number, _h: number, desiredPxAmount: numb
   const width = Math.round(_w * Math.pow(x, 0.5));
   const height = Math.round(_h * Math.pow(x, 0.5));
 
+  if (_w < width || _h < width) {
+    return { width: _w, height: _h };
+  }
   return { width, height };
 };
 
@@ -17,7 +20,6 @@ export const getDimensions = (w: number, h: number): IThumbnailMeasure[] => {
     (howWide <= 0.75 && w >= MD_CELL_SIZE && h >= 2 * MD_CELL_SIZE)
       ? 2
       : 1;
-  console.log({ allowedPixelsModifier });
 
   const arr: IThumbnailMeasure[] = [];
   arr.push({

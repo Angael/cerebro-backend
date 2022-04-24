@@ -20,7 +20,9 @@ export class ItemsService {
   async getAll(): Promise<IFrontItem[]> {
     const db = this.dbService.getDb();
 
-    const items: IItem[] = await db.select('id', 'category', 'created_at').from('item');
+    const items: IItem[] = await db
+      .select('id', 'category', 'created_at', 'processed')
+      .from('item');
 
     const { images, thumbnails, videos, files } = await makeItemQueries(db, items);
 
@@ -31,7 +33,7 @@ export class ItemsService {
     const db = this.dbService.getDb();
 
     const items: IItem[] = await db
-      .select('id', 'category', 'created_at')
+      .select('id', 'category', 'created_at', 'processed')
       .from('item')
       .where({ id });
 

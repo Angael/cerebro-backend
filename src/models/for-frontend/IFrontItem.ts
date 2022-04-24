@@ -14,6 +14,7 @@ export type IFrontItem = {
   category: ItemCategory;
   private: boolean;
   created_at: string;
+  processed: boolean;
 
   fileData?: {
     filename: string;

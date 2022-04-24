@@ -70,6 +70,7 @@ export const joinItemQueries = (
       category: item.category,
       private: item.private,
       created_at: item.created_at,
+      processed: item.processed,
 
       fileData,
       video,

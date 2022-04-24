@@ -4,6 +4,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
+import { Scheduler, forEachSeries } from 'modern-async';
 
 import { DbService } from '../../providers/db.service';
 import { DOWNLOADS_DIR, THUMBNAILS_DIR } from '../../utils/consts';
@@ -17,9 +18,12 @@ import { UploadThumbnailService } from './uploadThumbnail.service';
 import { ItemsService } from '../items.service';
 import { IThumbnailBeforeUpload } from '../../models/IThumbnail';
 import { changeExtension } from '../../utils/changeExtension';
+import { betterUnlink } from '../../utils/betterUnlink';
 
 @Injectable()
 export class ThumbnailsService {
+  public readonly scheduler: Scheduler;
+
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
     private readonly s3Service: S3Service,
@@ -31,6 +35,21 @@ export class ThumbnailsService {
     console.log('making DOWNLOADS_DIR folder');
     fs.mkdir(DOWNLOADS_DIR, { recursive: true });
     fs.mkdir(THUMBNAILS_DIR, { recursive: true });
+
+    this.scheduler = new Scheduler(
+      async () => {
+        // this.logger.verbose('Scheduler running...');
+        return this.generateThumbnails().then((didGenerateThumbnails) => {});
+      },
+      4000,
+      {
+        concurrency: 1,
+        maxPending: 1,
+        startImmediate: true,
+      },
+    );
+    this.logger.info('Scheduler starting...');
+    this.scheduler.start();
   }
 
   async getItemForThumbnails(): Promise<(IItem & IFile) | undefined> {
@@ -44,7 +63,6 @@ export class ThumbnailsService {
           .where('processed', 0)
           .limit(1)
       )[0];
-      console.log({ unprocessedFileItem });
       return unprocessedFileItem;
     } catch (e) {
       this.logger.error(e);
@@ -70,19 +88,20 @@ export class ThumbnailsService {
     }
   }
 
-  async generateThumbnails() {
+  async generateThumbnails(): Promise<boolean> {
     const fileItem = await this.getItemForThumbnails();
     if (!fileItem) {
-      return;
+      return false;
     }
 
     const savedPath = await this.downloadFile(fileItem);
 
     // TODO: Try catch
+    let thumbnails: IThumbnailBeforeUpload[];
     if (fileItem.type === FileType.image) {
       const generatedThumbs = await this.sharpThumbnailService.run(fileItem, savedPath);
 
-      const thumbnails: IThumbnailBeforeUpload[] = generatedThumbs.map((t) => ({
+      thumbnails = generatedThumbs.map((t) => ({
         thumbnail: {
           ...t.dimensions,
           item_id: fileItem.item_id,
@@ -96,14 +115,13 @@ export class ThumbnailsService {
         },
         diskPath: t.diskPath,
       }));
-
-      const result = await this.uploadThumbnails.uploadThumbnails(thumbnails);
     }
+    const result = await this.uploadThumbnails.uploadThumbnails(thumbnails);
 
     await this.itemsService.markItemProcessed(fileItem.item_id);
 
-    // TODO: fs unlink() na koncu, ale nie w kontrolerze !
+    forEachSeries(thumbnails, (t) => betterUnlink(t.diskPath));
 
-    return;
+    return true;
   }
 }
