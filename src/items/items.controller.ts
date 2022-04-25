@@ -17,7 +17,6 @@ import { performance } from 'perf_hooks';
 import { UploadService } from './upload/upload.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import sleep from 'sleep-promise';
 
 @Controller('items')
 export class ItemsController {
