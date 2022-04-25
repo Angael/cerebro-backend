@@ -1,5 +1,5 @@
 import { Knex } from 'knex';
-import { FileType, IFile, IItem, IS3_image, ItemCategory } from '../src/models/IItem';
+import { FileType, IFile, IItem, IImage, ItemCategory } from '../src/models/IItem';
 import { v4 as uuidv4 } from 'uuid';
 
 const getUid = (num) =>
@@ -37,7 +37,7 @@ export async function seed(knex: Knex): Promise<void> {
       item_id: item_id[0],
       filename: 'obrazek.png',
       path: `u/${getUid(1)}/${uuidv4()}`,
-      type: FileType.s3_image,
+      type: FileType.image,
       size: 4 * 1024 * 1024,
     } as IFile)
     .into('file')) as number;
@@ -48,7 +48,7 @@ export async function seed(knex: Knex): Promise<void> {
       width: 640,
       height: 400,
       hash: '1234123412341234',
-    } as IS3_image)
+    } as IImage)
     .into('s3_image');
 
   // //2
