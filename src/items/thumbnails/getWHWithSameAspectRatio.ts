@@ -31,6 +31,5 @@ export const getDimensions = (w: number, h: number): IThumbnailMeasure[] => {
     ...resizeWithSameAspectRatio(w, h, allowedPixelsModifier * XS_CELL_SIZE * XS_CELL_SIZE),
   });
 
-  //Filter bigger sizes:
-  return arr.filter((t) => t.width * t.height < w * h);
+  return arr;
 };
