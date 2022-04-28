@@ -1,4 +1,5 @@
 export enum AccountType {
+  free = 'free',
   standard = 'standard',
   premium = 'premium',
   admin = 'admin',

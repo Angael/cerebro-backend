@@ -15,7 +15,7 @@ export class RegisterService {
     const account: IAccount = {
       uid,
       email,
-      type: AccountType.standard,
+      type: AccountType.free,
     };
 
     try {
