@@ -11,6 +11,7 @@ import { AccountModule } from './account/account.module';
 import { FirebaseAuthMiddleware } from './firebase/firebase-auth-middleware';
 import { DbModule } from './providers/db.module';
 import { S3Module } from './providers/s3.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -51,15 +52,16 @@ import { S3Module } from './providers/s3.module';
     AccountModule,
     DbModule,
     S3Module,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(FirebaseAuthMiddleware).forRoutes({
-      path: '*',
-      method: RequestMethod.ALL,
-    });
+    // consumer.apply(FirebaseAuthMiddleware).forRoutes({
+    //   path: '*',
+    //   method: RequestMethod.ALL,
+    // });
   }
 }

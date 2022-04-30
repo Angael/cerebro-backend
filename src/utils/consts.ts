@@ -1,4 +1,5 @@
-const MB = 1024 * 1024;
+export const MB = 1024 * 1024;
+export const GB = 1024 * 1024 * 1024;
 
 export const MD_CELL_SIZE = 300;
 export const XS_CELL_SIZE = 32;
