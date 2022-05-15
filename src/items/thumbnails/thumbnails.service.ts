@@ -32,7 +32,6 @@ export class ThumbnailsService {
     private readonly sharpThumbnailService: SharpThumbnailService,
     private readonly uploadThumbnails: UploadThumbnailService,
   ) {
-    console.log('making DOWNLOADS_DIR folder');
     fs.mkdir(DOWNLOADS_DIR, { recursive: true });
     fs.mkdir(THUMBNAILS_DIR, { recursive: true });
 

@@ -39,7 +39,6 @@ export class VideoService {
   async handleUpload(file: Express.Multer.File, author: firebase.auth.DecodedIdToken) {
     const { width, height, duration, bitrate } = await getVidInfo(file.path);
 
-    console.log({ width, height, duration, bitrate });
     const key = await this.saveToS3(file, author);
 
     // await this.insertIntoDb({ key, width, height, hash, isAnimated }, file, author);

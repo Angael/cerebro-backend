@@ -8,3 +8,11 @@ export const MAX_UPLOAD_SIZE = 30 * MB;
 export const UPLOADS_DIR = '_temp/file-uploads';
 export const DOWNLOADS_DIR = '_temp/downloads';
 export const THUMBNAILS_DIR = '_temp/thumbnails';
+
+export enum DB_TABLE {
+  thumbnail = 'thumbnail',
+  video = 's3_video',
+  image = 's3_image',
+  file = 'file',
+  item = 'item',
+}

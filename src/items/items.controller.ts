@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -25,7 +26,7 @@ import { PremiumGuard } from '../auth/guards/premium.guard';
 export class ItemsController {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-    private readonly listService: ItemsService,
+    private readonly itemsService: ItemsService,
     private readonly uploadService: UploadService,
   ) {}
 
@@ -33,17 +34,25 @@ export class ItemsController {
   @UseGuards(TokenGuard, PremiumGuard)
   @Get()
   async listAll() {
-    const items = await this.listService.getAll();
+    const items = await this.itemsService.getAll();
 
     return items;
   }
 
   @Get('item/:id')
   async getItem(@Param('id') id: number) {
-    console.log({ id }, typeof id);
-    const item = await this.listService.getItem(id);
+    const item = await this.itemsService.getItem(id);
 
     return item;
+  }
+
+  @UseGuards(TokenGuard)
+  @Delete('item/:id')
+  async deleteItem(@User() user: firebase.auth.DecodedIdToken, @Param('id') id: number) {
+    console.log('id', id, typeof id);
+    await this.itemsService.deleteItem(id, user.uid);
+
+    return;
   }
 
   // @Get(':drive')
@@ -53,7 +62,7 @@ export class ItemsController {
   //   @Query('offset') offset: string,
   // ) {
   //   console.log({ id, howMany, offset });
-  //   return this.listService.getUserItems();
+  //   return this.itemsService.getUserItems();
   // }
 
   // TODO ADD gouard/pipe/middleware for determining storage that is left.

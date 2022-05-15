@@ -42,6 +42,7 @@ import { AuthModule } from './auth/auth.module';
           level: 'warn',
           filename: 'combined.log',
           format: winston.format.combine(
+            winston.format.colorize({ all: true }),
             winston.format.timestamp(),
             nestWinstonModuleUtilities.format.nestLike(),
           ),

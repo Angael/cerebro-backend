@@ -19,7 +19,6 @@ export class UploadService {
     private readonly imageService: ImageService,
     private readonly videoService: VideoService,
   ) {
-    console.log('making UPLOADS_DIR folder');
     fs.mkdir(UPLOADS_DIR, { recursive: true });
   }
 

@@ -2,7 +2,7 @@ import { Knex } from 'knex';
 import { IFile, IImage, IItem, IVideo } from '../../models/IItem';
 import { IThumbnailRow } from '../../models/IThumbnail';
 
-export const makeItemQueries = async (db: Knex, items: IItem[]) => {
+export const makeItemQueries = async (db: Knex, items: Pick<IItem, 'id'>[]) => {
   const itemsIds = items.map((item) => item.id);
 
   const thumbnails: IThumbnailRow[] = await db

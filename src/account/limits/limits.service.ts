@@ -28,7 +28,6 @@ export class LimitsService {
         .where({ uid: user.uid })
     )[0];
 
-    console.log({ type, files_size, thumbs_size });
     return {
       type,
       bytes: {

@@ -6,7 +6,6 @@ export const getVidInfo = (
   path: string,
 ): Promise<Pick<IVideo, 'duration' | 'bitrate' | 'width' | 'height'>> =>
   new Promise((resolve, _reject) => {
-    console.log(ffprobePath);
     exec(`${ffprobePath} -hide_banner -i "${path}"`, {}, (_error, _stdout, stderr) => {
       // regexpy na to wszystko
       const durationMatch = stderr.match(/Duration: ([\d:.]+)/);
@@ -21,7 +20,6 @@ export const getVidInfo = (
       const bitrateMatch = stderr.match(/bitrate: (\d+) ([\w/]+)/);
       const bitrateNum = Number(bitrateMatch && bitrateMatch[1]);
       const bitrateUnit = bitrateMatch && bitrateMatch[2];
-      console.log({ bitrateUnit, durationInSec });
       //"kb/s" seems always kb
 
       // rozdzialka:

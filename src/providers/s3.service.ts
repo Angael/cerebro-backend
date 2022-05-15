@@ -85,4 +85,53 @@ export class S3Service {
       }),
     );
   }
+
+  deleteFile(Key: string): Promise<void> {
+    const s3 = this.s3;
+
+    const params = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key,
+    };
+
+    return new Promise((res, rej) =>
+      s3.deleteObject(params, (s3Err) => {
+        if (s3Err) {
+          this.logger.error(`Failed to delete object`, { Key });
+          rej(s3Err);
+        } else {
+          this.logger.verbose(`Deleted from s3`, { Key });
+          res();
+        }
+      }),
+    );
+  }
+
+  deleteFiles(keys: string[]): Promise<void> {
+    const s3 = this.s3;
+
+    if (keys.length === 0) {
+      return Promise.resolve();
+    }
+
+    const params = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Delete: {
+        Objects: keys.map((Key) => ({ Key })),
+        Quiet: false,
+      },
+    };
+
+    return new Promise((res, rej) =>
+      s3.deleteObjects(params, (s3Err) => {
+        if (s3Err) {
+          this.logger.error(`Failed to delete some objects`, { keys });
+          rej(s3Err);
+        } else {
+          this.logger.verbose(`Deleted from s3`, { keys });
+          res();
+        }
+      }),
+    );
+  }
 }

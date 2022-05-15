@@ -14,10 +14,14 @@ export class PremiumGuard implements CanActivate {
       return false;
     }
 
-    const result = await this.dbService.getDb().select().from('account').where({ uid: user.uid });
+    const result = await this.dbService
+      .getDb()
+      // I added type, hope it wont break
+      .select('type')
+      .from('account')
+      .where({ uid: user.uid });
     const firstRow = result[0];
 
-    console.log({ firstRow });
     const type = firstRow.type; //result.type;
 
     return type !== AccountType.free;

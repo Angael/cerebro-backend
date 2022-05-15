@@ -2,8 +2,6 @@
 
 const NODE_ENV = process.env.NODE_ENV ?? 'development'; // when operating from cmd will use dev db
 
-console.log({ NODE_ENV_calculated: NODE_ENV });
-
 require('dotenv').config({ path: 'env/.env.' + NODE_ENV });
 
 module.exports = {
