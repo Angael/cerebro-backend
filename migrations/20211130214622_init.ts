@@ -85,7 +85,7 @@ export async function up(knex: Knex): Promise<void> {
       table.foreign('author_uid').references('account.uid');
     })
     .createTable(DB_TABLE.wall_item, (table) => {
-      table.increments();
+      addCommon(knex, table);
       table.integer('wall_id').unsigned();
       table.foreign('wall_id').references('wall.id');
 
