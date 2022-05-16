@@ -25,7 +25,7 @@ export class ItemsService {
 
     const items: IItem[] = await db
       .select('id', 'category', 'created_at', 'processed')
-      .from('item');
+      .from(DB_TABLE.item);
 
     const { images, thumbnails, videos, files } = await makeItemQueries(db, items);
 
@@ -37,7 +37,7 @@ export class ItemsService {
 
     const items: IItem[] = await db
       .select('id', 'category', 'created_at', 'processed')
-      .from('item')
+      .from(DB_TABLE.item)
       .where({ id });
 
     const { images, thumbnails, videos, files } = await makeItemQueries(db, items);
@@ -57,14 +57,14 @@ export class ItemsService {
   getUserItems() {
     const db = this.dbService.getDb();
 
-    return db.select('uid', 'email', 'created_at', 'name').from('account');
+    return db.select('uid', 'email', 'created_at', 'name').from(DB_TABLE.account);
   }
 
   async markItemProcessed(itemId: IItem['id']): Promise<any> {
     const db = this.dbService.getDb();
 
     return db.transaction(async (trx) => {
-      const item_id = await db('item')
+      const item_id = await db(DB_TABLE.item)
         .transacting(trx)
         .where({ id: itemId })
         .update({
@@ -75,7 +75,7 @@ export class ItemsService {
 
   async deleteItem(itemId: IItem['id'], userId: firebase.auth.DecodedIdToken['uid']) {
     const db = this.dbService.getDb();
-    const row = (await db.select('account_uid').from('item').where({ id: itemId }))[0];
+    const row = (await db.select('account_uid').from(DB_TABLE.item).where({ id: itemId }))[0];
 
     if (row) {
       const { account_uid } = row;
@@ -114,6 +114,6 @@ export class ItemsService {
   // getDriveItems() {
   //   const db = this.dbService.getDb();
   //
-  //   return db.select('uid', 'email', 'created_at', 'name').from('account');
+  //   return db.select('uid', 'email', 'created_at', 'name').from(DB_TABLE.account);
   // }
 }

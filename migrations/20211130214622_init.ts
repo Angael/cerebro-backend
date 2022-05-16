@@ -1,28 +1,29 @@
 import { Knex } from 'knex';
+import { addCommon } from './common/common';
+import { DB_TABLE } from '../src/utils/consts';
 
 const UID_LEN = 36;
 const PATH_LEN = 256;
 
 export async function up(knex: Knex): Promise<void> {
   return knex.schema
-    .createTable('account', (table) => {
+    .createTable(DB_TABLE.account, (table) => {
       table.string('uid', UID_LEN).primary();
       table.string('email', 320).notNullable().unique();
       table.string('name', 64).nullable();
       table.string('type', 64).notNullable();
       table.datetime('created_at').defaultTo(knex.fn.now());
     })
-    .createTable('item', (table) => {
-      table.increments('id');
+    .createTable(DB_TABLE.item, (table) => {
+      addCommon(knex, table);
       table.string('account_uid', UID_LEN).notNullable();
       table.foreign('account_uid').references('account.uid');
 
       table.string('category', 32).notNullable();
       table.boolean('private').defaultTo(false);
       table.boolean('processed').defaultTo(false);
-      table.datetime('created_at').defaultTo(knex.fn.now());
     })
-    .createTable('file', (table) => {
+    .createTable(DB_TABLE.file, (table) => {
       table.increments('id');
       table.integer('item_id').unsigned().unique().notNullable();
       table.foreign('item_id').references('item.id');
@@ -32,12 +33,11 @@ export async function up(knex: Knex): Promise<void> {
       table.string('type', 32).notNullable(); //s3_video | s3_image | url_image | text | link
       table.bigInteger('size').unsigned();
     })
-    .createTable('thumbnail', (table) => {
-      table.increments('id');
+    .createTable(DB_TABLE.thumbnail, (table) => {
+      addCommon(knex, table);
       table.integer('item_id').unsigned().notNullable();
       table.foreign('item_id').references('item.id');
 
-      table.datetime('created_at').defaultTo(knex.fn.now());
       table.string('type', 32).notNullable(); // xs, sm, md, animated
       table.string('path', PATH_LEN).unique().notNullable();
       table.integer('size').unsigned();
@@ -45,7 +45,7 @@ export async function up(knex: Knex): Promise<void> {
       table.integer('height').unsigned();
       table.boolean('isAnimated');
     })
-    .createTable('s3_video', (table) => {
+    .createTable(DB_TABLE.video, (table) => {
       table.increments('id');
       // TODO: Maybe not unique? Dash video will have multiple entries multiple WxH etc.
       table.integer('file_id').unsigned().unique().notNullable();
@@ -56,7 +56,7 @@ export async function up(knex: Knex): Promise<void> {
       table.integer('width').unsigned();
       table.integer('height').unsigned();
     })
-    .createTable('s3_image', (table) => {
+    .createTable(DB_TABLE.image, (table) => {
       table.increments('id');
       table.integer('file_id').unsigned().unique().notNullable();
       table.foreign('file_id').references('file.id');
@@ -65,8 +65,8 @@ export async function up(knex: Knex): Promise<void> {
       table.boolean('isAnimated');
       table.string('hash', 32);
     })
-    .createTable('seen_time', (table) => {
-      table.increments();
+    .createTable(DB_TABLE.seen_time, (table) => {
+      addCommon(knex, table);
 
       table.string('account_uid', UID_LEN);
       table.foreign('account_uid').references('account.uid');
@@ -76,24 +76,15 @@ export async function up(knex: Knex): Promise<void> {
 
       table.integer('count').unsigned().defaultTo(0);
 
-      table
-        .datetime('updated_at')
-        .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
-
       table.unique(['account_uid', 'item_id']);
     })
-    .createTable('wall', (table) => {
-      table.increments('id');
+    .createTable(DB_TABLE.wall, (table) => {
+      addCommon(knex, table);
       table.string('name', 128).unique();
       table.string('author_uid', UID_LEN);
       table.foreign('author_uid').references('account.uid');
-
-      table.datetime('created_at').defaultTo(knex.fn.now());
-      table
-        .datetime('updated_at')
-        .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
     })
-    .createTable('wall_item', (table) => {
+    .createTable(DB_TABLE.wall_item, (table) => {
       table.increments();
       table.integer('wall_id').unsigned();
       table.foreign('wall_id').references('wall.id');
@@ -107,13 +98,13 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   return knex.schema
-    .dropTableIfExists('s3_video')
-    .dropTableIfExists('s3_image')
-    .dropTableIfExists('file')
-    .dropTableIfExists('thumbnail')
-    .dropTableIfExists('wall_item')
-    .dropTableIfExists('wall')
-    .dropTableIfExists('seen_time')
-    .dropTableIfExists('item')
-    .dropTableIfExists('account');
+    .dropTableIfExists(DB_TABLE.video)
+    .dropTableIfExists(DB_TABLE.image)
+    .dropTableIfExists(DB_TABLE.file)
+    .dropTableIfExists(DB_TABLE.thumbnail)
+    .dropTableIfExists(DB_TABLE.wall_item)
+    .dropTableIfExists(DB_TABLE.wall)
+    .dropTableIfExists(DB_TABLE.seen_time)
+    .dropTableIfExists(DB_TABLE.item)
+    .dropTableIfExists(DB_TABLE.account);
 }

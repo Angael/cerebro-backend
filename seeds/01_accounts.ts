@@ -1,5 +1,6 @@
 import { Knex } from 'knex';
 import { AccountType, IAccount } from '../src/models/IAccount';
+import { DB_TABLE } from '../src/utils/consts';
 
 const getUid = (num) =>
   Array.from({ length: 30 }).reduce((acc, v, i) => `${acc}${num}`, '') as string;
@@ -35,5 +36,5 @@ export async function seed(knex: Knex): Promise<void> {
   ];
 
   // Inserts seed entries
-  await knex('account').insert(accounts);
+  await knex(DB_TABLE.account).insert(accounts);
 }

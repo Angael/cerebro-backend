@@ -6,6 +6,7 @@ import { Logger } from 'winston';
 import { mapSeries } from 'modern-async';
 import { S3Service } from '../../providers/s3.service';
 import { IThumbnailBeforeUpload, IThumbnailPayload } from '../../models/IThumbnail';
+import { DB_TABLE } from '../../utils/consts';
 
 @Injectable()
 export class UploadThumbnailService {
@@ -26,7 +27,7 @@ export class UploadThumbnailService {
     const db = this.dbService.getDb();
 
     return db.transaction(async (trx) => {
-      const thumbnail_id = await db('thumbnail').transacting(trx).insert(thumbnail);
+      const thumbnail_id = await db(DB_TABLE.thumbnail).transacting(trx).insert(thumbnail);
     });
   }
 

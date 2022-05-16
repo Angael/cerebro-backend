@@ -15,4 +15,10 @@ export enum DB_TABLE {
   image = 's3_image',
   file = 'file',
   item = 'item',
+
+  account = 'account',
+
+  seen_time = 'wall_item',
+  wall = 'wall_item',
+  wall_item = 'wall_item',
 }

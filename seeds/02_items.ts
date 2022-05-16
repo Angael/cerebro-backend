@@ -1,6 +1,7 @@
 import { Knex } from 'knex';
 import { FileType, IFile, IItem, IImage, ItemCategory } from '../src/models/IItem';
 import { v4 as uuidv4 } from 'uuid';
+import { DB_TABLE } from '../src/utils/consts';
 
 const getUid = (num) =>
   Array.from({ length: 30 }).reduce((acc, v, i) => `${acc}${num}`, '') as string;
@@ -30,7 +31,7 @@ export async function seed(knex: Knex): Promise<void> {
   ];
 
   // 1
-  const item_id = (await knex.insert(items).into('item')) as number[];
+  const item_id = (await knex.insert(items).into(DB_TABLE.item)) as number[];
   console.log({ item_id });
   const file_id = (await knex
     .insert({
@@ -40,7 +41,7 @@ export async function seed(knex: Knex): Promise<void> {
       type: FileType.image,
       size: 4 * 1024 * 1024,
     } as IFile)
-    .into('file')) as number;
+    .into(DB_TABLE.file)) as number;
 
   await knex
     .insert({
@@ -49,17 +50,17 @@ export async function seed(knex: Knex): Promise<void> {
       height: 400,
       hash: '1234123412341234',
     } as IImage)
-    .into('s3_image');
+    .into(DB_TABLE.image);
 
   // //2
   // const item_id = await knex
   //   .insert<IItem>(items[1])
   //   .returning('id')
-  //   .into('item');
+  //   .into(DB_TABLE.item);
   //
   // //3
   // const item_id = await knex
   //   .insert<IItem>(items[2])
   //   .returning('id')
-  //   .into('item');
+  //   .into(DB_TABLE.item);
 }

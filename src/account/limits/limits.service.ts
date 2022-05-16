@@ -5,6 +5,7 @@ import { Logger } from 'winston';
 import { DbService } from '../../providers/db.service';
 import { ILimits } from '../../models/for-frontend/ILimits';
 import { limitsConfig } from '../../config/limits';
+import { DB_TABLE } from '../../utils/consts';
 
 @Injectable()
 export class LimitsService {
@@ -21,10 +22,10 @@ export class LimitsService {
       await db
         .select('account.type')
         .sum({ files_size: 'file.size', thumbs_size: 'thumbnail.size' })
-        .from('account')
-        .join('item', 'uid', 'account_uid')
-        .join('file', 'item.id', 'file.item_id')
-        .join('thumbnail', 'item.id', 'thumbnail.item_id')
+        .from(DB_TABLE.account)
+        .join(DB_TABLE.item, 'uid', 'account_uid')
+        .join(DB_TABLE.file, 'item.id', 'file.item_id')
+        .join(DB_TABLE.thumbnail, 'item.id', 'thumbnail.item_id')
         .where({ uid: user.uid })
     )[0];
 

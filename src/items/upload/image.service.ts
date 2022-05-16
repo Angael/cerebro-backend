@@ -10,6 +10,7 @@ import { S3Service } from '../../providers/s3.service';
 import { FileType, IFile, IImage, IItem, ItemCategory } from '../../models/IItem';
 import { makeS3Path, replaceFileWithHash } from '../../utils/makeS3Path';
 import { ThumbnailSize } from '../../models/IThumbnail';
+import { DB_TABLE } from '../../utils/consts';
 
 @Injectable()
 export class ImageService {
@@ -34,7 +35,7 @@ export class ImageService {
     const db = this.dbService.getDb();
 
     return db.transaction(async (trx) => {
-      const item_id = await db('item')
+      const item_id = await db(DB_TABLE.item)
         .transacting(trx)
         .insert({
           account_uid: author.uid,
@@ -43,7 +44,7 @@ export class ImageService {
           processed: false,
         } as IItem);
 
-      const file_id = await db('file')
+      const file_id = await db(DB_TABLE.file)
         .transacting(trx)
         .insert({
           item_id: item_id[0],
@@ -53,7 +54,7 @@ export class ImageService {
           size: file.size,
         } as IFile);
 
-      await db('s3_image')
+      await db(DB_TABLE.image)
         .transacting(trx)
         .insert({
           file_id: file_id[0],

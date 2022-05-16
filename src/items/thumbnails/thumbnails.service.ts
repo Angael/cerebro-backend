@@ -7,7 +7,7 @@ import path from 'path';
 import { Scheduler, forEachSeries } from 'modern-async';
 
 import { DbService } from '../../providers/db.service';
-import { DOWNLOADS_DIR, THUMBNAILS_DIR } from '../../utils/consts';
+import { DB_TABLE, DOWNLOADS_DIR, THUMBNAILS_DIR } from '../../utils/consts';
 import { S3Service } from '../../providers/s3.service';
 import { download } from './downloadFile';
 import { FileType, IFile, IItem } from '../../models/IItem';
@@ -57,8 +57,8 @@ export class ThumbnailsService {
       const unprocessedFileItem = (
         await db
           .select()
-          .from('item')
-          .join('file', 'item.id', 'file.item_id')
+          .from(DB_TABLE.item)
+          .join(DB_TABLE.file, 'item.id', 'file.item_id')
           .where('processed', 0)
           .limit(1)
       )[0];
