@@ -1,6 +1,5 @@
 import { Knex } from 'knex';
-import { FileType, IFile, IItem, IImage, ItemCategory } from '../src/models/IItem';
-import { v4 as uuidv4 } from 'uuid';
+import { IFile, IImage, IVideo } from '../src/models/IItem';
 import { DB_TABLE } from '../src/utils/consts';
 
 const getUid = (num) =>
@@ -9,58 +8,41 @@ const getUid = (num) =>
 export async function seed(knex: Knex): Promise<void> {
   console.log('[items seed]');
 
-  const items: IItem[] = [
-    {
-      account_uid: getUid(1),
-      category: ItemCategory.file,
-      private: false,
-      processed: false,
-    },
-    {
-      account_uid: getUid(2),
-      category: ItemCategory.file,
-      private: false,
-      processed: false,
-    },
-    {
-      account_uid: getUid(3),
-      category: ItemCategory.text,
-      private: false,
-      processed: false,
-    },
-  ];
+  const image: IImage = {
+    account_uid: getUid(1),
+    private: false,
+    processed: true,
+    width: 240,
+    height: 240,
+    isAnimated: false,
+    hash: '',
+    filesize: 4 * 1024 * 1024,
+    originalFilename: 'a.jpg',
+    s3path: 'u/asd/source/1',
+  };
 
-  // 1
-  const item_id = (await knex.insert(items).into(DB_TABLE.item)) as number[];
-  console.log({ item_id });
-  const file_id = (await knex
-    .insert({
-      item_id: item_id[0],
-      filename: 'obrazek.png',
-      path: `u/${getUid(1)}/${uuidv4()}`,
-      type: FileType.image,
-      size: 4 * 1024 * 1024,
-    } as IFile)
-    .into(DB_TABLE.file)) as number;
+  const video: IVideo = {
+    account_uid: getUid(1),
+    private: false,
+    processed: true,
+    width: 240,
+    height: 240,
+    duration: 121,
+    bitrate: 1000000,
+    filesize: 4 * 1024 * 1024,
+    originalFilename: 'a.jpg',
+    s3path: 'u/asd/source/2',
+  };
 
-  await knex
-    .insert({
-      file_id: file_id[0],
-      width: 640,
-      height: 400,
-      hash: '1234123412341234',
-    } as IImage)
-    .into(DB_TABLE.image);
+  const file: IFile = {
+    account_uid: getUid(1),
+    private: false,
+    filesize: 4 * 1024 * 1024,
+    originalFilename: 'a.jpg',
+    s3path: 'u/asd/source/3',
+  };
 
-  // //2
-  // const item_id = await knex
-  //   .insert<IItem>(items[1])
-  //   .returning('id')
-  //   .into(DB_TABLE.item);
-  //
-  // //3
-  // const item_id = await knex
-  //   .insert<IItem>(items[2])
-  //   .returning('id')
-  //   .into(DB_TABLE.item);
+  await knex.insert(image).into(DB_TABLE.image);
+  await knex.insert(video).into(DB_TABLE.video);
+  await knex.insert(file).into(DB_TABLE.file);
 }

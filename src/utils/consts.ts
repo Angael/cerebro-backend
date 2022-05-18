@@ -11,14 +11,15 @@ export const THUMBNAILS_DIR = '_temp/thumbnails';
 
 export enum DB_TABLE {
   thumbnail = 'thumbnail',
-  video = 's3_video',
-  image = 's3_image',
+  video = 'video',
+  image = 'image',
   file = 'file',
-  item = 'item',
 
   account = 'account',
 
-  seen_time = 'wall_item',
-  wall = 'wall_item',
-  wall_item = 'wall_item',
+  seen_time = 'seen_time',
+  wall = 'wall',
+  wall_image = 'wall_image',
+  wall_video = 'wall_video',
+  wall_file = 'wall_file',
 }
