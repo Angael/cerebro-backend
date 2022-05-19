@@ -24,12 +24,16 @@ export async function up(knex: Knex): Promise<void> {
       columns_originalFilename(knex, table);
     })
     .createTable(DB_TABLE.thumbnail, (table) => {
-      columns_item(knex, table);
+      // TODO IMPORTANT tutaj resource_id to taki hack pomysl ze nie referencuje zadnej tabelki
+      //  a tak naprawde tylko node to laczy z itemami.
+      table.integer('resource_id').unsigned().notNullable();
+      table.foreign('resource_id').references('item.id');
+
+      columns_common(knex, table);
       columns_fileBasics(knex, table);
       columns_widthHeight(knex, table);
 
       table.string('type', 32).notNullable(); // xs, sm, md, animated
-      table.boolean('isAnimated');
     })
     .createTable(DB_TABLE.video, (table) => {
       columns_item(knex, table);

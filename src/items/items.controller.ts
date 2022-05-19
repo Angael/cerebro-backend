@@ -21,6 +21,7 @@ import { TokenGuard } from '../auth/guards/token.guard';
 import { User } from '../auth/decorators/user.decorator';
 import firebase from 'firebase-admin';
 import { PremiumGuard } from '../auth/guards/premium.guard';
+import { IFrontItem } from '../models/for-frontend/IFrontItem';
 
 @Controller('items')
 export class ItemsController {
@@ -33,14 +34,14 @@ export class ItemsController {
   // List all items
   @UseGuards(TokenGuard, PremiumGuard)
   @Get()
-  async listAll() {
+  async listAll(): Promise<IFrontItem[]> {
     const items = await this.itemsService.getAll();
 
     return items;
   }
 
   @Get('item/:id')
-  async getItem(@Param('id') id: number) {
+  async getItem(@Param('id') id: number): Promise<IFrontItem> {
     const item = await this.itemsService.getItem(id);
 
     return item;
