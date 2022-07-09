@@ -12,7 +12,7 @@ export class DbService {
     if (!db) {
       this.logger.verbose(`knex starting`);
       db = knex({
-        client: 'mysql',
+        client: 'mysql2',
         connection: {
           host: process.env.DB_HOST,
           port: 3306,

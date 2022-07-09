@@ -1,39 +1,22 @@
 ## Description
 
-Nest backend for cerebro project
+Nest backend for cerebro project.
 
 ## Installation
 
-```bash
-$ npm install
+```js
+yarn install
 ```
 
-## Running the app
+## Development
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+Pull and run docker sql image with command
+```js
+docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=cerebro -d mysql:latest
 ```
 
-## Test
+then
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```js
+yarn start:dev
 ```
-
-## License
-
-Nest is [MIT licensed](LICENSE).
