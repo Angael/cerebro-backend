@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import fs from 'fs-extra';
 
 import { DbService } from '../../providers/db.service';
@@ -8,7 +8,7 @@ import firebase from 'firebase-admin';
 import { VideoService } from './video.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { MAX_UPLOAD_SIZE, UPLOADS_DIR } from '../../utils/consts';
+import { UPLOADS_DIR } from '../../utils/consts';
 import { betterUnlink } from '../../utils/betterUnlink';
 
 @Injectable()
@@ -35,10 +35,6 @@ export class UploadService {
   }
 
   async handleFile(file: Express.Multer.File, user: firebase.auth.DecodedIdToken): Promise<void> {
-    if (file.size > MAX_UPLOAD_SIZE) {
-      throw new Error('file too big');
-    }
-
     try {
       const fileType = this.getFileType(file);
       if (fileType === FileType.image) {
@@ -48,11 +44,11 @@ export class UploadService {
       }
     } catch (e) {
       this.logger.error(e);
-      throw new Error(e);
+      betterUnlink(file.path);
+      throw new BadRequestException('Unsupported filetype');
     }
 
     betterUnlink(file.path);
-
     return;
   }
 }

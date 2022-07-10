@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Delete,
   Get,
@@ -21,6 +22,7 @@ import { TokenGuard } from '../auth/guards/token.guard';
 import { User } from '../auth/decorators/user.decorator';
 import firebase from 'firebase-admin';
 import { PremiumGuard } from '../auth/guards/premium.guard';
+import { MAX_UPLOAD_SIZE } from '../utils/consts';
 
 @Controller('items')
 export class ItemsController {
@@ -65,7 +67,7 @@ export class ItemsController {
   //   return this.itemsService.getUserItems();
   // }
 
-  // TODO ADD gouard/pipe/middleware for determining storage that is left.
+  // TODO ADD gouard/pipe/middleware/check for determining storage that is left.
   @UseGuards(TokenGuard)
   @Post('upload/file')
   @UseInterceptors(FileInterceptor('file', multerOptions))
@@ -73,14 +75,15 @@ export class ItemsController {
     @User() user: firebase.auth.DecodedIdToken,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<any> {
-    const startTime = performance.now();
+    if (file.size > MAX_UPLOAD_SIZE) {
+      throw new BadRequestException('File too big');
+    }
 
-    const fileType = this.uploadService.getFileType(file);
+    const startTime = performance.now();
 
     await this.uploadService.handleFile(file, user);
 
-    const endTime = performance.now();
-    this.logger.verbose(`uploadFile - ${endTime - startTime} ms`);
+    this.logger.verbose(`uploadFile - ${performance.now() - startTime} ms`);
 
     return;
   }

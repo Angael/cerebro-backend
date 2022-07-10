@@ -20,32 +20,38 @@ export interface IItem {
   created_at?: string; // ISO
 }
 
-export interface IFile {
-  id?: number;
-  item_id: number;
-
+export interface IFileData {
   filename: string;
   path: string;
   type: FileType;
   size: number;
 }
 
-export interface IVideo {
+export interface IFile extends IFileData {
   id?: number;
-  file_id: number;
+  item_id: number;
+}
 
+export interface IVideoData {
   duration: number;
   bitrate: number;
   width: number;
   height: number;
 }
 
-export interface IImage {
+export interface IVideo extends IVideoData {
   id?: number;
   file_id: number;
+}
 
+export interface IImageData {
   width: number;
   height: number;
   isAnimated: boolean;
   hash: string;
+}
+
+export interface IImage extends IImageData {
+  id?: number;
+  file_id: number;
 }

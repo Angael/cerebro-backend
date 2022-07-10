@@ -7,7 +7,7 @@ import { Logger } from 'winston';
 
 import { DbService } from '../../providers/db.service';
 import { S3Service } from '../../providers/s3.service';
-import { FileType, IFile, IImage, IItem, ItemCategory } from '../../models/IItem';
+import { FileType, IFile, IImage, IImageData, IItem, ItemCategory } from '../../models/IItem';
 import { makeS3Path, replaceFileWithHash } from '../../utils/makeS3Path';
 import { ThumbnailSize } from '../../models/IThumbnail';
 import { DB_TABLE } from '../../utils/consts';
@@ -28,7 +28,8 @@ export class ImageService {
   }
 
   async insertIntoDb(
-    item: { key: string; width: number; height: number; hash: string; isAnimated: boolean },
+    s3Key: string,
+    itemData: IImageData,
     file: Express.Multer.File,
     author: firebase.auth.DecodedIdToken,
   ): Promise<any> {
@@ -49,7 +50,7 @@ export class ImageService {
         .insert({
           item_id: item_id[0],
           filename: file.originalname,
-          path: item.key,
+          path: s3Key,
           type: FileType.image,
           size: file.size,
         } as IFile);
@@ -58,20 +59,12 @@ export class ImageService {
         .transacting(trx)
         .insert({
           file_id: file_id[0],
-          width: item.width,
-          height: item.height,
-          hash: item.hash,
-          isAnimated: item.isAnimated,
+          ...itemData,
         } as IImage);
     });
   }
 
-  async analyze(file: Express.Multer.File): Promise<{
-    width: number;
-    height: number;
-    hash: string;
-    isAnimated: boolean;
-  }> {
+  async analyze(file: Express.Multer.File): Promise<IImageData> {
     const pipeline = sharp(file.path);
 
     return pipeline.metadata().then(async (metadata) => {
@@ -100,7 +93,7 @@ export class ImageService {
     file: Express.Multer.File,
     author: firebase.auth.DecodedIdToken,
   ): Promise<void> {
-    const { width, height, hash, isAnimated } = await this.analyze(file);
+    const imageData = await this.analyze(file);
 
     const key = makeS3Path(
       author.uid,
@@ -110,9 +103,10 @@ export class ImageService {
     await this.saveToS3(file, key);
 
     try {
-      await this.insertIntoDb({ key, width, height, hash, isAnimated }, file, author);
+      await this.insertIntoDb(key, imageData, file, author);
     } catch (e) {
-      // TODO remove file from s3
+      this.logger.error('Failed to insert image into DB');
+      this.s3Service.deleteFile(file.path);
     }
   }
 }

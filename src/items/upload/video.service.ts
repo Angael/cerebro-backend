@@ -6,7 +6,10 @@ import { getVidInfo } from './ffmpeg-helpers/getVidInfo';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { S3Service } from '../../providers/s3.service';
-import fs from 'fs-extra';
+import { DB_TABLE } from '../../utils/consts';
+import { FileType, IFile, IItem, ItemCategory, IVideo, IVideoData } from '../../models/IItem';
+import { makeS3Path, replaceFileWithHash } from '../../utils/makeS3Path';
+import { ThumbnailSize } from '../../models/IThumbnail';
 
 @Injectable()
 export class VideoService {
@@ -16,31 +19,69 @@ export class VideoService {
     private readonly s3Service: S3Service,
   ) {}
 
-  async saveToS3(file: Express.Multer.File, author: firebase.auth.DecodedIdToken) {
-    try {
-      const key = `u/${author.uid}/source/${file.originalname}`;
-      const upload = await this.s3Service.simpleUploadFile({
-        key,
-        filePath: file.path,
-      });
-      this.logger.verbose(`Uploaded to s3`, key);
-    } catch (e) {
-      this.logger.error(`Failed to upload to s3`, {
-        authorUid: author.uid,
-        fileName: file.originalname,
-      });
-    }
+  async saveToS3(file: Express.Multer.File, key: string): Promise<any> {
+    return this.s3Service.simpleUploadFile({
+      key,
+      filePath: file.path,
+    });
   }
 
-  async insertIntoDb() {}
+  async insertIntoDb(
+    s3Key: string,
+    videoData: IVideoData,
+    file: Express.Multer.File,
+    author: firebase.auth.DecodedIdToken,
+  ): Promise<any> {
+    const db = this.dbService.getDb();
 
-  async analyze() {}
+    return db.transaction(async (trx) => {
+      const item_id = await db(DB_TABLE.item)
+        .transacting(trx)
+        .insert({
+          account_uid: author.uid,
+          category: ItemCategory.file,
+          private: false,
+          processed: false,
+        } as IItem);
+
+      const file_id = await db(DB_TABLE.file)
+        .transacting(trx)
+        .insert({
+          item_id: item_id[0],
+          filename: file.originalname,
+          path: s3Key,
+          type: FileType.image,
+          size: file.size,
+        } as IFile);
+
+      await db(DB_TABLE.video)
+        .transacting(trx)
+        .insert({
+          file_id: file_id[0],
+          ...videoData,
+        } as IVideo);
+    });
+  }
+
+  async analyze(file: Express.Multer.File): Promise<IVideoData> {
+    return getVidInfo(file.path);
+  }
 
   async handleUpload(file: Express.Multer.File, author: firebase.auth.DecodedIdToken) {
-    const { width, height, duration, bitrate } = await getVidInfo(file.path);
+    const videoData = await this.analyze(file);
 
-    const key = await this.saveToS3(file, author);
+    const key = makeS3Path(
+      author.uid,
+      ThumbnailSize.source,
+      replaceFileWithHash(file.originalname),
+    );
+    await this.saveToS3(file, key);
 
-    // await this.insertIntoDb({ key, width, height, hash, isAnimated }, file, author);
+    try {
+      await this.insertIntoDb(key, videoData, file, author);
+    } catch (e) {
+      this.logger.error('Failed to insert video into DB');
+      this.s3Service.deleteFile(file.path);
+    }
   }
 }

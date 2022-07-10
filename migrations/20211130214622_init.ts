@@ -21,7 +21,7 @@ export async function up(knex: Knex): Promise<void> {
 
       table.string('category', 32).notNullable();
       table.boolean('private').defaultTo(false);
-      table.boolean('processed').defaultTo(false);
+      table.boolean('processed').defaultTo(false); // Should be enum, started | ended | waiting
     })
     .createTable(DB_TABLE.file, (table) => {
       table.increments('id');
