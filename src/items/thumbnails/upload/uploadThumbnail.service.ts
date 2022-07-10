@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { DbService } from '../../providers/db.service';
+import { DbService } from '../../../providers/db.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { mapSeries } from 'modern-async';
-import { S3Service } from '../../providers/s3.service';
-import { IThumbnailBeforeUpload, IThumbnailPayload } from '../../models/IThumbnail';
-import { DB_TABLE } from '../../utils/consts';
+import { S3Service } from '../../../providers/s3.service';
+import { IThumbnailBeforeUpload, IThumbnailPayload } from '../../../models/IThumbnail';
+import { DB_TABLE } from '../../../utils/consts';
 
 @Injectable()
 export class UploadThumbnailService {

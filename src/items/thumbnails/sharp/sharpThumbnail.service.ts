@@ -2,13 +2,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import sharp, { OutputInfo, Sharp } from 'sharp';
-import { getDimensions } from './getWHWithSameAspectRatio';
+import { getDimensions } from '../getWHWithSameAspectRatio';
 import async, { AsyncResultCallback } from 'async';
 
-import { IFile } from '../../models/IItem';
-import { THUMBNAILS_DIR } from '../../utils/consts';
+import { IFile } from '../../../models/IItem';
+import { THUMBNAILS_DIR } from '../../../utils/consts';
 import { nanoid } from 'nanoid';
-import { IGeneratedThumbnail, IThumbnailMeasure } from '../../models/IThumbnail';
+import { IGeneratedThumbnail, IThumbnailMeasure } from '../../../models/IThumbnail';
 
 type resizeArgs = {
   pipeline: Sharp;

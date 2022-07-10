@@ -12,13 +12,14 @@ export const THUMBNAILS_DIR = '_temp/thumbnails';
 export enum DB_TABLE {
   thumbnail = 'thumbnail',
   video = 's3_video',
+  video_optimized = 's3_video_optimized', // 360p 720p 1080p etc. webm
   image = 's3_image',
   file = 'file',
   item = 'item',
 
   account = 'account',
 
-  seen_time = 'wall_item',
-  wall = 'wall_item',
+  seen_time = 'seen_time',
+  wall = 'wall',
   wall_item = 'wall_item',
 }

@@ -9,6 +9,7 @@ export async function seed(knex: Knex): Promise<void> {
   await knex(DB_TABLE.thumbnail).del();
   await knex(DB_TABLE.image).del();
   await knex(DB_TABLE.video).del();
+  await knex(DB_TABLE.video_optimized).del();
   await knex(DB_TABLE.file).del();
   await knex(DB_TABLE.item).del();
   await knex(DB_TABLE.wall).del();

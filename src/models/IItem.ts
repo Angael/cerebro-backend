@@ -10,6 +10,12 @@ export enum FileType {
   other = 'other',
 }
 
+export enum VideoPurpose {
+  source = 'source',
+  preview = 'preview', // shorter version for animated thumbnails
+  standard = 'standard', // Standard compressed video quality
+}
+
 export interface IItem {
   id?: number;
   account_uid: string;
@@ -42,6 +48,15 @@ export interface IVideoData {
 export interface IVideo extends IVideoData {
   id?: number;
   file_id: number;
+}
+
+export interface IVideoOptimized extends IVideoData {
+  id?: number;
+  file_id: number;
+
+  path: string;
+  size: number;
+  purpose: VideoPurpose;
 }
 
 export interface IImageData {

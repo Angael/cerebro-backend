@@ -12,9 +12,9 @@ import { S3Service } from '../../providers/s3.service';
 import { download } from './downloadFile';
 import { FileType, IFile, IItem } from '../../models/IItem';
 import { s3PathToUrl } from '../../utils/s3PathToUrl';
-import { SharpThumbnailService } from './sharpThumbnail.service';
+import { SharpThumbnailService } from './sharp/sharpThumbnail.service';
 import { getNameFromS3Path, makeS3Path } from '../../utils/makeS3Path';
-import { UploadThumbnailService } from './uploadThumbnail.service';
+import { UploadThumbnailService } from './upload/uploadThumbnail.service';
 import { ItemsService } from '../items.service';
 import { IThumbnailBeforeUpload } from '../../models/IThumbnail';
 import { changeExtension } from '../../utils/changeExtension';
@@ -112,6 +112,9 @@ export class ThumbnailsService {
         },
         diskPath: t.diskPath,
       }));
+    } else {
+      // TODO: Not supported type, should skip it
+      throw new Error('Tried to optimize unsupported filetype');
     }
     const result = await this.uploadThumbnails.uploadThumbnails(thumbnails);
 

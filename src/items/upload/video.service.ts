@@ -50,7 +50,7 @@ export class VideoService {
           item_id: item_id[0],
           filename: file.originalname,
           path: s3Key,
-          type: FileType.image,
+          type: FileType.video,
           size: file.size,
         } as IFile);
 

@@ -1,5 +1,5 @@
 import { Knex } from 'knex';
-import { addCommon } from './common/common';
+import { addCommon, addVideoData } from './common/common';
 import { DB_TABLE } from '../src/utils/consts';
 
 const UID_LEN = 36;
@@ -17,7 +17,7 @@ export async function up(knex: Knex): Promise<void> {
     .createTable(DB_TABLE.item, (table) => {
       addCommon(knex, table);
       table.string('account_uid', UID_LEN).notNullable();
-      table.foreign('account_uid').references('account.uid');
+      table.foreign('account_uid').references(DB_TABLE.account + '.uid');
 
       table.string('category', 32).notNullable();
       table.boolean('private').defaultTo(false);
@@ -26,7 +26,7 @@ export async function up(knex: Knex): Promise<void> {
     .createTable(DB_TABLE.file, (table) => {
       table.increments('id');
       table.integer('item_id').unsigned().unique().notNullable();
-      table.foreign('item_id').references('item.id');
+      table.foreign('item_id').references(DB_TABLE.item + '.id');
 
       table.string('filename', 256).notNullable();
       table.string('path', PATH_LEN).unique().notNullable();
@@ -36,7 +36,7 @@ export async function up(knex: Knex): Promise<void> {
     .createTable(DB_TABLE.thumbnail, (table) => {
       addCommon(knex, table);
       table.integer('item_id').unsigned().notNullable();
-      table.foreign('item_id').references('item.id');
+      table.foreign('item_id').references(DB_TABLE.item + '.id');
 
       table.string('type', 32).notNullable(); // xs, sm, md, animated
       table.string('path', PATH_LEN).unique().notNullable();
@@ -49,17 +49,24 @@ export async function up(knex: Knex): Promise<void> {
       table.increments('id');
       // TODO: Maybe not unique? Dash video will have multiple entries multiple WxH etc.
       table.integer('file_id').unsigned().unique().notNullable();
-      table.foreign('file_id').references('file.id');
+      table.foreign('file_id').references(DB_TABLE.file + '.id');
 
-      table.integer('duration').unsigned();
-      table.integer('bitrate').unsigned();
-      table.integer('width').unsigned();
-      table.integer('height').unsigned();
+      addVideoData(knex, table);
+    })
+    .createTable(DB_TABLE.video_optimized, (table) => {
+      table.increments('id');
+      table.integer('video_id').unsigned().unique().notNullable();
+      table.foreign('video_id').references(DB_TABLE.video + '.id');
+
+      table.string('path', PATH_LEN).unique().notNullable();
+      table.integer('size').unsigned();
+      table.string('purpose', 16).notNullable(); // VideoPurpose
+      addVideoData(knex, table);
     })
     .createTable(DB_TABLE.image, (table) => {
       table.increments('id');
       table.integer('file_id').unsigned().unique().notNullable();
-      table.foreign('file_id').references('file.id');
+      table.foreign('file_id').references(DB_TABLE.file + '.id');
       table.integer('width').unsigned();
       table.integer('height').unsigned();
       table.boolean('isAnimated');
@@ -69,10 +76,10 @@ export async function up(knex: Knex): Promise<void> {
       addCommon(knex, table);
 
       table.string('account_uid', UID_LEN);
-      table.foreign('account_uid').references('account.uid');
+      table.foreign('account_uid').references(DB_TABLE.account + '.uid');
 
       table.integer('item_id').unsigned();
-      table.foreign('item_id').references('item.id');
+      table.foreign('item_id').references(DB_TABLE.item + '.id');
 
       table.integer('count').unsigned().defaultTo(0);
 
@@ -82,15 +89,15 @@ export async function up(knex: Knex): Promise<void> {
       addCommon(knex, table);
       table.string('name', 128).unique();
       table.string('author_uid', UID_LEN);
-      table.foreign('author_uid').references('account.uid');
+      table.foreign('author_uid').references(DB_TABLE.account + '.uid');
     })
     .createTable(DB_TABLE.wall_item, (table) => {
       addCommon(knex, table);
       table.integer('wall_id').unsigned();
-      table.foreign('wall_id').references('wall.id');
+      table.foreign('wall_id').references(DB_TABLE.wall + '.id');
 
       table.integer('item_id').unsigned();
-      table.foreign('item_id').references('item.id');
+      table.foreign('item_id').references(DB_TABLE.item + '.id');
 
       table.unique(['wall_id', 'item_id']);
     });
