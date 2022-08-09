@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
-import { ThumbnailsController } from './thumbnails.controller';
-import { ThumbnailsService } from './thumbnails.service';
+import { SpaceOptimizerController } from './spaceOptimizer.controller';
+import { SpaceOptimizerService } from './spaceOptimizer.service';
 import { SharpThumbnailService } from './sharp/sharpThumbnail.service';
 import { UploadThumbnailService } from './upload/uploadThumbnail.service';
 import { ItemsService } from '../items.service';
 import { FfmpegCompressorService } from './ffmpeg/ffmpegCompressor.service';
 
 @Module({
-  controllers: [ThumbnailsController],
+  controllers: [SpaceOptimizerController],
   providers: [
-    ThumbnailsService,
+    SpaceOptimizerService,
     ItemsService,
     SharpThumbnailService,
     UploadThumbnailService,
     FfmpegCompressorService,
   ],
 })
-export class ThumbnailsModule {}
+export class SpaceOptimizerModule {}

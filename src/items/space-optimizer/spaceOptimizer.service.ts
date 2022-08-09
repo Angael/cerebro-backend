@@ -21,7 +21,7 @@ import { changeExtension } from '../../utils/changeExtension';
 import { betterUnlink } from '../../utils/betterUnlink';
 
 @Injectable()
-export class ThumbnailsService {
+export class SpaceOptimizerService {
   public readonly scheduler: Scheduler;
 
   constructor(
