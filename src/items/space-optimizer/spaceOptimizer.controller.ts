@@ -19,14 +19,14 @@ export class SpaceOptimizerController {
 
   @Post('get')
   async get() {
-    const a = await this.thumbnailsService.getItemForThumbnails();
+    const a = await this.thumbnailsService.findItemToOptimize();
 
     return a;
   }
 
   @Post('run')
   async run() {
-    const a = await this.thumbnailsService.generateThumbnails();
+    const a = await this.thumbnailsService.optimizeItem();
 
     return a;
   }

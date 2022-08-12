@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-
-import { DbService } from '../../../providers/db.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { mapSeries } from 'modern-async';
+
+import { DbService } from '../../../providers/db.service';
 import { S3Service } from '../../../providers/s3.service';
 import { IThumbnailBeforeUpload, IThumbnailPayload } from '../../../models/IThumbnail';
 import { DB_TABLE } from '../../../utils/consts';
@@ -16,14 +16,14 @@ export class UploadThumbnailService {
     private readonly s3Service: S3Service,
   ) {}
 
-  async s3Upload(thumbnailPayload: IThumbnailBeforeUpload) {
+  private async s3Upload(thumbnailPayload: IThumbnailBeforeUpload) {
     return this.s3Service.simpleUploadFile({
       key: thumbnailPayload.thumbnail.path,
       filePath: thumbnailPayload.diskPath,
     });
   }
 
-  async dbInsert(thumbnail: IThumbnailPayload) {
+  private async dbInsert(thumbnail: IThumbnailPayload) {
     const db = this.dbService.getDb();
 
     return db.transaction(async (trx) => {
@@ -37,7 +37,11 @@ export class UploadThumbnailService {
       try {
         await this.dbInsert(t.thumbnail);
       } catch (e) {
-        // TODO: remove from s3
+        this.logger.error(
+          'Error inserting thumbnail into db. Delete s3 thumb for item',
+          t.thumbnail.item_id,
+        );
+        await this.s3Service.deleteFile(t.thumbnail.path);
       }
       return t.diskPath;
     });

@@ -17,7 +17,7 @@ export class PremiumGuard implements CanActivate {
 
     const result = await this.dbService
       .getDb()
-      // I added type, hope it wont break
+      // I added type, hope it won't break
       .select('type')
       .from(DB_TABLE.account)
       .where({ uid: user.uid });

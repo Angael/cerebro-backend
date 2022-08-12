@@ -1,9 +1,8 @@
 import { Knex } from 'knex';
-import { addCommon, addVideoData } from './common/common';
+import { addCommon, addFileData, addVideoData } from './common/common';
 import { DB_TABLE } from '../src/utils/consts';
 
 const UID_LEN = 36;
-const PATH_LEN = 256;
 
 export async function up(knex: Knex): Promise<void> {
   return knex.schema
@@ -16,22 +15,20 @@ export async function up(knex: Knex): Promise<void> {
     })
     .createTable(DB_TABLE.item, (table) => {
       addCommon(knex, table);
+
       table.string('account_uid', UID_LEN).notNullable();
       table.foreign('account_uid').references(DB_TABLE.account + '.uid');
 
-      table.string('category', 32).notNullable();
       table.boolean('private').defaultTo(false);
-      table.boolean('processed').defaultTo(false); // Should be enum, started | ended | waiting
+      table.string('type', 32).notNullable();
+      table.string('processed', 32).notNullable();
     })
     .createTable(DB_TABLE.file, (table) => {
       table.increments('id');
       table.integer('item_id').unsigned().unique().notNullable();
       table.foreign('item_id').references(DB_TABLE.item + '.id');
 
-      table.string('filename', 256).notNullable();
-      table.string('path', PATH_LEN).unique().notNullable();
-      table.string('type', 32).notNullable(); //s3_video | s3_image | url_image | text | link
-      table.bigInteger('size').unsigned();
+      addFileData(knex, table);
     })
     .createTable(DB_TABLE.thumbnail, (table) => {
       addCommon(knex, table);
@@ -39,8 +36,7 @@ export async function up(knex: Knex): Promise<void> {
       table.foreign('item_id').references(DB_TABLE.item + '.id');
 
       table.string('type', 32).notNullable(); // xs, sm, md, animated
-      table.string('path', PATH_LEN).unique().notNullable();
-      table.integer('size').unsigned();
+      addFileData(knex, table);
       table.integer('width').unsigned();
       table.integer('height').unsigned();
       table.boolean('isAnimated');
@@ -48,9 +44,10 @@ export async function up(knex: Knex): Promise<void> {
     .createTable(DB_TABLE.video, (table) => {
       table.increments('id');
       // TODO: Maybe not unique? Dash video will have multiple entries multiple WxH etc.
-      table.integer('file_id').unsigned().unique().notNullable();
-      table.foreign('file_id').references(DB_TABLE.file + '.id');
+      table.integer('item_id').unsigned().unique().notNullable();
+      table.foreign('item_id').references(DB_TABLE.item + '.id');
 
+      addFileData(knex, table);
       addVideoData(knex, table);
     })
     .createTable(DB_TABLE.video_optimized, (table) => {
@@ -58,19 +55,20 @@ export async function up(knex: Knex): Promise<void> {
       table.integer('video_id').unsigned().unique().notNullable();
       table.foreign('video_id').references(DB_TABLE.video + '.id');
 
-      table.string('path', PATH_LEN).unique().notNullable();
-      table.integer('size').unsigned();
-      table.string('purpose', 16).notNullable(); // VideoPurpose
+      table.string('purpose', 32).notNullable(); // VideoPurpose
+      addFileData(knex, table);
       addVideoData(knex, table);
     })
     .createTable(DB_TABLE.image, (table) => {
       table.increments('id');
-      table.integer('file_id').unsigned().unique().notNullable();
-      table.foreign('file_id').references(DB_TABLE.file + '.id');
+      table.integer('item_id').unsigned().unique().notNullable();
+      table.foreign('item_id').references(DB_TABLE.item + '.id');
+
       table.integer('width').unsigned();
       table.integer('height').unsigned();
       table.boolean('isAnimated');
       table.string('hash', 32);
+      addFileData(knex, table);
     })
     .createTable(DB_TABLE.seen_time, (table) => {
       addCommon(knex, table);
@@ -105,6 +103,7 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   return knex.schema
+    .dropTableIfExists(DB_TABLE.video_optimized)
     .dropTableIfExists(DB_TABLE.video)
     .dropTableIfExists(DB_TABLE.image)
     .dropTableIfExists(DB_TABLE.file)

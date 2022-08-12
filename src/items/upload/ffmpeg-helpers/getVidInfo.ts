@@ -1,10 +1,8 @@
 import { exec } from 'child_process';
-import { IVideo } from '../../../models/IItem';
+import { IVideo, IVideoData } from '../../../models/IItem';
 const ffprobePath = require('@ffprobe-installer/ffprobe').path;
 
-export const getVidInfo = (
-  path: string,
-): Promise<Pick<IVideo, 'duration' | 'bitrate' | 'width' | 'height'>> =>
+export const getVidInfo = (path: string): Promise<IVideoData> =>
   new Promise((resolve, _reject) => {
     exec(`${ffprobePath} -hide_banner -i "${path}"`, {}, (_error, _stdout, stderr) => {
       // regexpy na to wszystko

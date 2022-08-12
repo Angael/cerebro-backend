@@ -1,17 +1,22 @@
-import { IFile, IImage, IItem, IVideo } from '../../models/IItem';
+import {
+  IFile,
+  IFileData,
+  IImage,
+  IImageData,
+  IItem,
+  IVideo,
+  IVideoData,
+  SpaceOptimized,
+} from '../../models/IItem';
 import { IFrontItem } from '../../models/for-frontend/IFrontItem';
 import { s3PathToUrl } from '../../utils/s3PathToUrl';
 import { IThumbnailRow } from '../../models/IThumbnail';
 
-type FileData = IFrontItem['fileData'];
-type Video = IFrontItem['video'];
-type Image = IFrontItem['image'];
 type Thumbnails = IFrontItem['thumbnails'];
 
 // Typing whole Pick<> can be a bitch, maybe lets simplify it? Its not safe anyway due to sql returning untyped data...
 export const joinItemQueries = (
   items: IItem[],
-  files: IFile[],
   images: IImage[],
   videos: IVideo[],
   _thumbnails: IThumbnailRow[],
@@ -20,41 +25,39 @@ export const joinItemQueries = (
   return items.map((item) => {
     const filteredThumbnails = _thumbnails.filter((t) => t.item_id === item.id);
 
-    const foundFile = files.find((f) => f.item_id === item.id);
-    const foundImage = foundFile
-      ? images.find((image) => image.file_id === foundFile.id)
-      : undefined;
-    const foundVideo = foundFile ? videos.find((vid) => vid.file_id === foundFile.id) : undefined;
+    // const foundFile = files.find((f) => f.item_id === item.id);
+    const foundImage = images.find((image) => image.item_id === item.id);
+    const foundVideo = videos.find((vid) => vid.item_id === item.id);
 
-    let fileData: FileData;
-    let video: Video;
-    let image: Image;
-    if (foundFile) {
-      fileData = {
-        filename: foundFile.filename,
-        url: s3PathToUrl(envProcess, foundFile.path),
-        type: foundFile.type,
+    // let fileData: IFileData;
+    let video: IVideoData & { url: string };
+    let image: IImageData & { url: string };
+    // fileData = {
+    //   filename: foundFile.filename,
+    //   url: s3PathToUrl(envProcess, foundFile.path),
+    //   type: foundFile.type,
+    // };
+
+    if (foundImage) {
+      const { width, height, hash, isAnimated, path } = foundImage;
+      image = {
+        width,
+        height,
+        hash,
+        isAnimated,
+        url: s3PathToUrl(envProcess, path),
       };
+    }
 
-      if (foundImage) {
-        const { width, height, hash, isAnimated } = foundImage;
-        image = {
-          width,
-          height,
-          hash,
-          isAnimated,
-        };
-      }
-
-      if (foundVideo) {
-        const { width, height, duration, bitrate } = foundVideo;
-        video = {
-          width,
-          height,
-          duration,
-          bitrate,
-        };
-      }
+    if (foundVideo) {
+      const { width, height, duration, bitrate, path } = foundVideo;
+      video = {
+        width,
+        height,
+        duration,
+        bitrate,
+        url: s3PathToUrl(envProcess, path),
+      };
     }
 
     // Omit id
@@ -64,15 +67,20 @@ export const joinItemQueries = (
       isAnimated: t.isAnimated,
     }));
 
+    const notProcessed = [
+      SpaceOptimized.no,
+      SpaceOptimized.started,
+      SpaceOptimized.failed,
+    ].includes(item.processed);
+
     return {
       id: item.id,
       account_uid: item.account_uid,
-      category: item.category,
+      type: item.type,
       private: item.private,
       created_at: item.created_at,
-      processed: item.processed,
+      processed: !notProcessed,
 
-      fileData,
       video,
       image,
       thumbnails,

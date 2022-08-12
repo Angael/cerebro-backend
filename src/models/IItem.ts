@@ -1,13 +1,9 @@
-export enum ItemCategory {
+export enum ItemType {
   file = 'file',
+  image = 'image',
+  video = 'video',
   website = 'website',
   text = 'text',
-}
-
-export enum FileType {
-  video = 'video',
-  image = 'image',
-  other = 'other',
 }
 
 export enum VideoPurpose {
@@ -16,20 +12,28 @@ export enum VideoPurpose {
   standard = 'standard', // Standard compressed video quality
 }
 
+export enum SpaceOptimized {
+  no = 'no',
+  started = 'started',
+  failed = 'failed',
+  not_applicable = 'n/a',
+  yes_v1 = 'v1', // Leave possibility for more optimized formats in the future, and versioning of how item was optimized
+}
+
+// TODO make into IItemRow and IItem
 export interface IItem {
   id?: number;
   account_uid: string;
 
-  category: ItemCategory;
+  type: ItemType;
   private: boolean;
-  processed?: boolean;
+  processed: SpaceOptimized;
   created_at?: string; // ISO
 }
 
 export interface IFileData {
   filename: string;
   path: string;
-  type: FileType;
   size: number;
 }
 
@@ -45,14 +49,14 @@ export interface IVideoData {
   height: number;
 }
 
-export interface IVideo extends IVideoData {
+export interface IVideo extends IVideoData, IFileData {
   id?: number;
-  file_id: number;
+  item_id: number;
 }
 
-export interface IVideoOptimized extends IVideoData {
+export interface IVideoOptimized extends IVideoData, IFileData {
   id?: number;
-  file_id: number;
+  video_id: number; // TODO change to video_id
 
   path: string;
   size: number;
@@ -66,7 +70,7 @@ export interface IImageData {
   hash: string;
 }
 
-export interface IImage extends IImageData {
+export interface IImage extends IImageData, IFileData {
   id?: number;
-  file_id: number;
+  item_id: number;
 }

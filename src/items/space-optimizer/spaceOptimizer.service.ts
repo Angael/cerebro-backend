@@ -2,23 +2,15 @@ import { Inject, Injectable } from '@nestjs/common';
 import fs from 'fs-extra';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { v4 as uuidv4 } from 'uuid';
-import path from 'path';
-import { Scheduler, forEachSeries } from 'modern-async';
+import { Scheduler } from 'modern-async';
 
 import { DbService } from '../../providers/db.service';
 import { DB_TABLE, DOWNLOADS_DIR, THUMBNAILS_DIR } from '../../utils/consts';
 import { S3Service } from '../../providers/s3.service';
-import { download } from './downloadFile';
-import { FileType, IFile, IItem } from '../../models/IItem';
-import { s3PathToUrl } from '../../utils/s3PathToUrl';
-import { SharpThumbnailService } from './sharp/sharpThumbnail.service';
-import { getNameFromS3Path, makeS3Path } from '../../utils/makeS3Path';
+import { IItem, ItemType, SpaceOptimized } from '../../models/IItem';
 import { UploadThumbnailService } from './upload/uploadThumbnail.service';
 import { ItemsService } from '../items.service';
-import { IThumbnailBeforeUpload } from '../../models/IThumbnail';
-import { changeExtension } from '../../utils/changeExtension';
-import { betterUnlink } from '../../utils/betterUnlink';
+import { ImageSpaceOptimizerService } from './image/imageSpaceOptimizer.service';
 
 @Injectable()
 export class SpaceOptimizerService {
@@ -29,8 +21,8 @@ export class SpaceOptimizerService {
     private readonly s3Service: S3Service,
     private readonly dbService: DbService,
     private readonly itemsService: ItemsService,
-    private readonly sharpThumbnailService: SharpThumbnailService,
     private readonly uploadThumbnails: UploadThumbnailService,
+    private readonly imageSpaceOptimizer: ImageSpaceOptimizerService,
   ) {
     fs.mkdir(DOWNLOADS_DIR, { recursive: true });
     fs.mkdir(THUMBNAILS_DIR, { recursive: true });
@@ -38,7 +30,14 @@ export class SpaceOptimizerService {
     this.scheduler = new Scheduler(
       async () => {
         // this.logger.verbose('Scheduler running...');
-        return this.generateThumbnails().then((didGenerateThumbnails) => {});
+        return this.optimizeItem()
+          .then((didGenerateThumbnails) => {
+            // some item was optimized!
+          })
+          .catch((error) => {
+            this.logger.error('item optimize fail', error);
+            // error happened, anyway...
+          });
       },
       4000,
       {
@@ -51,77 +50,40 @@ export class SpaceOptimizerService {
     this.scheduler.start();
   }
 
-  async getItemForThumbnails(): Promise<(IItem & IFile) | undefined> {
+  async findItemToOptimize(): Promise<IItem | undefined> {
     const db = this.dbService.getDb();
-    try {
-      const unprocessedFileItem = (
+    return (
+      (
         await db
           .select()
           .from(DB_TABLE.item)
-          .join(DB_TABLE.file, 'item.id', 'file.item_id')
-          .where('processed', 0)
+          // .join(DB_TABLE.file, 'item.id', 'file.item_id')
+          .where('processed', SpaceOptimized.no as IItem['processed'])
           .limit(1)
-      )[0];
-      return unprocessedFileItem;
-    } catch (e) {
-      this.logger.error(e);
-      throw new Error(e);
-    }
+      )[0]
+    );
   }
 
-  async downloadFile(file: IFile): Promise<string> {
-    const extension = path.extname(file.filename);
-    if (!extension) {
-      throw new Error('file has no extension');
-    }
-
-    try {
-      const downloadedPath = DOWNLOADS_DIR + '/' + uuidv4() + extension;
-      await download(s3PathToUrl(process.env, file.path), downloadedPath);
-      return downloadedPath;
-    } catch (e) {
-      this.logger.error(e);
-      throw new Error(e);
-    }
-  }
-
-  async generateThumbnails(): Promise<boolean> {
-    const fileItem = await this.getItemForThumbnails();
-    if (!fileItem) {
+  async optimizeItem(): Promise<boolean> {
+    const item = await this.findItemToOptimize();
+    if (!item) {
       return false;
     }
+    console.log({ item });
 
-    const savedPath = await this.downloadFile(fileItem);
+    try {
+      await this.itemsService.updateItemProcessed(item.id, SpaceOptimized.started);
+      if (item.type === ItemType.image) {
+        await this.imageSpaceOptimizer.optimize(item);
+      } else {
+        // TODO: Not supported type, should skip it
+        throw new Error('Tried to optimize unsupported filetype');
+      }
 
-    // TODO: Try catch
-    let thumbnails: IThumbnailBeforeUpload[];
-    if (fileItem.type === FileType.image) {
-      const generatedThumbs = await this.sharpThumbnailService.run(fileItem, savedPath);
-
-      thumbnails = generatedThumbs.map((t) => ({
-        thumbnail: {
-          ...t.dimensions,
-          item_id: fileItem.item_id,
-          isAnimated: t.isAnimated, // TODO: Lie? It can I think result in animated thumbnail
-          path: makeS3Path(
-            fileItem.account_uid,
-            t.dimensions.type,
-            changeExtension(getNameFromS3Path(fileItem.path), 'webp'),
-          ),
-          size: t.size,
-        },
-        diskPath: t.diskPath,
-      }));
-    } else {
-      // TODO: Not supported type, should skip it
-      throw new Error('Tried to optimize unsupported filetype');
+      await this.itemsService.updateItemProcessed(item.id, SpaceOptimized.yes_v1);
+    } catch (e) {
+      await this.itemsService.updateItemProcessed(item.id, SpaceOptimized.failed);
+      throw e;
     }
-    const result = await this.uploadThumbnails.uploadThumbnails(thumbnails);
-
-    await this.itemsService.markItemProcessed(fileItem.item_id);
-
-    forEachSeries(thumbnails, (t) => betterUnlink(t.diskPath));
-
-    return true;
   }
 }

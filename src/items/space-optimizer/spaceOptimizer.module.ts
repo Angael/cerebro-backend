@@ -5,6 +5,7 @@ import { SharpThumbnailService } from './sharp/sharpThumbnail.service';
 import { UploadThumbnailService } from './upload/uploadThumbnail.service';
 import { ItemsService } from '../items.service';
 import { FfmpegCompressorService } from './ffmpeg/ffmpegCompressor.service';
+import { ImageSpaceOptimizerService } from './image/imageSpaceOptimizer.service';
 
 @Module({
   controllers: [SpaceOptimizerController],
@@ -14,6 +15,7 @@ import { FfmpegCompressorService } from './ffmpeg/ffmpegCompressor.service';
     SharpThumbnailService,
     UploadThumbnailService,
     FfmpegCompressorService,
+    ImageSpaceOptimizerService,
   ],
 })
 export class SpaceOptimizerModule {}

@@ -1,4 +1,4 @@
-import { FileType, IFile, IImage, IItem, ItemCategory, IVideo } from '../IItem';
+import { IFileData, IImageData, ItemType, IVideoData } from '../IItem';
 import { ThumbnailSize } from '../IThumbnail';
 
 type Thumbnail = {
@@ -7,34 +7,30 @@ type Thumbnail = {
   isAnimated: boolean;
 };
 
+type AddUrl = {
+  url: string;
+};
+
 // Keep in sync in frontend-backend !!   Make monorepo to share ts types?
 export type IFrontItem = {
   id: number;
   account_uid: string;
-  category: ItemCategory;
+  type: ItemType; // Tutaj zmiana do zreflektowania na froncie
   private: boolean;
   created_at: string;
   processed: boolean;
 
-  fileData?: {
-    filename: string;
-    url: string;
-    type: FileType;
-  };
+  // TODO: zrób properte data: IImageData | IVideoData | IFileData ...
+  // data: (IVideoData | IImageData) & AddUrl;
 
-  video?: {
-    width: number;
-    height: number;
-    duration: number;
-    bitrate: number;
-  };
+  // TODO tutaj jest problem, bo te property potrzebuja urla,
+  // nie ma co wysylac do frontu path.
+  // fileData?: IFileData & AddUrl;
 
-  image?: {
-    width: number;
-    height: number;
-    isAnimated: boolean;
-    hash: string;
-  };
+  // I teraz filedata nie powinno byc zawsze, wiec na to tez zwroc uwage
+  video?: IVideoData & AddUrl;
+
+  image?: IImageData & AddUrl;
 
   thumbnails: Thumbnail[];
 };

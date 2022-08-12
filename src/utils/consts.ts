@@ -11,9 +11,9 @@ export const THUMBNAILS_DIR = '_temp/thumbnails';
 
 export enum DB_TABLE {
   thumbnail = 'thumbnail',
-  video = 's3_video',
-  video_optimized = 's3_video_optimized', // 360p 720p 1080p etc. webm
-  image = 's3_image',
+  video = 'video',
+  video_optimized = 'video_optimized', // 360p 720p 1080p etc. webm
+  image = 'image',
   file = 'file',
   item = 'item',
 
