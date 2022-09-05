@@ -64,7 +64,6 @@ export const joinItemQueries = (
     let thumbnails: Thumbnails = filteredThumbnails.map((t) => ({
       url: s3PathToUrl(envProcess, t.path),
       type: t.type,
-      isAnimated: t.isAnimated,
     }));
 
     const notProcessed = [

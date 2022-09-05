@@ -7,7 +7,7 @@ export const makeItemQueries = async (db: Knex, items: Pick<IItem, 'id'>[]) => {
   const itemsIds = items.map((item) => item.id);
 
   const thumbnails: IThumbnailRow[] = await db
-    .select('id', 'item_id', 'type', 'path', 'isAnimated')
+    .select('id', 'item_id', 'type', 'path')
     .from(DB_TABLE.thumbnail)
     .whereIn('item_id', itemsIds);
 

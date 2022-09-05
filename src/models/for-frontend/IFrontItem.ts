@@ -4,7 +4,6 @@ import { ThumbnailSize } from '../IThumbnail';
 type Thumbnail = {
   url: string;
   type: ThumbnailSize;
-  isAnimated: boolean;
 };
 
 type AddUrl = {
