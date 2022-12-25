@@ -1,4 +1,4 @@
-import { IFileData } from './IItem';
+import { IFileData } from './IItem.js';
 
 export enum ThumbnailSize {
   source = 'source',

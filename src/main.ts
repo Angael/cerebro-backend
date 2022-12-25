@@ -1,13 +1,8 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import './loadEnv.js';
+import startRouter from './routes/MyRouter.js';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  if (process.env.NODE_ENV === 'development') {
-    app.enableCors();
-  }
-  app.useGlobalPipes(new ValidationPipe());
-  await app.listen(3000);
-}
-bootstrap();
+// import MyRouter from './routes/MyRouter.js';
+// import SynchFilesInDirs from './auto-services/SyncDirs.js';
+
+startRouter();
+// SynchFilesInDirs.start();

@@ -1,0 +1,993 @@
+silean
+vular
+cerebro
+maji
+chrisis
+almos
+thessia
+feros
+veles
+Ilos
+Amada
+Crescent
+illium
+Vexi
+Nevos
+Nios
+Omega
+Sanctum
+thessia
+
+
+
+
+
+all:
+Acaeria
+Acermos
+Acheron
+Adas
+Adek
+Aegis
+Aequitas
+Aethon Cluster
+Agaiou
+Aganju
+Agebinium
+Ageko
+Agessia
+Agetoton
+Agnin
+Aigela
+Aitarus
+Aite
+Aitis
+Akraia
+Alchera
+Alcyoneus
+Alformus
+Alingon
+Alko
+Alkonost
+Allusah
+Almarcrux
+Almos
+Alpha Draconis
+Alrumter
+Alsages
+Altaaya
+Altahe
+Altakiril
+Altanorch
+Amada
+Amaranthine
+Amazon
+Ameayii
+Ammut
+Amun
+Anadius
+Anasa
+Anedia
+Anhur
+Anjea
+Annos Basin
+Ansuz
+Antaeus
+Antibaar
+Antictra
+Antida
+Antigar
+Antinax
+Antiroprus
+Antirumgon
+Antitarra
+Aphras
+Apien Crest
+Apo
+Aquila
+Aralakh
+Aratoht
+Arcadia
+Archanes
+Archon's Flagship
+Arcturus
+Arcturus Station
+Arcturus Stream
+Argos Rho
+Aria's Fleet
+Arinlarkan
+Ark Leusinia
+Ark Natanus
+Ark Paarchero
+Armeni
+Armstrong Nebula
+Arrae
+Artemis Tau
+Aru
+Arvuna
+Asgard
+Asiaq
+Asteria
+Atahil
+Atebolos
+Athame
+Athena Nebula
+Athens
+Atos Irn
+Attican Beta
+Avelosa
+Aventen
+Aya
+Aysur
+Azimir
+Azrahas
+Bahak
+Bakker
+Balor
+Bannik
+Bast
+Bastzuda
+Batalla
+Beach Thunder
+Bekenstein
+Benda
+Beness
+Benning
+Beregale
+Beyalt
+Biloun
+Bindur
+Binthu
+Black Hole
+Bleeding Ruby
+Boltzmann
+Boro
+Borr
+Bosavay
+Bothros
+Bovis Tor
+Bres
+Cacus
+Caelax
+Caestus
+Caleston
+Caleston Rift
+Camala
+Camaron
+Canalus
+Canctra
+Candavorni
+Canrum
+Capek
+Carborix
+Carcosa
+Casbin
+Caspian
+Castellus
+Century
+Cernunnos
+Chalkhos
+Chandrasekhar
+Charoum
+Chasca
+Cherk Sab
+Chofen
+Chohe
+Choitadix
+Cholis
+Chomos
+Chophise
+Circe
+Citadel
+Civki
+Clobaka
+Clocrolis
+Clogon
+Clojiia
+Clomarthu
+Cloroplon
+Clotanca
+Clugon
+Columbia
+Comet Dawnstar
+Comet Jarovbees
+Comet Jim Dandy
+Comet Revolver
+Comet Talula
+Comet Tamoko's Arrow
+Corang
+Crescent Nebula
+Crick
+Cronos Station
+Cyllene
+Cyone
+Dakka
+Damkianna
+Dar'hegah
+Daratar
+Darwin
+Datriux
+Decoris
+Dekuuna
+Denesh
+Derelict Reaper
+Derneuca
+Dezda
+Dholen
+Digeris
+Diplomatic Ships
+Dirada
+Dis
+Ditivios
+Dobrovolski
+Doldit
+Dor
+Dorgal
+Doriae
+Dovar
+Doz Atab
+Dragel
+Dranek
+Dranen
+Dregir
+Dubraaci
+Duiononasa
+Dumah
+Durak
+Eagle Nebula
+Echidna
+Eden Prime
+Edmos
+Edolus
+Efaja
+Egalic
+Ehstag
+Eingana
+Eirene
+Ejoda
+Ekuna
+Elaaden
+Elatha
+Eletania
+Elohi
+Elysium
+Elysta
+Enoch
+Eos
+Epho
+Erebus
+Eriksson
+Erinle
+Erros
+Erszbat
+Esori
+Essenus
+Etamis
+Euler
+Eunomia
+Euntanta
+Everodaan
+Exodus Cluster
+Ezka
+Faia
+Far Rim
+Farcrothu
+Fargeluse
+Farinata
+Faringor
+Farlas
+Farnuri
+Faroang
+Faross
+Farrum
+Farthorl
+Faryar
+Fathar
+Fei Xin
+Fen Odam
+Fen Sayat
+Fermi
+Feros
+Fetvun
+Feynman
+Fiax
+First Land
+Fitful Current
+Flett
+Fortis
+Fortuna
+Gaelon
+Gagarin
+Gamayun
+Garan
+Garef
+Garvug
+Gei Hinnom
+Gellix
+Gemini Sigma
+Gemmae
+Gesaimo
+Gestiir
+Geth Debris Field
+Geth Dreadnought
+Geus
+Gilead
+Goliath
+Gong Zhen
+Gorgon
+Gorgun
+Gotha
+Govok's Folly
+Govorkam
+Gregas
+Gremar
+Grill
+Grissom
+Grissom Academy
+Grogorna
+Gromar
+Grosalgen
+Hades Gamma
+Hades Nexus
+Haestrom
+Hagalaz
+Halegeuse
+Hali
+Han
+Hanalei
+Harsa
+Haskins
+Havarl
+Hawking Eta
+Haza
+Hebat
+Hefena
+Hekate
+Heleus Cluster
+Helluland
+Helyme
+Hercules
+Heretic Station
+Herschel
+Hesano
+Heshtok
+Hiba
+Hipaal
+Hito
+Hoc
+Hong
+Hoplos
+Horizon
+Horse Head Nebula
+Hourglass Nebula
+Huiton
+Hunidor
+Huningto
+Hunsalra
+Hybaro
+Hydra
+Hyetiana
+Ialessa
+Iera
+Ihaafor
+Ilem
+Illapa
+Illium
+Ilmnos
+Ilos
+Imaen
+Imaneya
+Imir
+Imorkan
+Impera
+Inakhos
+Inalaara
+Indris
+Insaaron
+Intai'sei
+Inti
+Invictus
+Iritum
+Irune
+Isa
+Isale
+Ishang
+Ishassara
+Island Wind
+Ismar Frontier
+Israfil
+Ithrone
+Jak Ser
+Janiri
+Jarfor
+Jarrahe Station
+Jartar
+Jegraph
+Jirayder
+Joab
+Joba
+Jontan
+Jonus
+Joppa
+Juncro
+Juntauma
+Junthor
+Jupiter
+Kadara
+Kaddi
+Kailo
+Kairavamori
+Kakabel
+Kalabsha
+Kallini
+Kamiiro No
+Kanin
+Karora
+Karumto
+Kashshaptu
+Katebolo
+Kaushus
+Kaver Station
+Keimowitz
+Kelim
+Kenaz
+Keph
+Kepler Verge
+Ker
+Khar'shan
+Khi Tasira
+Khonsu
+Kindrax
+Kite's Nest
+Kizrata
+Klencory
+Klendagon
+Klensal
+Klos
+Knossos
+Kobayashi
+Komarov
+Korar
+Korlus
+Korvath
+Kotkoborra
+Kralla
+Kriseroi
+Krogan DMZ
+Kruban
+Kurinth
+Kypladon
+Kyzil
+Laban
+Laconix
+Laena
+Lahu
+Lattesh
+Layan
+Lemnia
+Lenal
+Lenuamund
+Lepini
+Lesuss
+Letapho
+Lethe
+Liam's Scavenger Debris Field
+Lihrat
+Linossa
+Lisir
+Local Cluster
+Locil
+Logan
+Logasiri
+Loki
+Lorek
+Loropi
+Loxia
+Lusarn
+Lusia
+Lymetis
+MSV Broken Arrow
+MSV Cornucopia
+MSV Fedele
+MSV Majesty
+MSV Ontario
+MSV Strontium Mule
+MSV Worthington
+Ma Huan
+Ma-at
+Macedon
+Mae Raav
+Mae Shesa
+Maganlis
+Mahavid
+Maidla
+Maisuth
+Maitrum
+Maji
+Makhaira
+Maklan
+Maldor
+Malgus
+Mantun
+Margoth
+Markland
+Maroon Sea
+Mars
+Masiid
+Maskawa
+Maskim Xul
+Matano
+Matar
+Matol
+Mavigon
+Mawinor
+Medokos
+Melile
+Mendradym
+Meos
+Mercury
+Meridian
+Mesana
+Metaponto
+Metgos
+Micah
+Migrant Fleet
+Mil
+Mine
+Ming
+Mingito
+Minos Wasteland
+Mizraim
+Mnemosyne
+Mocalaam
+Mola
+Momairus
+Morana
+Mornax Vinkaar
+Moros
+Mosiiba
+Mosiino
+Mosiives
+Mulla Xul
+Murky Water
+Mylasi
+Nadinoor
+Nahuala
+Nalesh
+Nalisin
+Namakli
+Nambu
+Nanuk
+Nariph
+Naskral
+Nataisa
+Nausicaa
+Nauti
+Naxell
+Ne'grale
+Neargas
+Nearog
+Nearrum
+Neidus
+Neith
+Nemata
+Nepheron
+Nephros
+Nepmos
+Nepneu
+Neptune
+Nepyma
+Netiquur
+Nevos
+Newton
+Nexus
+Niacal
+Niagolon
+Nimbus Cluster
+Ninmah Cluster
+Nios
+Nirrus
+Nirvana
+Nith
+Nodacrux
+Nol
+Nonuel
+Norehsa
+Norgraqua
+Nossia
+Notanban
+Noveria
+Novolori
+Nubian Expanse
+Nura
+Nutus
+Nuundri
+Obayro
+Odasst
+Olokun
+Oltan
+Oma Ker
+Omega
+Omega Nebula
+Onaon
+Ondeste
+Ontaheter
+Ontamalca
+Ontarom
+Orisoni
+Orunmila
+Osalri
+Ossqyu
+Osun
+Paeto
+Pahhur
+Palaven
+Pamyat
+Pangaea Expanse
+Pania
+Paphos
+Parag
+Parasc
+Paravin
+Parnassus
+Parnitha
+Partholon
+Pataiton
+Patajiri
+Patamalrus
+Patashi
+Patatanlis
+Patavig
+Patsayev
+Pauling
+Pax
+Paz
+Pele
+Pelion
+Perseus Veil
+Petra Nebula
+Pfeiffer
+Phaidra
+Phaistos
+Pharos
+Pheiros
+Phi Clio
+Phoenix
+Phontes
+Phoros
+Phostaan
+Piares
+Pietas
+Pinnacle Station
+Ploba
+Ploitari
+Pluto
+Plutus
+Polissa
+Pollino
+Poloh Tem
+Pomal
+Ponolus
+Ponos
+Porolan
+Posbaar
+Prachonyi
+Pragia
+Pranas
+Pregel
+Prescyla
+Pressha
+Preying Mouth
+Promavess
+Pronoia
+Prospect
+Proteus
+Psi Tophet
+Purgatory
+Pylos Nebula
+Pytheas
+Qertassi
+Quaji
+Quana
+Quarem
+Quarian Envoy Ship
+Quirezia
+Quodis
+Ra Madesya
+Ra Moorondi
+Raheel-Leyya
+Rahere
+Raisaris
+Rakaelmo
+Ramlat
+Rannoch
+Ratul
+Rayingri
+Raysha
+Red Qorayk
+Refuge
+Relic
+Remav
+Renshato
+Rescel
+Reyer
+Rihali
+Rilar
+Roha
+Rohvir
+Ronhadin
+Rosetta Nebula
+Rotesk
+Rothla
+Rough Tide
+Ruam
+Rustaka
+Saajor
+Sabeng
+Sahrabarik
+Sakata
+Salahiel
+Salamis
+Saleas
+Sanctum
+Sangel
+Sansesyol
+Sanves
+Saradril
+Sarait
+Sarapai
+Satent
+Satu Arrd
+Saturn
+Sazgoth
+Schwarzschild
+Sedele
+Sehtor
+Sekhmet
+Selvos
+Semrahet
+Sentry Omega
+Sephesa
+Serao
+Serpent Nebula
+Sesmose
+Shadow Sea
+Sharblu
+Sharjila
+Sharring
+Shastessia
+Shasu
+Sheol
+Shir
+Shojaon
+Siano
+Sidon
+Sigurd's Cradle
+Siktin
+Silean Nebula
+Silva
+Sineus
+Skeldah
+Skepsis
+Slekon
+Slohva
+Sobek
+Sogelrus
+Sol
+Solad
+Solmarlon
+Solminae
+Solu Paolis
+Solveig
+Sonedma
+Sotera
+Sowilo
+Sparta
+Spekilas
+Sthenia
+Stodraan
+Strabo
+Strenuus
+Styx Theta
+Suen
+Suiorna
+Supay
+Sur'Kesh
+Surtur
+Suuricco
+Svarog
+Syba
+Sybin
+Syided
+Sylsalto
+Synalus
+Sytau
+Tafeno
+Taitus
+Takkan
+Talaria
+Talava
+Talis Fia
+Tamahera
+Tamgauta
+Tarith
+Tasale
+Tassrah
+Tecunis
+Tefnut
+Telluune
+Temerarus
+Tenesta
+Tenoth
+Tentrobiil
+Terapso
+Tereshkova
+Teroshe
+Terra Nova
+Teshub
+Teukria
+Tevura
+Teyolia
+Thail
+Thal
+Tharopto
+The Phoenix Massing
+The Sea of Storms
+The Shrike Abyssal
+Thegan
+Thegeuse
+Themis
+Thenusi
+Theonax
+Therum
+Therumlon
+Thesalgon
+Theseus
+Theshaca
+Thessia
+Theyar
+Thissioni
+Thooft
+Thorne
+Thrivaldi
+Thunawanuro
+Thurisaz
+Thy'vernos
+Tijorana
+Tikkun
+Titan Nebula
+Tobonoor
+Togessan
+Tomaros
+Tosal Nym
+Trategos
+Treagir
+Trebia
+Trebin
+Trelyn
+Tremanre
+Tremar
+Treyarmus
+Trident
+Trigestis
+Triginta Petra
+Trikalon
+Triodia
+Tritogenith
+Trobror
+Tuchanka
+Tula
+Tunfigel
+Tungel
+Tunharaset
+Tunshagon
+Tuntau
+Tyfrondra
+Typhon
+Tyr
+Tyre
+Tyrix
+Unidentified Space Facility
+Untrel
+Uranus
+Urdak
+Uriyah
+Urla Rast
+Urmola
+Uruz
+Utha
+Utopia
+Utukku
+Uwan Oche
+Uza
+Uzin
+Vaalon
+Vaar
+Vael
+Valay
+Vallhallan Threshold
+Vamshi
+Vana
+Vaotessa
+Vard
+Varmalus
+Vatar
+Vaul
+Vebinok
+Vecchio
+Vectra
+Veles
+Veltman
+Vem Osca
+Vemal
+Venture
+Venus
+Vernio
+Verr
+Verush
+Vetus
+Veyaria
+Viantel
+Vinland
+Vinvaiko
+Vioresa
+Viper Nebula
+Vir
+Virits
+Virmire
+Voeld
+Volkov
+Volturno
+Vostok
+Voyager Cluster
+Vular
+Vylius
+Wallace
+Waoge
+Watchman
+Watson
+Welm Urun
+Wenrum
+Wentania
+Werius
+Wermani
+Wheeler
+Widow
+Wreckage
+Wrill
+Wuo
+Xamarri
+Xanadu
+Xathorron
+Xawin
+Xe Cha
+Xerceo
+Xetic
+Yakawa
+Yamm
+Yan Tao
+Yangtze
+Yasilium
+Yilfaen
+Yukawa
+Yunaca
+Yunthorl
+Zada Ban
+Zafe
+Zaherin
+Zaherux
+Zakros
+Zanethu
+Zatorus
+Zaubray
+Zayarter
+Zelene
+Zeona
+Zesmeni
+Zeth
+Zheng He
+Zion
+Zirnitra
+Zorya
+Zosteros
+Zylium

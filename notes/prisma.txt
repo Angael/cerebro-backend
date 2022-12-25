@@ -1,0 +1,9 @@
+# seeding
+prisma db seed
+
+# prototype
+prisma db push
+    will push changes to db and remake ts types
+    will probably drop stuff but trigger seed
+
+#

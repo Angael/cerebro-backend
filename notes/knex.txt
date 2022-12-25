@@ -1,0 +1,4 @@
+cross-env NODE_ENV=production knex migrate:list
+
+Base user in db
+Se561raFjoSjJY5Q7kZtwoIHk4H2,user@user.com,myUser,admin,2022-07-09 21:41:35

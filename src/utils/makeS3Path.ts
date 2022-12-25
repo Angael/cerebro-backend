@@ -1,6 +1,6 @@
 import { extname } from 'path';
 import { nanoid } from 'nanoid';
-import { ThumbnailSize } from '../models/IThumbnail';
+import { ThumbnailSize } from '../models/IThumbnail.js';
 
 export const replaceFileWithHash = (filename: string, hash?: string) => {
   if (hash) {

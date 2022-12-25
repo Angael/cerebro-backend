@@ -1,41 +1,36 @@
-# compiled output
-/dist
-/node_modules
-
 # Logs
 logs
 *.log
 npm-debug.log*
-pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
 
-# OS
-.DS_Store
+# Dependencies
+node_modules/
 
-# Tests
-/coverage
-/.nyc_output
+# Coverage
+coverage
 
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+# Transpiled files
+build/
 
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# VS Code
+.vscode
+!.vscode/tasks.js
+
+# JetBrains IDEs
+.idea/
 
 .env*
-/env/fileupdownload-9d68f-firebase-adminsdk-r12jp-483cc95599.json
+env/*
 /notes/
 /file-uploads/
 /_temp/
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Misc
+*.db
+
+temp/

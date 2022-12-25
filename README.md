@@ -1,22 +1,17 @@
-## Description
+## Cerebro-api
 
-Nest backend for cerebro project.
+Express backend for cerebro project.
 
 ## Installation
 
-```js
+```cmd
 yarn install
 ```
 
 ## Development
 
 Pull and run docker sql image with command
-```js
-docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=cerebro -d mysql:latest
-```
-
-then
-
-```js
+```cmd
+yarn db:dev
 yarn start:dev
 ```
