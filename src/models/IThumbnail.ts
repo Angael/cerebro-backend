@@ -1,10 +1,12 @@
+import { IFileData } from './IItem';
+
 export enum ThumbnailSize {
   source = 'source',
   xs = 'xs',
   md = 'md',
 }
 
-export interface IThumbnailPayload {
+export interface IThumbnailPayload extends IFileData {
   item_id: number;
 
   type: ThumbnailSize;

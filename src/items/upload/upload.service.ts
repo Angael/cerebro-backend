@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import fs from 'fs-extra';
 
 import { DbService } from '../../providers/db.service';
-import { FileType } from '../../models/IItem';
+import { ItemType } from '../../models/IItem';
 import { ImageService } from './image.service';
 import firebase from 'firebase-admin';
 import { VideoService } from './video.service';
@@ -22,24 +22,24 @@ export class UploadService {
     fs.mkdir(UPLOADS_DIR, { recursive: true });
   }
 
-  getFileType(file: Express.Multer.File): FileType {
+  getFileType(file: Express.Multer.File): ItemType {
     const { mimetype } = file;
 
     if (['image/png', 'image/gif', 'image/webp', 'image/jpeg'].includes(mimetype)) {
-      return FileType.image;
+      return ItemType.image;
     } else if (['video/mp4'].includes(mimetype)) {
-      return FileType.video;
+      return ItemType.video;
     } else {
-      return FileType.other;
+      return ItemType.file;
     }
   }
 
   async handleFile(file: Express.Multer.File, user: firebase.auth.DecodedIdToken): Promise<void> {
     try {
-      const fileType = this.getFileType(file);
-      if (fileType === FileType.image) {
+      const itemType = this.getFileType(file);
+      if (itemType === ItemType.image) {
         await this.imageService.handleUpload(file, user);
-      } else if (fileType === FileType.video) {
+      } else if (itemType === ItemType.video) {
         await this.videoService.handleUpload(file, user);
       }
     } catch (e) {

@@ -4,10 +4,10 @@ import { ItemsController } from './items.controller';
 import { UploadService } from './upload/upload.service';
 import { VideoService } from './upload/video.service';
 import { ImageService } from './upload/image.service';
-import { ThumbnailsModule } from './thumbnails/thumbnails.module';
+import { SpaceOptimizerModule } from './space-optimizer/spaceOptimizer.module';
 
 @Module({
-  imports: [ThumbnailsModule],
+  imports: [SpaceOptimizerModule],
   controllers: [ItemsController],
   providers: [ItemsService, UploadService, VideoService, ImageService],
 })

@@ -43,7 +43,7 @@ export class SharpThumbnailService {
       .then((info) => ({ info, path: outPath }));
   }
 
-  async run(file: IFile, filePath: string): Promise<IGeneratedThumbnail[]> {
+  async run(filePath: string): Promise<IGeneratedThumbnail[]> {
     try {
       const animatedPipeline = sharp(filePath, { animated: false });
 
@@ -62,6 +62,7 @@ export class SharpThumbnailService {
               callback(null, { diskPath: path, dimensions, size: info.size, isAnimated: false });
             })
             .catch((error) => {
+              // TODO: Need to unlink files that crashed!
               callback(error);
             });
         },

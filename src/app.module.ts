@@ -8,7 +8,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ItemsModule } from './items/items.module';
 import { AccountModule } from './account/account.module';
-import { FirebaseAuthMiddleware } from './firebase/firebase-auth-middleware';
 import { DbModule } from './providers/db.module';
 import { S3Module } from './providers/s3.module';
 import { AuthModule } from './auth/auth.module';

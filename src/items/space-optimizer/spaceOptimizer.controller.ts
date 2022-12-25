@@ -1,13 +1,13 @@
 import { Controller, Inject, Post } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { ThumbnailsService } from './thumbnails.service';
+import { SpaceOptimizerService } from './spaceOptimizer.service';
 
 @Controller('test/thumbnails')
-export class ThumbnailsController {
+export class SpaceOptimizerController {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-    private readonly thumbnailsService: ThumbnailsService,
+    private readonly thumbnailsService: SpaceOptimizerService,
   ) {}
 
   @Post('download')
@@ -19,14 +19,14 @@ export class ThumbnailsController {
 
   @Post('get')
   async get() {
-    const a = await this.thumbnailsService.getItemForThumbnails();
+    const a = await this.thumbnailsService.findItemToOptimize();
 
     return a;
   }
 
   @Post('run')
   async run() {
-    const a = await this.thumbnailsService.generateThumbnails();
+    const a = await this.thumbnailsService.optimizeItem();
 
     return a;
   }

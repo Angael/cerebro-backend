@@ -7,7 +7,7 @@ import { Logger } from 'winston';
 
 import { DbService } from '../../providers/db.service';
 import { S3Service } from '../../providers/s3.service';
-import { FileType, IFile, IImage, IImageData, IItem, ItemCategory } from '../../models/IItem';
+import { IImage, IImageData, IItem, ItemType, SpaceOptimized } from '../../models/IItem';
 import { makeS3Path, replaceFileWithHash } from '../../utils/makeS3Path';
 import { ThumbnailSize } from '../../models/IThumbnail';
 import { DB_TABLE } from '../../utils/consts';
@@ -32,35 +32,28 @@ export class ImageService {
     itemData: IImageData,
     file: Express.Multer.File,
     author: firebase.auth.DecodedIdToken,
-  ): Promise<any> {
+  ): Promise<void> {
     const db = this.dbService.getDb();
 
     return db.transaction(async (trx) => {
-      const item_id = await db(DB_TABLE.item)
-        .transacting(trx)
-        .insert({
-          account_uid: author.uid,
-          category: ItemCategory.file,
-          private: false,
-          processed: false,
-        } as IItem);
+      const item: IItem = {
+        account_uid: author.uid,
+        type: ItemType.image,
+        private: false,
+        processed: SpaceOptimized.no,
+      };
 
-      const file_id = await db(DB_TABLE.file)
-        .transacting(trx)
-        .insert({
-          item_id: item_id[0],
-          filename: file.originalname,
-          path: s3Key,
-          type: FileType.image,
-          size: file.size,
-        } as IFile);
+      const item_id = await db(DB_TABLE.item).transacting(trx).insert(item);
 
-      await db(DB_TABLE.image)
-        .transacting(trx)
-        .insert({
-          file_id: file_id[0],
-          ...itemData,
-        } as IImage);
+      const image: IImage = {
+        item_id: item_id[0],
+        filename: file.originalname,
+        path: s3Key,
+        size: file.size,
+        ...itemData,
+      };
+
+      await db(DB_TABLE.image).transacting(trx).insert(image);
     });
   }
 
@@ -100,6 +93,7 @@ export class ImageService {
       ThumbnailSize.source,
       replaceFileWithHash(file.originalname),
     );
+
     await this.saveToS3(file, key);
 
     try {
