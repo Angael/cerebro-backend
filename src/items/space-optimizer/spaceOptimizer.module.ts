@@ -6,6 +6,7 @@ import { UploadThumbnailService } from './upload/uploadThumbnail.service';
 import { ItemsService } from '../items.service';
 import { FfmpegCompressorService } from './ffmpeg/ffmpegCompressor.service';
 import { ImageSpaceOptimizerService } from './image/imageSpaceOptimizer.service';
+import { VideoSpaceOptimizerService } from './video/videoSpaceOptimizer.service';
 
 @Module({
   controllers: [SpaceOptimizerController],
@@ -16,6 +17,7 @@ import { ImageSpaceOptimizerService } from './image/imageSpaceOptimizer.service'
     UploadThumbnailService,
     FfmpegCompressorService,
     ImageSpaceOptimizerService,
+    VideoSpaceOptimizerService,
   ],
 })
 export class SpaceOptimizerModule {}

@@ -11,6 +11,7 @@ import { IItem, ItemType, SpaceOptimized } from '../../models/IItem';
 import { UploadThumbnailService } from './upload/uploadThumbnail.service';
 import { ItemsService } from '../items.service';
 import { ImageSpaceOptimizerService } from './image/imageSpaceOptimizer.service';
+import { VideoSpaceOptimizerService } from './video/videoSpaceOptimizer.service';
 
 @Injectable()
 export class SpaceOptimizerService {
@@ -23,6 +24,7 @@ export class SpaceOptimizerService {
     private readonly itemsService: ItemsService,
     private readonly uploadThumbnails: UploadThumbnailService,
     private readonly imageSpaceOptimizer: ImageSpaceOptimizerService,
+    private readonly videoSpaceOptimizer: VideoSpaceOptimizerService,
   ) {
     fs.mkdir(DOWNLOADS_DIR, { recursive: true });
     fs.mkdir(THUMBNAILS_DIR, { recursive: true });
@@ -75,6 +77,8 @@ export class SpaceOptimizerService {
       await this.itemsService.updateItemProcessed(item.id, SpaceOptimized.started);
       if (item.type === ItemType.image) {
         await this.imageSpaceOptimizer.optimize(item);
+      } else if (item.type === ItemType.video) {
+        await this.videoSpaceOptimizer.optimize(item);
       } else {
         // TODO: Not supported type, should skip it
         throw new Error('Tried to optimize unsupported filetype');
