@@ -20,7 +20,7 @@ build/
 .idea/
 
 .env*
-env/*
+/env/*
 /notes/
 /file-uploads/
 /_temp/
