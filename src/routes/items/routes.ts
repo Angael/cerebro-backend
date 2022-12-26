@@ -1,4 +1,4 @@
-import { getAllItems, getItem } from './fileFns.js';
+import { deleteItem, getAllItems, getItem } from './fileFns.js';
 import { Express, Request } from 'express';
 import logger from '../../utils/log.js';
 import { addAuth } from '../../middleware/addAuth.js';
@@ -51,4 +51,20 @@ export default (router: Express) => {
       }
     },
   );
+
+  router.delete('/items/item/:id', addAuth, isPremium, async (req: Request, res) => {
+    const id = Number(req.params.id);
+
+    try {
+      if (!id || isNaN(id)) {
+        throw new Error('Bad id');
+      }
+      await deleteItem(id, req.user.uid);
+
+      res.status(200).send();
+    } catch (e) {
+      logger.error('Error: %O', e);
+      res.sendStatus(500);
+    }
+  });
 };

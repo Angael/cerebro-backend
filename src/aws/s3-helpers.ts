@@ -100,10 +100,10 @@ export function S3DeleteMany(keys: string[]): Promise<void> {
   return new Promise((res, rej) =>
     s3.deleteObjects(params, (s3Err) => {
       if (s3Err) {
-        logger.error(`Failed to delete some objects`, { keys });
+        logger.error(`Failed to delete some objects %o`, keys);
         rej(s3Err);
       } else {
-        logger.verbose(`Deleted from s3`, { keys });
+        logger.verbose(`Deleted from s3 %o`, keys);
         res();
       }
     }),
