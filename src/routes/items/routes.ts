@@ -1,4 +1,4 @@
-import { listFiles, getItem } from './fileFns.js';
+import { getAllItems, getItem } from './fileFns.js';
 import { Express, Request } from 'express';
 import logger from '../../utils/log.js';
 import { addAuth } from '../../middleware/addAuth.js';
@@ -13,7 +13,7 @@ const uploadMiddleware = multer(multerOptions);
 export default (router: Express) => {
   router.get('/items/', addAuth, isPremium, async (req, res) => {
     try {
-      res.json(await listFiles());
+      res.json(await getAllItems());
     } catch (e) {
       logger.error('Error: %O', e);
       res.sendStatus(500);

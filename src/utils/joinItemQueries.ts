@@ -11,7 +11,6 @@ export const joinItemQueries = (
   images: IImage[],
   videos: IVideo[],
   _thumbnails: IThumbnailRow[],
-  envProcess: Object,
 ): IFrontItem[] => {
   return items.map((item) => {
     const filteredThumbnails = _thumbnails.filter((t) => t.item_id === item.id);
@@ -36,7 +35,7 @@ export const joinItemQueries = (
         height,
         hash,
         isAnimated,
-        url: s3PathToUrl(envProcess, path),
+        url: s3PathToUrl(path),
       };
     }
 
@@ -47,13 +46,13 @@ export const joinItemQueries = (
         height,
         duration,
         bitrate,
-        url: s3PathToUrl(envProcess, path),
+        url: s3PathToUrl(path),
       };
     }
 
     // Omit id
     let thumbnails: Thumbnails = filteredThumbnails.map((t) => ({
-      url: s3PathToUrl(envProcess, t.path),
+      url: s3PathToUrl(t.path),
       type: t.type,
     }));
 

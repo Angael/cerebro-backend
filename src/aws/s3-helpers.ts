@@ -2,6 +2,11 @@ import logger from '../utils/log.js';
 import AWS from 'aws-sdk';
 import fs from 'fs-extra';
 import { s3 } from './s3.js';
+import path from 'path';
+import { DOWNLOADS_DIR } from '../utils/consts.js';
+import { downloadFile } from '../utils/downloadFile.js';
+import { s3PathToUrl } from '../utils/s3PathToUrl.js';
+import { nanoid } from 'nanoid';
 
 export async function S3CreateBucket(bucketName: string) {
   const bucket = bucketName;
@@ -103,4 +108,21 @@ export function S3DeleteMany(keys: string[]): Promise<void> {
       }
     }),
   );
+}
+
+export async function S3Download(filename: string, s3Path: string): Promise<string> {
+  const extension = path.extname(filename);
+  if (!extension) {
+    throw new Error('file has no extension');
+  }
+
+  try {
+    const url = s3PathToUrl(s3Path);
+    const downloadDestination = DOWNLOADS_DIR + '/' + nanoid() + extension;
+    await downloadFile(url, downloadDestination);
+    return downloadDestination;
+  } catch (e) {
+    this.logger.error(e);
+    throw new Error(e);
+  }
 }
