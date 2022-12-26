@@ -4,9 +4,9 @@ import firebase from '../firebase/firebase-params.js';
 export const addAuth = (req: Request, res: Response, next: NextFunction) => {
   let token = req.get('Authorization');
 
-  console.log('token', token);
   if (token) {
     token = token.replace('Bearer ', '');
+
     firebase
       .auth()
       .verifyIdToken(token)
