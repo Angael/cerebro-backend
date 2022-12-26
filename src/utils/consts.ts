@@ -23,3 +23,6 @@ export enum DB_TABLE {
   wall = 'wall',
   wall_item = 'wall_item',
 }
+
+export const FFMPEG_PATH = 'ffmpeg';
+export const FFPROBE_PATH = 'ffprobe';
