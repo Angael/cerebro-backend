@@ -7,6 +7,7 @@ import { IFrontItem } from '../../models/for-frontend/IFrontItem.js';
 import firebase from 'firebase-admin';
 import { forEach } from 'modern-async';
 import { S3DeleteMany } from '../../aws/s3-helpers.js';
+import { HttpError } from '../../utils/errors/HttpError.js';
 
 export async function getAllItems(): Promise<IFrontItem[]> {
   const items: IItem[] = await db.select().from(DB_TABLE.item);
@@ -26,7 +27,10 @@ export async function getItem(id: number): Promise<IFrontItem> {
   if (joined.length === 1) {
     return joined[0];
   } else {
-    throw new Error('Found ' + joined.length + 'items');
+    if (joined.length === 0) {
+      throw new HttpError(404);
+    }
+    throw new Error('Found ' + joined.length + ' items');
   }
 }
 
