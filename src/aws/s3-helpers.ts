@@ -55,10 +55,10 @@ export function S3SimpleUpload({
   return new Promise((res, rej) =>
     s3.upload(params, (s3Err, data) => {
       if (s3Err) {
-        logger.error(`Failed to upload to s3`, filePath);
+        logger.error(`Failed to upload to s3 %s`, filePath);
         rej(s3Err);
       } else {
-        logger.verbose(`Uploaded to s3`, data.Key);
+        logger.verbose(`Uploaded to s3 %s`, data.Key);
         res();
       }
     }),
