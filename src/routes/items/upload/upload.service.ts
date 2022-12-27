@@ -1,13 +1,9 @@
-import fs from 'fs-extra';
 import firebase from 'firebase-admin';
 import { ItemType } from '../../../models/IItem.js';
-import { UPLOADS_DIR } from '../../../utils/consts.js';
 import { betterUnlink } from '../../../utils/betterUnlink.js';
 import logger from '../../../utils/log.js';
 import { uploadImage } from './image.service.js';
 import { uploadVideo } from './video.service.js';
-
-fs.mkdir(UPLOADS_DIR, { recursive: true });
 
 function getFileType(file: Express.Multer.File): ItemType {
   const { mimetype } = file;

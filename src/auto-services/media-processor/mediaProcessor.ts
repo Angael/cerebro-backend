@@ -1,11 +1,6 @@
 import { Scheduler } from 'modern-async';
 import logger from '../../utils/log.js';
-import fs from 'fs-extra';
-import { DOWNLOADS_DIR, THUMBNAILS_DIR } from '../../utils/consts.js';
 import { processSomeItem } from './processSomeItem.js';
-
-fs.mkdir(DOWNLOADS_DIR, { recursive: true });
-fs.mkdir(THUMBNAILS_DIR, { recursive: true });
 
 const mediaProcessor = new Scheduler(
   () =>
