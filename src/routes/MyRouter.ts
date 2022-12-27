@@ -1,9 +1,11 @@
 import express, { Express } from 'express';
 import cors from 'cors';
 import log from '../utils/log.js';
-import filesRoutes from './items/routes.js';
+import itemRoutes from './items/routes.js';
+import registerRoutes from './register/routes.js';
+import { addAuth } from '../middleware/addAuth.js';
 
-const routes2: ((router: Express) => void)[] = [filesRoutes];
+const routes2: ((router: Express) => void)[] = [itemRoutes, registerRoutes];
 
 const startRouter = () => {
   const router = express();
@@ -11,6 +13,7 @@ const startRouter = () => {
 
   router.use(express.json());
   router.use(cors());
+  router.use(addAuth);
   router.get('/', (req, res) => 'v1');
 
   // v2 way of writing things? more compact
