@@ -34,10 +34,10 @@ export async function uploadFileForUser(
     }
   } catch (e) {
     logger.error(e);
-    betterUnlink(file.path);
     throw new Error('Unsupported filetype');
+  } finally {
+    betterUnlink(file.path);
   }
 
-  betterUnlink(file.path);
   return;
 }

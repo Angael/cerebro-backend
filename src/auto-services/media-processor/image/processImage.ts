@@ -1,4 +1,4 @@
-import { forEachSeries } from 'modern-async';
+import { forEach } from 'modern-async';
 import { IImage, IItem } from '../../../models/IItem.js';
 import { DB_TABLE } from '../../../utils/consts.js';
 import { S3Download } from '../../../aws/s3-helpers.js';
@@ -40,8 +40,13 @@ export async function processImage(item: IItem) {
     try {
       await uploadThumbnails(thumbnails);
     } catch (e) {
-      forEachSeries(thumbnails, (t) => betterUnlink(t.diskPath));
+      //
+    } finally {
+      forEach(thumbnails, (t) => betterUnlink(t.diskPath));
     }
-  } catch (e) {}
-  betterUnlink(download);
+  } catch (e) {
+    //
+  } finally {
+    betterUnlink(download);
+  }
 }
