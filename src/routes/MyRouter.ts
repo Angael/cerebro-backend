@@ -1,11 +1,13 @@
 import express, { Express } from 'express';
 import cors from 'cors';
 import log from '../utils/log.js';
-import itemRoutes from './items/routes.js';
-import registerRoutes from './register/routes.js';
 import { addAuth } from '../middleware/addAuth.js';
 
-const routes2: ((router: Express) => void)[] = [itemRoutes, registerRoutes];
+import itemRoutes from './items/routes.js';
+import registerRoutes from './register/routes.js';
+import limitsRoutes from './limits/routes.js';
+
+const routes2: ((router: Express) => void)[] = [itemRoutes, registerRoutes, limitsRoutes];
 
 const startRouter = () => {
   const router = express();
