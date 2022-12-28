@@ -75,9 +75,9 @@ export async function deleteItem(itemId: IItem['id'], userId: firebase.auth.Deco
       // Better for AWS costs, but could lead to orphaned files in S3
       await S3DeleteMany(s3PathsToDelete);
     } else {
-      throw new Error('unauthorized');
+      throw new HttpError(403);
     }
   } else {
-    throw new Error('404');
+    throw new HttpError(404);
   }
 }
