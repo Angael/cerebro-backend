@@ -1,4 +1,4 @@
-import { AccountType } from '../IAccount';
+import { AccountType } from '../IAccount.js';
 
 export interface ILimits {
   type: AccountType;

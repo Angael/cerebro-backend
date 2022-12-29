@@ -1,18 +1,25 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
+    "target": "ES2022",
+    "module": "Node16",
+    "lib": ["ES2022"],
+    "moduleResolution": "Node16",
+    "rootDir": ".",
+    "outDir": "build",
     "allowSyntheticDefaultImports": true,
-    "target": "es2017",
+    "importHelpers": true,
+    "alwaysStrict": true,
     "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./",
-    "incremental": true,
-    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "strictNullChecks": false,
     "resolveJsonModule": true,
-    "esModuleInterop": true
-  }
+    "skipLibCheck": true // This is needed as long as there is error in importing with require in some firebase deps
+  },
+  "include": ["src/**/*", "__tests__/**/*"]
 }

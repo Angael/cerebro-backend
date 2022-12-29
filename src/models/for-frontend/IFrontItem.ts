@@ -1,5 +1,5 @@
-import { IFileData, IImageData, ItemType, IVideoData } from '../IItem';
-import { ThumbnailSize } from '../IThumbnail';
+import { IImageData, ItemType, IVideoData } from '../IItem.js';
+import { ThumbnailSize } from '../IThumbnail.js';
 
 type Thumbnail = {
   url: string;

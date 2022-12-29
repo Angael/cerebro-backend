@@ -1,0 +1,85 @@
+oryginal
+1mb -> 
+
+ffmpeg -i t1.webm -benchmark t1-c0.webm
+1.07mb
+12.7s
+
+ffmpeg -i t1.webm -benchmark -speed 8 t1-c1.webm
+1.00 mb
+6.938s
+
+ffmpeg -i t1.webm -benchmark -speed 0 t1-c2.webm
+1.01 mb
+29.339s
+
+limitowanie do 10B/s
+ffmpeg -i t1.webm -benchmark -speed 0 -b:v 10 t1-c3.webm
+110 KB
+rtime=4.630s
+
+
+
+t2
+3,68 mb
+50k
+286 KB
+5,8 s
+
+150k
+357 KB
+5,8 s
+
+
+300k
+564 KB
+6,4 s
+
+1000k
+1,48 MB
+9s
+
+
+
+Rezolucja:
+Wideo jest tylko dla płacących, ew pozniej dorobie by z YT sie dalo.
+
+zawsze da sie wyciagnac bitrate i duration, wystarczy przekopiowac ffmpegiem:
+ffmpeg -i source.webm -vcodec copy -acodec copy source-withDuration.webm
+i to zbadac probem
+
+dla >1.5 MB || bitrate > 2MB
+zmniejszaj bitrate 
+bitrate nie pokazuje sie w webm na przyklad :<
+
+bit_rate: '12096909', = 12 MB/s
+w streamie video
+
+mozna zmniejszac do 50-60% oryginalnego bitrate spokojnie, o ile nie jest to juz od poczatku maly bitrate.
+1MB bitrate do 500kB slabo bedzie
+7MB do 3 to prawie nie zauwazalne.
+
+max -b:v to 2M
+min -b:v to 300K
+
+co z big res? 4k? takie pliki nie powinny trafiać na serwer, moja architektóra nie wyrobi i koszty mi się nie zwrócą na 80%
+
+pierwsza tabelka:
+1080p = 2073600 px = min 0.5M max 3M
+720p = 921600 px = min 0.15M max 1.33M
+
+
+
+A tak moge robic animowane thumbnaile:
+ffmpeg -i t1.webm -lossless 0 -q:v 40 -ss 00:00:00 -t 00:00:03 -s 320x180 -loop 0 -filter:v fps=4 -c:v libwebp 1.webp
+speeed up: 0.5 daje 2x szybsze wideo
+ffmpeg -i input.mkv -filter:v "setpts=2.0*PTS" output.mkv
+
+Chyba mam już całkiem niezłą kompresję, jeszcze sprawdz z jakims 4k footage
+
+Dodaj coefficient dla size
+
+
+dash
+ffmpeg -i f.mp4 -vn -acodec libvorbis -ab 128k -dash 1 my_audio.webm
+ffmpeg -i f.mp4 -c:v libvpx-vp9 -keyint_min 150 -g 150 -tile-columns 4 -frame-parallel 1  -f webm -dash 1 -an -vf scale=320:180 -b:v 500k -dash 1 video_320x180_500k.webm

@@ -1,3 +1,3 @@
-export const s3PathToUrl = (processEnv: any, path: string) => {
-  return `https://s3.${processEnv.AWS_REGION}.amazonaws.com/${processEnv.AWS_BUCKET_NAME}/${path}`;
+export const s3PathToUrl = (s3Path: string) => {
+  return `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.AWS_BUCKET_NAME}/${s3Path}`;
 };

@@ -1,22 +1,21 @@
-import * as firebase from 'firebase-admin';
-import * as firebaseConfig from '../../env/fileupdownload-9d68f-firebase-adminsdk-r12jp-483cc95599.json';
+import admin from 'firebase-admin';
 
-const firebase_params = {
-  type: firebaseConfig.type,
-  projectId: firebaseConfig.project_id,
-  privateKeyId: firebaseConfig.private_key_id,
-  privateKey: firebaseConfig.private_key,
-  clientEmail: firebaseConfig.client_email,
-  clientId: firebaseConfig.client_id,
-  authUri: firebaseConfig.auth_uri,
-  tokenUri: firebaseConfig.token_uri,
-  authProviderX509CertUrl: firebaseConfig.auth_provider_x509_cert_url,
-  clientC509CertUrl: firebaseConfig.client_x509_cert_url,
-};
+const serviceAccount = {
+  type: 'service_account',
+  project_id: process.env.FB_PROJECT_ID,
+  private_key_id: '483cc9559928cede2807b9a345effe402ff965e3',
+  private_key: process.env.FB_KEY,
+  client_email: process.env.FB_EMAIL,
+  client_id: '116388986778231348956',
+  auth_uri: 'https://accounts.google.com/o/oauth2/auth',
+  token_uri: 'https://oauth2.googleapis.com/token',
+  auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
+  client_x509_cert_url:
+    'https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-r12jp%40fileupdownload-9d68f.iam.gserviceaccount.com',
+} as any;
 
-firebase.initializeApp({
-  credential: firebase.credential.cert(firebase_params),
-  databaseURL: process.env.FIREBASE_DB_URL,
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
 });
 
-export default firebase;
+export default admin;

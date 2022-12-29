@@ -1,0 +1,8 @@
+sudo systemctl reload nginx
+
+path godless pc:
+I:\_projekty\nginx\copyOfDroplet\
+
+path droplet:
+/etc/nginx
+
