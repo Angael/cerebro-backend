@@ -3,11 +3,13 @@ import cors from 'cors';
 import log from '../utils/log.js';
 import { addAuth } from '../middleware/addAuth.js';
 
-import itemRoutes from './items/routes.js';
+import itemRouter from './items/itemRouter.js';
 import registerRoutes from './register/routes.js';
 import limitsRoutes from './limits/routes.js';
+import { MyRoute } from './express-helpers/routeType.js';
 
-const routes2: ((router: Express) => void)[] = [itemRoutes, registerRoutes, limitsRoutes];
+const routes2: ((router: Express) => void)[] = [registerRoutes, limitsRoutes];
+const routes3: MyRoute[] = [itemRouter];
 
 const startRouter = () => {
   const router = express();
@@ -22,6 +24,12 @@ const startRouter = () => {
   routes2.forEach((registerRoutes) => {
     registerRoutes(router);
   });
+
+  // v3 with subRouters
+  routes3.forEach((myRoute) => {
+    router.use(myRoute.path, myRoute.router);
+  });
+  router.use(itemRouter.path, itemRouter.router);
 
   router.listen(port, () => {
     log.info(`Router started`);

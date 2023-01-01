@@ -6,4 +6,4 @@ export const limitsConfig = {
   [AccountType.standard]: 100 * MB,
   [AccountType.premium]: 1 * GB,
   [AccountType.admin]: 1 * GB,
-};
+} as const;
