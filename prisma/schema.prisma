@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  FREE
+  PREMIUM
+  ADMIN
+}
+
+model User {
+  uid       String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  email     String   @db.VarChar(320)
+  name      String?  @db.VarChar(64)
+  type      UserType
+  items     Item[]
+}
+
+enum ItemType {
+  IMAGE
+  VIDEO
+}
+
+enum Processed {
+  NO
+  FAIL
+  V1
+}
+
+model Item {
+  id         Int         @id @default(autoincrement())
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  private    Boolean     @default(false)
+  User       User        @relation(fields: [userUid], references: [uid])
+  userUid    String      @unique
+  processed  Processed
+  thumbnails Thumbnail[]
+  Image      Image[]
+  Video      Video[]
+}
+
+enum ThumbnailType {
+  XS
+  SM
+  MD
+}
+
+model Thumbnail {
+  id        Int           @id @default(autoincrement())
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  Item      Item?         @relation(fields: [itemId], references: [id])
+  itemId    Int?
+  type      ThumbnailType
+
+  path String @db.VarChar(256)
+  size Int
+}
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Item      Item?    @relation(fields: [itemId], references: [id])
+  itemId    Int?
+
+  path     String  @db.VarChar(256)
+  size     Int
+  width    Int
+  height   Int
+  animated Boolean
+}
+
+model Video {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Item      Item?    @relation(fields: [itemId], references: [id])
+  itemId    Int?
+
+  path     String @db.VarChar(256)
+  size     Int
+  width    Int
+  height   Int
+  duration Int
+  bitrate  Int
+}
+
+// model User {
+//   id      Int      @id @default(autoincrement())
+//   email   String   @unique
+//   name    String?
+//   posts   Post[]
+//   profile Profile?
+// }

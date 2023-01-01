@@ -1,4 +1,3 @@
-import * as knexPkg from 'knex';
 const { knex } = knexPkg.default;
 
 export const db = knex({
