@@ -33,4 +33,6 @@ build/
 # Misc
 *.db
 
-temp/
+/temp/*
+/dist/*
+/build/*

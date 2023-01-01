@@ -2,7 +2,7 @@ import { DB_TABLE } from '../../utils/consts.js';
 import { limitsConfig } from '../../utils/limits.js';
 import firebase from '../../firebase/firebase-params.js';
 import { db } from '../../db/db.js';
-import { userTypeCache } from '../../cache/userCache.js';
+import { usedSpaceCache, userTypeCache } from '../../cache/userCache.js';
 import { AccountType } from '../../models/IAccount.js';
 
 const getThingSize = async (tableName: string, uid: string): Promise<number> => {
@@ -32,23 +32,30 @@ export async function getUserType(uid: string): Promise<AccountType> {
 
 export async function getLimitsForUser(user: firebase.auth.DecodedIdToken) {
   const type = await getUserType(user.uid);
+  const max = limitsConfig[type];
 
-  const sizes = await Promise.allSettled([
-    getThingSize(DB_TABLE.image, user.uid),
-    getThingSize(DB_TABLE.video, user.uid),
-    getThingSize(DB_TABLE.thumbnail, user.uid),
-  ]);
+  let used: number;
+  if (usedSpaceCache.has(user.uid)) {
+    used = usedSpaceCache.get(user.uid);
+  } else {
+    const sizes = await Promise.allSettled([
+      getThingSize(DB_TABLE.image, user.uid),
+      getThingSize(DB_TABLE.video, user.uid),
+      getThingSize(DB_TABLE.thumbnail, user.uid),
+    ]);
 
-  const used = sizes.reduce<number>(
-    (sum, size) => (size.status === 'fulfilled' ? sum + size.value : sum),
-    0,
-  );
+    used = sizes.reduce<number>(
+      (sum, size) => (size.status === 'fulfilled' ? sum + size.value : sum),
+      0,
+    );
+    usedSpaceCache.set(user.uid, used);
+  }
 
   return {
     type,
     bytes: {
-      used: used,
-      max: limitsConfig[type],
+      used,
+      max,
     },
   };
 }
