@@ -22,7 +22,6 @@ const startRouter = () => {
   routes3.forEach((myRoute) => {
     router.use(myRoute.path, myRoute.router);
   });
-  // router.use(itemRouter.path, itemRouter.router);
 
   router.listen(port, () => {
     log.info(`Router started`);
