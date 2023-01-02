@@ -65,6 +65,8 @@ model Thumbnail {
   Item      Item          @relation(fields: [itemId], references: [id])
   itemId    Int
   type      ThumbnailType
+  width     Int
+  height    Int
 
   path String @db.VarChar(256)
   size Int

@@ -22,9 +22,10 @@ export async function processImage(item: Item) {
 
     let thumbnails: IThumbnailBeforeUpload[] = generatedThumbs.map((t) => ({
       thumbnail: {
-        ...t.dimensions,
-        item_id: item.id,
-        isAnimated: t.animated, // TODO: Lie? It can I think result in animated thumbnail
+        itemId: item.id,
+        type: t.dimensions.type,
+        width: t.dimensions.width,
+        height: t.dimensions.height,
         path: makeS3Path(
           item.userUid,
           t.dimensions.type,

@@ -5,7 +5,6 @@ import { S3Delete, S3SimpleUpload } from '../../../aws/s3-helpers.js';
 import { IVideoData } from '../../../models/IItem.js';
 import { FFPROBE_PATH } from '../../../utils/consts.js';
 import { makeS3Path, replaceFileWithHash } from '../../../utils/makeS3Path.js';
-import { ThumbnailSize } from '../../../models/IThumbnail.js';
 import { prisma } from '../../../db/db.js';
 import { ItemType, Processed } from '@prisma/client';
 
@@ -70,7 +69,7 @@ async function analyze(path: string): Promise<IVideoData> {
 export async function uploadVideo(file: Express.Multer.File, author: firebase.auth.DecodedIdToken) {
   const videoData = await analyze(file.path);
 
-  const key = makeS3Path(author.uid, ThumbnailSize.source, replaceFileWithHash(file.originalname));
+  const key = makeS3Path(author.uid, 'source', replaceFileWithHash(file.originalname));
 
   await S3SimpleUpload({
     key,

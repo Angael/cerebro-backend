@@ -1,23 +1,43 @@
-import { DB_TABLE } from '../../utils/consts.js';
 import { limitsConfig } from '../../utils/limits.js';
 import firebase from '../../firebase/firebase-params.js';
-import { db, prisma } from '../../db/db.js';
+import { prisma } from '../../db/db.js';
 import { usedSpaceCache, userTypeCache } from '../../cache/userCache.js';
 import { UserType } from '@prisma/client';
 
-const getThingSize = async (tableName: string, uid: string): Promise<number> => {
-  const response = await db
-    .sum({ size: tableName + '.size' })
-    .from(DB_TABLE.item)
-    .join(tableName, 'item.id', tableName + '.item_id')
-    .where({ account_uid: uid });
-
-  const asNumber = Number(response[0]?.size);
-  if (isNaN(asNumber)) {
-    return 0;
+export const getSpaceUsedByUser = async (uid: string): Promise<number> => {
+  let used: number;
+  if (usedSpaceCache.has(uid)) {
+    used = usedSpaceCache.get(uid);
   } else {
-    return asNumber;
+    const items = await prisma.item.findMany({
+      where: { userUid: uid },
+      include: {
+        Image: true,
+        Video: true,
+        thumbnails: true,
+      },
+    });
+
+    used = items.reduce((sum, item) => {
+      const imagesSize = item.Image.reduce((sum, image) => {
+        return sum + image.size;
+      }, 0);
+
+      const videoSize = item.Video.reduce((sum, image) => {
+        return sum + image.size;
+      }, 0);
+
+      const thumbnailsSize = item.thumbnails.reduce((sum, image) => {
+        return sum + image.size;
+      }, 0);
+
+      return imagesSize + videoSize + thumbnailsSize;
+    }, 0);
+
+    usedSpaceCache.set(uid, used);
   }
+
+  return used;
 };
 
 export async function getUserType(uid: string): Promise<UserType> {
@@ -36,28 +56,10 @@ export async function getLimitsForUser(user: firebase.auth.DecodedIdToken) {
   const type = await getUserType(user.uid);
   const max = limitsConfig[type];
 
-  let used: number;
-  if (usedSpaceCache.has(user.uid)) {
-    used = usedSpaceCache.get(user.uid);
-  } else {
-    const sizes = await Promise.allSettled([
-      getThingSize(DB_TABLE.image, user.uid),
-      getThingSize(DB_TABLE.video, user.uid),
-      getThingSize(DB_TABLE.thumbnail, user.uid),
-    ]);
-
-    used = sizes.reduce<number>(
-      (sum, size) => (size.status === 'fulfilled' ? sum + size.value : sum),
-      0,
-    );
-    usedSpaceCache.set(user.uid, used);
-  }
+  const used = getSpaceUsedByUser(user.uid);
 
   return {
     type,
-    bytes: {
-      used,
-      max,
-    },
+    bytes: { used, max },
   };
 }

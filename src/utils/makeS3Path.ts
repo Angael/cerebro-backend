@@ -1,6 +1,6 @@
 import { extname } from 'path';
 import { nanoid } from 'nanoid';
-import { ThumbnailSize } from '../models/IThumbnail.js';
+import { ThumbnailType } from '@prisma/client';
 
 export const replaceFileWithHash = (filename: string, hash?: string) => {
   if (hash) {
@@ -10,7 +10,7 @@ export const replaceFileWithHash = (filename: string, hash?: string) => {
   }
 };
 
-export const makeS3Path = (userId: string, type: ThumbnailSize, filename: string) => {
+export const makeS3Path = (userId: string, type: ThumbnailType | 'source', filename: string) => {
   return `u/${userId}/${type}/${filename}`;
 };
 

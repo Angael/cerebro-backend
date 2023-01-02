@@ -1,29 +1,7 @@
-import { Thumbnail } from '@prisma/client';
-
-export enum ThumbnailSize {
-  source = 'source',
-  xs = 'xs',
-  md = 'md',
-}
-
-// export interface IThumbnailPayload extends IFileData {
-//   item_id: number;
-//
-//   type: ThumbnailSize;
-//   path: string;
-//   size: number; // bytes
-//   width: number;
-//   height: number;
-//   isAnimated: boolean;
-// }
-
-// export interface IThumbnailRow extends IThumbnailPayload {
-//   id: number;
-//   created_at: string;
-// }
+import { Thumbnail, ThumbnailType } from '@prisma/client';
 
 export interface IThumbnailBeforeUpload {
-  thumbnail: Thumbnail;
+  thumbnail: Omit<Thumbnail, 'id' | 'createdAt' | 'updatedAt'>;
   diskPath: string;
 }
 
@@ -35,7 +13,7 @@ export interface IGeneratedThumbnail {
 }
 
 export type IThumbnailMeasure = {
-  type: ThumbnailSize;
+  type: ThumbnailType;
   width: number;
   height: number;
 };

@@ -5,7 +5,6 @@ import logger from '../../../utils/log.js';
 import { S3Delete, S3SimpleUpload } from '../../../aws/s3-helpers.js';
 import { IImageData } from '../../../models/IItem.js';
 import { makeS3Path, replaceFileWithHash } from '../../../utils/makeS3Path.js';
-import { ThumbnailSize } from '../../../models/IThumbnail.js';
 import { prisma } from '../../../db/db.js';
 import { ItemType, Processed } from '@prisma/client';
 
@@ -65,7 +64,7 @@ export async function uploadImage(
 ): Promise<void> {
   const imageData = await analyze(file);
 
-  const key = makeS3Path(author.uid, ThumbnailSize.source, replaceFileWithHash(file.originalname));
+  const key = makeS3Path(author.uid, 'source', replaceFileWithHash(file.originalname));
 
   await S3SimpleUpload({
     key,

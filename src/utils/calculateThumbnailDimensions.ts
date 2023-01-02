@@ -1,5 +1,6 @@
-import { IThumbnailMeasure, ThumbnailSize } from '../models/IThumbnail.js';
+import { IThumbnailMeasure } from '../models/IThumbnail.js';
 import { MD_CELL_SIZE, XS_CELL_SIZE } from './consts.js';
+import { ThumbnailType } from '@prisma/client';
 
 const resizeWithSameAspectRatio = (_w: number, _h: number, desiredPxAmount: number) => {
   const x = desiredPxAmount / (_w * _h);
@@ -23,11 +24,11 @@ export const calculateThumbnailDimensions = (w: number, h: number): IThumbnailMe
 
   const arr: IThumbnailMeasure[] = [];
   arr.push({
-    type: ThumbnailSize.md,
+    type: ThumbnailType.MD,
     ...resizeWithSameAspectRatio(w, h, allowedPixelsModifier * MD_CELL_SIZE * MD_CELL_SIZE),
   });
   arr.push({
-    type: ThumbnailSize.xs,
+    type: ThumbnailType.XS,
     ...resizeWithSameAspectRatio(w, h, allowedPixelsModifier * XS_CELL_SIZE * XS_CELL_SIZE),
   });
 
