@@ -1,4 +1,4 @@
-import { IFileData } from './IItem.js';
+import { Thumbnail } from '@prisma/client';
 
 export enum ThumbnailSize {
   source = 'source',
@@ -6,24 +6,24 @@ export enum ThumbnailSize {
   md = 'md',
 }
 
-export interface IThumbnailPayload extends IFileData {
-  item_id: number;
+// export interface IThumbnailPayload extends IFileData {
+//   item_id: number;
+//
+//   type: ThumbnailSize;
+//   path: string;
+//   size: number; // bytes
+//   width: number;
+//   height: number;
+//   isAnimated: boolean;
+// }
 
-  type: ThumbnailSize;
-  path: string;
-  size: number; // bytes
-  width: number;
-  height: number;
-  isAnimated: boolean;
-}
-
-export interface IThumbnailRow extends IThumbnailPayload {
-  id: number;
-  created_at: string;
-}
+// export interface IThumbnailRow extends IThumbnailPayload {
+//   id: number;
+//   created_at: string;
+// }
 
 export interface IThumbnailBeforeUpload {
-  thumbnail: IThumbnailPayload;
+  thumbnail: Thumbnail;
   diskPath: string;
 }
 
@@ -31,7 +31,7 @@ export interface IGeneratedThumbnail {
   diskPath: string;
   dimensions: IThumbnailMeasure;
   size: number;
-  isAnimated: boolean;
+  animated: boolean;
 }
 
 export type IThumbnailMeasure = {

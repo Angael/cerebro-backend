@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import { AccountType } from '../models/IAccount.js';
-import { DB_TABLE } from '../utils/consts.js';
-import { db } from '../db/db.js';
+import { UserType } from '@prisma/client';
 import { registerUser } from '../routes/register/register-service.js';
+import { getUserType } from '../routes/limits/limits-service.js';
 
 export const isPremium = async (req: Request, res: Response, next) => {
   const user = req?.user;
@@ -11,17 +10,13 @@ export const isPremium = async (req: Request, res: Response, next) => {
     return;
   }
 
-  const getAccountType = () => db.select('type').from(DB_TABLE.account).where({ uid: user.uid });
-
-  let firstRow = (await getAccountType())[0];
-  if (!firstRow) {
+  let type = await getUserType(user.uid);
+  if (!type) {
     await registerUser(user.uid, user.email);
-    firstRow = (await getAccountType())[0];
+    type = await getUserType(user.uid);
   }
 
-  const type = firstRow.type;
-
-  if (type === AccountType.free) {
+  if (type === UserType.FREE) {
     res.sendStatus(403);
   } else {
     next();

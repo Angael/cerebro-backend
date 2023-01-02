@@ -1,9 +1,9 @@
-import { IImageData, ItemType, IVideoData } from '../IItem.js';
-import { ThumbnailSize } from '../IThumbnail.js';
+import { IImageData, IVideoData } from '../IItem.js';
+import { ItemType, ThumbnailType } from '@prisma/client';
 
 type Thumbnail = {
   url: string;
-  type: ThumbnailSize;
+  type: ThumbnailType;
 };
 
 type AddUrl = {

@@ -1,41 +1,37 @@
-import { db } from '../../db/db.js';
+import { prisma } from '../../db/db.js';
 import { updateItemProcessed } from '../../routes/items/fileFns.js';
-import { DB_TABLE } from '../../utils/consts.js';
-import { IItem, ItemType, SpaceOptimized } from '../../models/IItem.js';
 import { processImage } from './image/processImage.js';
+import { Item, ItemType, Processed } from '@prisma/client';
 
-async function findNotProcessedItem(): Promise<IItem | undefined> {
-  const queryResult = await db
-    .select()
-    .from(DB_TABLE.item)
-    // .join(DB_TABLE.file, 'item.id', 'file.item_id')
-    .where('processed', SpaceOptimized.no as IItem['processed'])
-    .limit(1);
+async function findNotProcessedItem() {
+  const item: Item | null = await prisma.item.findFirst({
+    where: { processed: Processed.NO },
+  });
 
-  return queryResult[0];
+  return item;
 }
 
-export async function processSomeItem(): Promise<IItem['id'] | null> {
+export async function processSomeItem(): Promise<Item['id'] | null> {
   const item = await findNotProcessedItem();
   if (!item) {
     return null;
   }
 
   try {
-    await updateItemProcessed(item.id, SpaceOptimized.started);
-    if (item.type === ItemType.image) {
+    await updateItemProcessed(item.id, Processed.STARTED);
+    if (item.type === ItemType.IMAGE) {
       await processImage(item);
-    } else if (item.type === ItemType.video) {
+    } else if (item.type === ItemType.VIDEO) {
       // await videoSpaceOptimizer.optimize(item);
       throw new Error('Tried to optimize unsupported video filetype');
     } else {
       throw new Error('Tried to optimize unsupported unknown filetype');
     }
 
-    await updateItemProcessed(item.id, SpaceOptimized.yes_v1);
+    await updateItemProcessed(item.id, Processed.V1);
     return item.id;
   } catch (e) {
-    await updateItemProcessed(item.id, SpaceOptimized.failed);
+    await updateItemProcessed(item.id, Processed.FAIL);
     throw e;
   }
 }

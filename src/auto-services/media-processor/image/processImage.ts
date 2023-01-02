@@ -1,22 +1,21 @@
 import { forEach } from 'modern-async';
-import { IImage, IItem } from '../../../models/IItem.js';
-import { DB_TABLE } from '../../../utils/consts.js';
 import { S3Download } from '../../../aws/s3-helpers.js';
 import { IThumbnailBeforeUpload } from '../../../models/IThumbnail.js';
 import { getNameFromS3Path, makeS3Path } from '../../../utils/makeS3Path.js';
 import { changeExtension } from '../../../utils/changeExtension.js';
 import { generateThumbnails } from './sharpHelpers.js';
 import { betterUnlink } from '../../../utils/betterUnlink.js';
-import { db } from '../../../db/db.js';
+import { prisma } from '../../../db/db.js';
 import { uploadThumbnails } from '../uploadThumbnails.js';
+import { Item } from '@prisma/client';
 
-async function fetchDetails(item: IItem): Promise<IImage> {
-  return (await db.select().from(DB_TABLE.image).where({ item_id: item.id }).limit(1))[0];
+function fetchDetails(item: Item) {
+  return prisma.image.findFirst({ where: { itemId: item.id } });
 }
 
-export async function processImage(item: IItem) {
+export async function processImage(item: Item) {
   const imageRow = await fetchDetails(item);
-  const download = await S3Download(imageRow.filename, imageRow.path);
+  const download = await S3Download(imageRow.path);
 
   try {
     const generatedThumbs = await generateThumbnails(download);
@@ -25,13 +24,12 @@ export async function processImage(item: IItem) {
       thumbnail: {
         ...t.dimensions,
         item_id: item.id,
-        isAnimated: t.isAnimated, // TODO: Lie? It can I think result in animated thumbnail
+        isAnimated: t.animated, // TODO: Lie? It can I think result in animated thumbnail
         path: makeS3Path(
-          item.account_uid,
+          item.userUid,
           t.dimensions.type,
           changeExtension(getNameFromS3Path(imageRow.path), 'webp'),
         ),
-        filename: imageRow.filename,
         size: t.size,
       },
       diskPath: t.diskPath,

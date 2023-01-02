@@ -33,6 +33,7 @@ enum ItemType {
 
 enum Processed {
   NO
+  STARTED
   FAIL
   V1
 }
@@ -44,6 +45,7 @@ model Item {
   private    Boolean     @default(false)
   User       User        @relation(fields: [userUid], references: [uid])
   userUid    String      @unique
+  type       ItemType
   processed  Processed
   thumbnails Thumbnail[]
   Image      Image[]
@@ -60,8 +62,8 @@ model Thumbnail {
   id        Int           @id @default(autoincrement())
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
-  Item      Item?         @relation(fields: [itemId], references: [id])
-  itemId    Int?
+  Item      Item          @relation(fields: [itemId], references: [id])
+  itemId    Int
   type      ThumbnailType
 
   path String @db.VarChar(256)
@@ -72,8 +74,8 @@ model Image {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Item      Item?    @relation(fields: [itemId], references: [id])
-  itemId    Int?
+  Item      Item     @relation(fields: [itemId], references: [id])
+  itemId    Int
 
   path     String  @db.VarChar(256)
   size     Int
@@ -86,8 +88,8 @@ model Video {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Item      Item?    @relation(fields: [itemId], references: [id])
-  itemId    Int?
+  Item      Item     @relation(fields: [itemId], references: [id])
+  itemId    Int
 
   path     String @db.VarChar(256)
   size     Int

@@ -1,9 +1,9 @@
 import { DB_TABLE } from '../../utils/consts.js';
 import { limitsConfig } from '../../utils/limits.js';
 import firebase from '../../firebase/firebase-params.js';
-import { db } from '../../db/db.js';
+import { db, prisma } from '../../db/db.js';
 import { usedSpaceCache, userTypeCache } from '../../cache/userCache.js';
-import { AccountType } from '../../models/IAccount.js';
+import { UserType } from '@prisma/client';
 
 const getThingSize = async (tableName: string, uid: string): Promise<number> => {
   const response = await db
@@ -20,12 +20,14 @@ const getThingSize = async (tableName: string, uid: string): Promise<number> => 
   }
 };
 
-export async function getUserType(uid: string): Promise<AccountType> {
+export async function getUserType(uid: string): Promise<UserType> {
   if (userTypeCache.has(uid)) {
     return userTypeCache.get(uid);
   } else {
-    const { type } = (await db.select('account.type').from(DB_TABLE.account).where({ uid }))[0];
-    userTypeCache.set(uid, type);
+    const { type } = await prisma.user.findFirst({ where: { uid }, select: { type: true } });
+    if (type) {
+      userTypeCache.set(uid, type);
+    }
     return type;
   }
 }
