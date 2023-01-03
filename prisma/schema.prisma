@@ -44,7 +44,7 @@ model Item {
   updatedAt  DateTime    @updatedAt
   private    Boolean     @default(false)
   User       User        @relation(fields: [userUid], references: [uid])
-  userUid    String      @unique
+  userUid    String
   type       ItemType
   processed  Processed
   thumbnails Thumbnail[]

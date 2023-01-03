@@ -21,6 +21,9 @@
     "prettier": "prettier --config .prettierrc --write .",
     "test:watch": "jest --watch"
   },
+  "prisma": {
+    "seed": "npx tsx .\\prisma\\seed.ts"
+  },
   "dependencies": {
     "@prisma/client": "^4.8.0",
     "@types/fs-extra": "^9.0.13",

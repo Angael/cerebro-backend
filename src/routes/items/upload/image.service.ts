@@ -74,7 +74,7 @@ export async function uploadImage(
   try {
     await insertIntoDb(key, imageData, file, author);
   } catch (e) {
-    logger.error('Failed to insert image into DB');
+    logger.error('Failed to insert image into DB, %O', e);
     S3Delete(file.path);
   }
 }

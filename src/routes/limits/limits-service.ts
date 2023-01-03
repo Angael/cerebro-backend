@@ -18,7 +18,7 @@ export const getSpaceUsedByUser = async (uid: string): Promise<number> => {
       },
     });
 
-    used = items.reduce((sum, item) => {
+    used = items.reduce((_sum, item) => {
       const imagesSize = item.Image.reduce((sum, image) => {
         return sum + image.size;
       }, 0);
@@ -31,7 +31,7 @@ export const getSpaceUsedByUser = async (uid: string): Promise<number> => {
         return sum + image.size;
       }, 0);
 
-      return imagesSize + videoSize + thumbnailsSize;
+      return _sum + imagesSize + videoSize + thumbnailsSize;
     }, 0);
 
     usedSpaceCache.set(uid, used);
@@ -44,11 +44,11 @@ export async function getUserType(uid: string): Promise<UserType> {
   if (userTypeCache.has(uid)) {
     return userTypeCache.get(uid);
   } else {
-    const { type } = await prisma.user.findFirst({ where: { uid }, select: { type: true } });
-    if (type) {
-      userTypeCache.set(uid, type);
+    const user = await prisma.user.findFirst({ where: { uid }, select: { type: true } });
+    if (user.type) {
+      userTypeCache.set(uid, user.type);
     }
-    return type;
+    return user.type;
   }
 }
 
@@ -56,7 +56,7 @@ export async function getLimitsForUser(user: firebase.auth.DecodedIdToken) {
   const type = await getUserType(user.uid);
   const max = limitsConfig[type];
 
-  const used = getSpaceUsedByUser(user.uid);
+  const used: number = await getSpaceUsedByUser(user.uid);
 
   return {
     type,
