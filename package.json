@@ -9,17 +9,13 @@
   "scripts": {
     "start": "node build/src/main.js",
     "start:dev": "cross-env NODE_ENV=development tsc-watch --onSuccess \"npm run start\"",
+    "start:prod": "cross-env NODE_ENV=production npm run start",
     "db:run": "docker run -it --name cerebro -v \"C:/cerebro/db:/var/lib/mysql\" -p 27017:27017 -e MYSQL_ROOT_PASSWORD=root -d mysql:latest",
     "db:start": "docker start cerebro",
-    "clean": "rimraf coverage build tmp",
-    "prebuild": "npm run lint",
+    "prebuild": "rimraf build",
     "build": "cross-env NODE_ENV=production tsc -p tsconfig.json",
-    "build:watch": "tsc -w -p tsconfig.json",
-    "build:release": "npm run clean && tsc -p tsconfig.release.json",
-    "lint": "eslint . --ext .ts --ext .mts",
-    "test": "jest --coverage",
-    "prettier": "prettier --config .prettierrc --write .",
-    "test:watch": "jest --watch"
+    "prisma:seed": "prisma db seed"
+
   },
   "prisma": {
     "seed": "npx tsx .\\prisma\\seed.ts"

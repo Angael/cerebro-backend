@@ -6,3 +6,21 @@ declare module 'express' {
     user?: firebase.auth.DecodedIdToken;
   }
 }
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      NODE_ENV: 'development' | 'production';
+      PORT?: string;
+      AWS_USER: string;
+      AWS_KEY: string;
+      AWS_SECRET: string;
+      AWS_BUCKET_NAME: string;
+      AWS_REGION: string;
+      FB_PROJECT_ID: string;
+      FB_KEY: string;
+      FB_EMAIL: string;
+      DATABASE_URL: string;
+    }
+  }
+}
