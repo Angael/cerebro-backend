@@ -15,7 +15,6 @@
     "prebuild": "rimraf build",
     "build": "cross-env NODE_ENV=production tsc -p tsconfig.json",
     "prisma:seed": "prisma db seed"
-
   },
   "prisma": {
     "seed": "npx tsx .\\prisma\\seed.ts"
@@ -23,6 +22,7 @@
   "dependencies": {
     "@prisma/client": "^4.8.0",
     "@types/fs-extra": "^9.0.13",
+    "@vanih/dunes-node": "^1.1.0",
     "async": "^3.2.4",
     "aws-sdk": "^2.1282.0",
     "cors": "^2.8.5",

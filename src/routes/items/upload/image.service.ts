@@ -7,6 +7,7 @@ import { IImageData } from '../../../models/IItem.js';
 import { makeS3Path, replaceFileWithHash } from '../../../utils/makeS3Path.js';
 import { prisma } from '../../../db/db.js';
 import { ItemType, Processed } from '@prisma/client';
+import { HttpError } from '../../../utils/errors/HttpError.js';
 
 async function insertIntoDb(
   s3Key: string,
@@ -76,5 +77,6 @@ export async function uploadImage(
   } catch (e) {
     logger.error('Failed to insert image into DB, %O', e);
     S3Delete(file.path);
+    throw new HttpError(500);
   }
 }

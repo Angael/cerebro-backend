@@ -1,16 +1,15 @@
-import { exec } from 'child_process';
 import firebase from 'firebase-admin';
 import logger from '../../../utils/log.js';
 import { S3Delete, S3SimpleUpload } from '../../../aws/s3-helpers.js';
-import { IVideoData } from '../../../models/IItem.js';
-import { FFPROBE_PATH } from '../../../utils/consts.js';
 import { makeS3Path, replaceFileWithHash } from '../../../utils/makeS3Path.js';
 import { prisma } from '../../../db/db.js';
 import { ItemType, Processed } from '@prisma/client';
+import { analyzeVideo, VideoStats } from '@vanih/dunes-node';
+import { HttpError } from '../../../utils/errors/HttpError.js';
 
 async function insertIntoDb(
   s3Key: string,
-  videoData: IVideoData,
+  videoData: VideoStats,
   file: Express.Multer.File,
   author: firebase.auth.DecodedIdToken,
 ): Promise<any> {
@@ -26,50 +25,16 @@ async function insertIntoDb(
           size: file.size,
           width: videoData.width,
           height: videoData.height,
-          durationMs: videoData.durationMs,
-          bitrateKb: videoData.bitrateKb,
+          durationMs: videoData.duration,
+          bitrateKb: videoData.bitrate,
         },
       },
     },
   });
 }
 
-async function analyze(path: string): Promise<IVideoData> {
-  return new Promise((resolve, _reject) => {
-    exec(`${FFPROBE_PATH} -hide_banner -i "${path}"`, {}, (_error, _stdout, stderr) => {
-      // regexpy na to wszystko
-      const durationMatch = stderr.match(/Duration: ([\d:.]+)/);
-      const durationString = durationMatch && durationMatch[1];
-      // "00:00:15.01"
-
-      const durationInSec = durationString!
-        .split(':')
-        .reverse()
-        .reduce((acc, v, i) => acc + Number(v) * Math.pow(60, i), 0);
-
-      const durationInMs = Math.round(durationInSec * 1000);
-
-      const bitrateMatch = stderr.match(/bitrate: (\d+) ([\w/]+)/);
-      const bitrateNum = Number(bitrateMatch && bitrateMatch[1]);
-      // const bitrateUnit = bitrateMatch && bitrateMatch[2]; "kb/s" seems always kb
-
-      // rozdzialka:
-      const resMatch = stderr.match(/, (\d+)x(\d+)[\s,]/);
-      const w = resMatch && Number(resMatch[1]);
-      const h = resMatch && Number(resMatch[2]);
-
-      resolve({
-        width: w,
-        height: h,
-        durationMs: durationInMs,
-        bitrateKb: bitrateNum,
-      });
-    });
-  });
-}
-
 export async function uploadVideo(file: Express.Multer.File, author: firebase.auth.DecodedIdToken) {
-  const videoData = await analyze(file.path);
+  const videoData = await analyzeVideo(file.path);
 
   const key = makeS3Path(author.uid, 'source', replaceFileWithHash(file.originalname));
 
@@ -83,5 +48,6 @@ export async function uploadVideo(file: Express.Multer.File, author: firebase.au
   } catch (e) {
     logger.error('Failed to insert video into DB. Error: %o', e.message);
     S3Delete(file.path);
+    throw new HttpError(500);
   }
 }

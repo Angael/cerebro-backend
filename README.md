@@ -43,3 +43,8 @@ prisma validate
 ```bash
 prisma format
 ```
+
+## Helper Powershell commands
+```powershell
+Get-ChildItem I:\dir -Recurse -Include *.mp4, *.webm | measure -Property Length -sum
+```
