@@ -34,9 +34,10 @@ export async function uploadThumbnails(thumbnails: IThumbnailBeforeUpload[]) {
     } catch (e) {
       logger.error(
         'Error inserting thumbnail into db. Delete s3 thumb for itemId %i',
-        t.thumbnail.item_id,
+        t.thumbnail.itemId,
       );
       await S3Delete(t.thumbnail.path);
+      throw e;
     }
     return t.diskPath;
   });

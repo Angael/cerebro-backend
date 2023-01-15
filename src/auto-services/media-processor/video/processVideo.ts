@@ -1,6 +1,10 @@
 import { mapSeries } from 'modern-async';
 import { S3Download } from '../../../aws/s3-helpers.js';
-import { IGeneratedThumbnail, IThumbnailBeforeUpload } from '../../../models/IThumbnail.js';
+import {
+  IGeneratedThumbnail,
+  IThumbnailBeforeUpload,
+  IThumbnailMeasure,
+} from '../../../models/IThumbnail.js';
 import { getNameFromS3Path, makeS3Path } from '../../../utils/makeS3Path.js';
 import { changeExtension } from '../../../utils/changeExtension.js';
 import { betterUnlink } from '../../../utils/betterUnlink.js';
@@ -19,34 +23,41 @@ function fetchDetails(item: Item) {
   return prisma.video.findFirst({ where: { itemId: item.id } });
 }
 
+type UploadedThumbnail = { dimension: IThumbnailMeasure; outPath: string };
+
 async function generateThumbnails(video: Video, path: string): Promise<IGeneratedThumbnail[]> {
   const dimensions = calculateThumbnailDimensions(video.width, video.height);
 
-  const dimensionsWithPath = dimensions.map((dimension) => ({
+  const dimensionsWithPath: UploadedThumbnail[] = dimensions.map((dimension) => ({
     dimension,
     outPath: join(THUMBNAILS_DIR, nanoid() + '.webp'),
   }));
 
   try {
-    return mapSeries(dimensionsWithPath, async ({ dimension, outPath }) => {
-      const { width, height, type } = dimension;
+    const result = mapSeries(
+      dimensionsWithPath,
+      async ({ dimension, outPath }: UploadedThumbnail) => {
+        const { width, height } = dimension;
 
-      await createThumbnail(path, outPath, {
-        height,
-        width,
-      });
+        await createThumbnail(path, outPath, {
+          height,
+          width,
+        });
 
-      const { size } = await fs.stat(outPath);
+        const { size } = await fs.stat(outPath);
 
-      const generatedThumbnail: IGeneratedThumbnail = {
-        dimensions: type,
-        size,
-        animated: false,
-        diskPath: outPath,
-      };
+        const generatedThumbnail: IGeneratedThumbnail = {
+          dimensions: dimension,
+          size,
+          animated: false,
+          diskPath: outPath,
+        };
 
-      return generatedThumbnail;
-    });
+        return generatedThumbnail;
+      },
+    );
+
+    return result;
   } catch (e) {
     betterUnlink(dimensionsWithPath.map((t) => t.outPath));
     logger.error('Failed to generate thumbnails for video %o', video);
@@ -60,6 +71,8 @@ export async function processVideo(item: Item) {
 
   try {
     const generatedThumbs = await generateThumbnails(videoRow, download);
+
+    console.log(generatedThumbs);
 
     let thumbnails: IThumbnailBeforeUpload[] = generatedThumbs.map((t) => ({
       thumbnail: {
@@ -80,12 +93,14 @@ export async function processVideo(item: Item) {
     try {
       await uploadThumbnails(thumbnails);
     } catch (e) {
-      //
+      logger.error('Failed to uploadThumbnails %o', e);
+      throw e;
     } finally {
       betterUnlink(thumbnails.map((t) => t.diskPath));
     }
   } catch (e) {
-    //
+    logger.error('Failed to generateThumbnails %o', e);
+    throw e;
   } finally {
     betterUnlink(download);
   }

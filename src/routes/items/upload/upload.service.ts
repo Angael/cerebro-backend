@@ -30,6 +30,7 @@ export async function uploadFileForUser(
     } else if (itemType === ItemType.VIDEO) {
       await uploadVideo(file, user);
     }
+    logger.verbose('uploaded file %s', file.filename);
   } catch (e) {
     logger.error(e);
     throw new HttpError(400);

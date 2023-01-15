@@ -3,6 +3,7 @@ import { updateItemProcessed } from '../../routes/items/fileFns.js';
 import { processImage } from './image/processImage.js';
 import { processVideo } from './video/processVideo.js';
 import { Item, ItemType, Processed } from '@prisma/client';
+import logger from '../../utils/log.js';
 
 async function findNotProcessedItem() {
   const item: Item | null = await prisma.item.findFirst({
@@ -20,6 +21,7 @@ export async function processSomeItem(): Promise<Item['id'] | null> {
 
   try {
     await updateItemProcessed(item.id, Processed.STARTED);
+    logger.verbose('processing item %i', item.id);
     if (item.type === ItemType.IMAGE) {
       await processImage(item);
     } else if (item.type === ItemType.VIDEO) {
