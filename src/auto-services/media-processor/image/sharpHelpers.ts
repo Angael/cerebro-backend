@@ -5,6 +5,7 @@ import logger from '../../../utils/log.js';
 import { IGeneratedThumbnail, IThumbnailMeasure } from '../../../models/IThumbnail.js';
 import { calculateThumbnailDimensions } from '../../../utils/calculateThumbnailDimensions.js';
 import { THUMBNAILS_DIR } from '../../../utils/consts.js';
+import { join } from 'path';
 
 type resizeArgs = {
   pipeline: Sharp;
@@ -27,7 +28,7 @@ async function resizeFileAndSave({
   width,
   height,
 }: resizeArgs): Promise<{ info: OutputInfo; path: string }> {
-  const outPath = THUMBNAILS_DIR + '/' + nanoid() + '.webp';
+  const outPath = join(THUMBNAILS_DIR, nanoid() + '.webp');
   return pipeline
     .resize(width, height)
     .webp()

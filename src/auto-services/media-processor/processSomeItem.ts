@@ -1,6 +1,7 @@
 import { prisma } from '../../db/db.js';
 import { updateItemProcessed } from '../../routes/items/fileFns.js';
 import { processImage } from './image/processImage.js';
+import { processVideo } from './video/processVideo.js';
 import { Item, ItemType, Processed } from '@prisma/client';
 
 async function findNotProcessedItem() {
@@ -22,8 +23,7 @@ export async function processSomeItem(): Promise<Item['id'] | null> {
     if (item.type === ItemType.IMAGE) {
       await processImage(item);
     } else if (item.type === ItemType.VIDEO) {
-      // await videoSpaceOptimizer.optimize(item);
-      throw new Error('Tried to optimize unsupported video filetype');
+      await processVideo(item);
     } else {
       throw new Error('Tried to optimize unsupported unknown filetype');
     }
