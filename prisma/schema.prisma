@@ -93,12 +93,12 @@ model Video {
   Item      Item     @relation(fields: [itemId], references: [id])
   itemId    Int
 
-  path     String @db.VarChar(256)
-  size     Int
-  width    Int
-  height   Int
-  duration Int
-  bitrate  Int
+  path       String @db.VarChar(256)
+  size       Int    @db.UnsignedInt
+  width      Int    @db.UnsignedSmallInt
+  height     Int    @db.UnsignedSmallInt
+  durationMs Int    @db.UnsignedInt
+  bitrateKb  Int    @db.UnsignedSmallInt
 }
 
 // model User {

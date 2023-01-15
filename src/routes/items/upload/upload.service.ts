@@ -28,11 +28,12 @@ export async function uploadFileForUser(
     if (itemType === ItemType.IMAGE) {
       await uploadImage(file, user);
     } else if (itemType === ItemType.VIDEO) {
+      logger.debug('ItemType.VIDEO');
       await uploadVideo(file, user);
     }
   } catch (e) {
     logger.error(e);
-    throw new Error('Unsupported filetype');
+    throw new HttpError(400);
   } finally {
     betterUnlink(file.path);
   }

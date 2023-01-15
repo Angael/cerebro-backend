@@ -31,12 +31,12 @@ export const joinItemQueries = (
     }
 
     if (foundVideo) {
-      const { width, height, duration, bitrate, path } = foundVideo;
+      const { width, height, durationMs, bitrateKb, path } = foundVideo;
       video = {
         width,
         height,
-        duration,
-        bitrate,
+        durationMs,
+        bitrateKb,
         url: s3PathToUrl(path),
       };
     }

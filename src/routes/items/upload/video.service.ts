@@ -26,8 +26,8 @@ async function insertIntoDb(
           size: file.size,
           width: videoData.width,
           height: videoData.height,
-          duration: videoData.duration,
-          bitrate: videoData.bitrate,
+          durationMs: videoData.durationMs,
+          bitrateKb: videoData.bitrateKb,
         },
       },
     },
@@ -47,6 +47,8 @@ async function analyze(path: string): Promise<IVideoData> {
         .reverse()
         .reduce((acc, v, i) => acc + Number(v) * Math.pow(60, i), 0);
 
+      const durationInMs = Math.round(durationInSec * 1000);
+
       const bitrateMatch = stderr.match(/bitrate: (\d+) ([\w/]+)/);
       const bitrateNum = Number(bitrateMatch && bitrateMatch[1]);
       // const bitrateUnit = bitrateMatch && bitrateMatch[2]; "kb/s" seems always kb
@@ -59,8 +61,8 @@ async function analyze(path: string): Promise<IVideoData> {
       resolve({
         width: w,
         height: h,
-        duration: durationInSec,
-        bitrate: bitrateNum * 1000,
+        durationMs: durationInMs,
+        bitrateKb: bitrateNum,
       });
     });
   });
@@ -79,7 +81,7 @@ export async function uploadVideo(file: Express.Multer.File, author: firebase.au
   try {
     await insertIntoDb(key, videoData, file, author);
   } catch (e) {
-    logger.error('Failed to insert video into DB');
+    logger.error('Failed to insert video into DB. Error: %o', e.message);
     S3Delete(file.path);
   }
 }

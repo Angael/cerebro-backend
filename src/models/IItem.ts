@@ -5,8 +5,8 @@
 // }
 
 export interface IVideoData {
-  duration: number;
-  bitrate: number;
+  durationMs: number;
+  bitrateKb: number;
   width: number;
   height: number;
 }
