@@ -10,7 +10,7 @@ import { uploadThumbnails } from '../uploadThumbnails.js';
 import { Item } from '@prisma/client';
 
 function fetchDetails(item: Item) {
-  return prisma.image.findFirst({ where: { itemId: item.id } });
+  return prisma.image.findFirstOrThrow({ where: { itemId: item.id, mediaType: 'SOURCE' } });
 }
 
 export async function processImage(item: Item) {

@@ -20,7 +20,7 @@ import logger from '../../../utils/log.js';
 import fs from 'fs-extra';
 
 function fetchDetails(item: Item) {
-  return prisma.video.findFirst({ where: { itemId: item.id } });
+  return prisma.video.findFirstOrThrow({ where: { itemId: item.id, mediaType: 'SOURCE' } });
 }
 
 type UploadedThumbnail = { dimension: IThumbnailMeasure; outPath: string };

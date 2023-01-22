@@ -15,7 +15,7 @@ export async function S3CreateBucket(bucketName: string) {
     s3.listBuckets((err, data) => (err ? rej(err) : res(data))),
   );
 
-  const isAlreadyCreated = Buckets.some((b) => b.Name === bucket);
+  const isAlreadyCreated = Buckets && Buckets.some((b) => b.Name === bucket);
 
   if (!isAlreadyCreated) {
     logger.warn(`Bucket not found! Creating one now...`, { bucket, Buckets });

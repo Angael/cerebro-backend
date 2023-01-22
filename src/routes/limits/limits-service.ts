@@ -7,7 +7,7 @@ import { UserType } from '@prisma/client';
 export const getSpaceUsedByUser = async (uid: string): Promise<number> => {
   let used: number;
   if (usedSpaceCache.has(uid)) {
-    used = usedSpaceCache.get(uid);
+    used = usedSpaceCache.get(uid) as number;
   } else {
     const items = await prisma.item.findMany({
       where: { userUid: uid },
@@ -42,9 +42,9 @@ export const getSpaceUsedByUser = async (uid: string): Promise<number> => {
 
 export async function getUserType(uid: string): Promise<UserType> {
   if (userTypeCache.has(uid)) {
-    return userTypeCache.get(uid);
+    return userTypeCache.get(uid) as UserType;
   } else {
-    const user = await prisma.user.findFirst({ where: { uid }, select: { type: true } });
+    const user = await prisma.user.findFirstOrThrow({ where: { uid }, select: { type: true } });
     if (user.type) {
       userTypeCache.set(uid, user.type);
     }

@@ -12,7 +12,7 @@ export const isPremium = async (req: Request, res: Response, next) => {
 
   let type = await getUserType(user.uid);
   if (!type) {
-    await registerUser(user.uid, user.email);
+    await registerUser(user.uid, user.email!);
     type = await getUserType(user.uid);
   }
 

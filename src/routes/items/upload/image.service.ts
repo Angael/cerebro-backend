@@ -3,15 +3,20 @@ import sharp from 'sharp';
 import firebase from 'firebase-admin';
 import logger from '../../../utils/log.js';
 import { S3Delete, S3SimpleUpload } from '../../../aws/s3-helpers.js';
-import { IImageData } from '../../../models/IItem.js';
 import { makeS3Path, replaceFileWithHash } from '../../../utils/makeS3Path.js';
 import { prisma } from '../../../db/db.js';
 import { ItemType, Processed } from '@prisma/client';
 import { HttpError } from '../../../utils/errors/HttpError.js';
 
+type Analysis = {
+  width: number;
+  height: number;
+  animated: boolean;
+};
+
 async function insertIntoDb(
   s3Key: string,
-  itemData: IImageData,
+  itemData: Analysis,
   file: Express.Multer.File,
   author: firebase.auth.DecodedIdToken,
 ): Promise<void> {
@@ -35,13 +40,13 @@ async function insertIntoDb(
   });
 }
 
-async function analyze(file: Express.Multer.File): Promise<IImageData> {
+async function analyze(file: Express.Multer.File): Promise<Analysis> {
   const pipeline = sharp(file.path);
 
   return pipeline.metadata().then(async (metadata) => {
     const frameHeight = metadata.pageHeight ?? metadata.height ?? 0;
     const frameWidth = metadata.width ?? 0;
-    const isAnimated = metadata.pages > 1 ?? false;
+    const isAnimated = metadata.pages ? metadata.pages > 1 : false;
 
     // let hash = '';
     // if (!isAnimated) {

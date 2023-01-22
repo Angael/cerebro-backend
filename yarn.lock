@@ -1311,6 +1311,11 @@
     "@typescript-eslint/types" "5.47.0"
     eslint-visitor-keys "^3.3.0"
 
+"@vanih/cerebro-contracts@0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@vanih/cerebro-contracts/-/cerebro-contracts-0.0.4.tgz#05af61679efecbbf047f21b3e47e0aa11b83b785"
+  integrity sha512-LutPMQ0TcXunXsSjbqAgP4xqR8DfBRV92XTUgRMDOZP1neKk/JT4LjbsW5jypkIq7urAkh50uooo+6BQTbg/1g==
+
 "@vanih/dunes-node@2.1.1":
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/@vanih/dunes-node/-/dunes-node-2.1.1.tgz#5c0c7500996d4b7d3f61c342ea3affd3094a7698"

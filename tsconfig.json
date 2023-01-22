@@ -17,7 +17,7 @@
     "noUnusedParameters": false,
     "noImplicitAny": false,
     "noImplicitThis": false,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "resolveJsonModule": true,
     "skipLibCheck": true // This is needed as long as there is error in importing with require in some firebase deps
   },

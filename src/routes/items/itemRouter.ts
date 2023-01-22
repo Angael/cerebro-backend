@@ -37,14 +37,18 @@ router.post(
   uploadMiddleware.single('file'),
   async (req: Request, res) => {
     const file = req.file;
+    if (!file) {
+      res.sendStatus(400);
+      return;
+    }
     try {
       if (file.size > MAX_UPLOAD_SIZE) {
         throw new Error('File too big');
       }
 
-      await uploadFileForUser(file, req.user);
+      await uploadFileForUser(file, req.user!);
 
-      usedSpaceCache.del(req.user.uid);
+      usedSpaceCache.del(req.user!.uid);
       res.status(200).send();
     } catch (e) {
       errorResponse(res, e);
@@ -59,9 +63,9 @@ router.delete('/item/:id', isPremium, async (req: Request, res) => {
     if (!id || isNaN(id)) {
       throw new Error('Bad id');
     }
-    await deleteItem(id, req.user.uid);
+    await deleteItem(id, req.user!.uid);
 
-    usedSpaceCache.del(req.user.uid);
+    usedSpaceCache.del(req.user!.uid);
     res.status(200).send();
   } catch (e) {
     errorResponse(res, e);

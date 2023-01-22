@@ -7,6 +7,10 @@ import { MyRoute } from '../express-helpers/routeType.js';
 const router = express.Router({ mergeParams: true });
 
 router.get('/', isAuth, async (req: Request, res) => {
+  if (!req.user) {
+    errorResponse(res, new Error('no user found'));
+    return;
+  }
   try {
     res.json(await getLimitsForUser(req.user));
   } catch (e) {
