@@ -1311,10 +1311,10 @@
     "@typescript-eslint/types" "5.47.0"
     eslint-visitor-keys "^3.3.0"
 
-"@vanih/dunes-node@2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@vanih/dunes-node/-/dunes-node-2.0.0.tgz#5be8e9be0d84bca18176a558fc8f28c5706b6a35"
-  integrity sha512-E56Urw+f9S1HA9cQfeWavJjbq/+obF1V+sF4gEVLL/0Sm8S7aC4gRkwW9pY871YeNsphvGmjpbM/SeusrrpHhw==
+"@vanih/dunes-node@2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@vanih/dunes-node/-/dunes-node-2.1.1.tgz#5c0c7500996d4b7d3f61c342ea3affd3094a7698"
+  integrity sha512-7logdA2SlIMn+QtjqZlkFyGknZVIItZVRB/QdrxYEHVd8Cc+N/fvToe9m0Gmc33/MF3YoYxBtm3sAxksu5RyNw==
   dependencies:
     ffmpeg-static "^5.1.0"
     ffprobe-static "^3.1.0"

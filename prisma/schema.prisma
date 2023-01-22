@@ -72,6 +72,11 @@ model Thumbnail {
   size Int
 }
 
+enum MediaType {
+  SOURCE
+  COMPRESSED
+}
+
 model Image {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
@@ -79,11 +84,12 @@ model Image {
   Item      Item     @relation(fields: [itemId], references: [id])
   itemId    Int
 
-  path     String  @db.VarChar(256)
-  size     Int
-  width    Int
-  height   Int
-  animated Boolean
+  mediaType MediaType @default(SOURCE)
+  path      String    @db.VarChar(256)
+  size      Int
+  width     Int
+  height    Int
+  animated  Boolean
 }
 
 model Video {
@@ -93,18 +99,11 @@ model Video {
   Item      Item     @relation(fields: [itemId], references: [id])
   itemId    Int
 
-  path       String @db.VarChar(256)
-  size       Int    @db.UnsignedInt
-  width      Int    @db.UnsignedSmallInt
-  height     Int    @db.UnsignedSmallInt
-  durationMs Int    @db.UnsignedInt
-  bitrateKb  Int    @db.UnsignedSmallInt
+  mediaType  MediaType @default(SOURCE)
+  path       String    @db.VarChar(256)
+  size       Int       @db.UnsignedInt
+  width      Int       @db.UnsignedSmallInt
+  height     Int       @db.UnsignedSmallInt
+  durationMs Int       @db.UnsignedInt
+  bitrateKb  Int       @db.UnsignedSmallInt
 }
-
-// model User {
-//   id      Int      @id @default(autoincrement())
-//   email   String   @unique
-//   name    String?
-//   posts   Post[]
-//   profile Profile?
-// }
