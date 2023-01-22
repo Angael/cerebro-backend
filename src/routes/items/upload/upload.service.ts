@@ -1,19 +1,21 @@
 import firebase from 'firebase-admin';
-import { ItemType } from '../../../models/IItem.js';
 import { betterUnlink } from '../../../utils/betterUnlink.js';
 import logger from '../../../utils/log.js';
 import { uploadImage } from './image.service.js';
 import { uploadVideo } from './video.service.js';
+import { ItemType } from '@prisma/client';
+import { HttpError } from '../../../utils/errors/HttpError.js';
 
 function getFileType(file: Express.Multer.File): ItemType {
   const { mimetype } = file;
 
   if (['image/png', 'image/gif', 'image/webp', 'image/jpeg'].includes(mimetype)) {
-    return ItemType.image;
+    return ItemType.IMAGE;
   } else if (['video/mp4', 'video/webm'].includes(mimetype)) {
-    return ItemType.video;
+    return ItemType.VIDEO;
   } else {
-    return ItemType.file;
+    throw new HttpError(415);
+    // return ItemType.file;
   }
 }
 
@@ -23,14 +25,15 @@ export async function uploadFileForUser(
 ): Promise<void> {
   try {
     const itemType = getFileType(file);
-    if (itemType === ItemType.image) {
+    if (itemType === ItemType.IMAGE) {
       await uploadImage(file, user);
-    } else if (itemType === ItemType.video) {
+    } else if (itemType === ItemType.VIDEO) {
       await uploadVideo(file, user);
     }
+    logger.verbose('uploaded file %s', file.filename);
   } catch (e) {
     logger.error(e);
-    throw new Error('Unsupported filetype');
+    throw new HttpError(400);
   } finally {
     betterUnlink(file.path);
   }

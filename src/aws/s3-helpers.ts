@@ -110,8 +110,8 @@ export function S3DeleteMany(keys: string[]): Promise<void> {
   );
 }
 
-export async function S3Download(filename: string, s3Path: string): Promise<string> {
-  const extension = path.extname(filename);
+export async function S3Download(s3Path: string): Promise<string> {
+  const extension = path.extname(s3Path);
   if (!extension) {
     throw new Error('file has no extension');
   }

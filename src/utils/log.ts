@@ -7,20 +7,14 @@ const alignColorsAndTime = format.combine(
   format.timestamp({
     format: 'YY-MM-DD HH:mm:ss.SSS',
   }),
-  format.printf(
-    (info) => `[${info.timestamp}]  [${info.level}] : ${info.message}`,
-  ),
+  format.printf((info) => `[${info.timestamp}]  [${info.level}] : ${info.message}`),
 );
 
 export const logger = createLogger({
-  level: 'debug',
+  level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
   transports: [
     new transports.Console({
-      format: format.combine(
-        format.splat(),
-        format.colorize(),
-        alignColorsAndTime,
-      ),
+      format: format.combine(format.splat(), format.colorize(), alignColorsAndTime),
     }),
   ],
 });

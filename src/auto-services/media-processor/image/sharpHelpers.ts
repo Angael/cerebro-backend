@@ -5,6 +5,7 @@ import logger from '../../../utils/log.js';
 import { IGeneratedThumbnail, IThumbnailMeasure } from '../../../models/IThumbnail.js';
 import { calculateThumbnailDimensions } from '../../../utils/calculateThumbnailDimensions.js';
 import { THUMBNAILS_DIR } from '../../../utils/consts.js';
+import { join } from 'path';
 
 type resizeArgs = {
   pipeline: Sharp;
@@ -27,10 +28,10 @@ async function resizeFileAndSave({
   width,
   height,
 }: resizeArgs): Promise<{ info: OutputInfo; path: string }> {
-  const outPath = THUMBNAILS_DIR + '/' + nanoid() + '.webp';
+  const outPath = join(THUMBNAILS_DIR, nanoid() + '.webp');
   return pipeline
     .resize(width, height)
-    .webp({ pageHeight: height })
+    .webp()
     .toFile(outPath)
     .then((info) => ({ info, path: outPath }));
 }
@@ -41,7 +42,7 @@ export async function generateThumbnails(filePath: string): Promise<IGeneratedTh
 
     const dimensions = await measure(animatedPipeline);
 
-    // TODO: Make into modern-async
+    // TODO: Make into modern-async, async fails at typechecking
     return await async.map(
       dimensions,
       (dimensions, callback: AsyncResultCallback<IGeneratedThumbnail>) => {
@@ -51,7 +52,7 @@ export async function generateThumbnails(filePath: string): Promise<IGeneratedTh
           height: dimensions.height,
         })
           .then(({ info, path }) => {
-            callback(null, { diskPath: path, dimensions, size: info.size, isAnimated: false });
+            callback(null, { diskPath: path, dimensions, size: info.size, animated: false });
           })
           .catch((error) => {
             // TODO: Need to unlink files that crashed!

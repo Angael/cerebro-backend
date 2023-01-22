@@ -8,7 +8,7 @@ const mediaProcessor = new Scheduler(
       .then((id) => {
         if (!id === null) {
           // some item was optimized!
-          logger.verbose('Item optimized %i', id);
+          logger.verbose('Optimized itemId %i', id);
         }
       })
       .catch((error) => {
