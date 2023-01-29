@@ -16,7 +16,15 @@ export async function getAllItems(): Promise<FrontItem[]> {
     },
   });
 
-  return items.map((item) => getFrontItem(item, null));
+  return items
+    .map((item) => {
+      try {
+        return getFrontItem(item, null);
+      } catch (e) {
+        return null as any;
+      }
+    })
+    .filter(Boolean);
 }
 
 export async function getItem(id: number): Promise<FrontItem> {
