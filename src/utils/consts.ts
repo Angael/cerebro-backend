@@ -9,6 +9,7 @@ export const TEMP_DIR = '_temp';
 export const UPLOADS_DIR = '_temp/file-uploads';
 export const DOWNLOADS_DIR = '_temp/downloads';
 export const THUMBNAILS_DIR = '_temp/thumbnails';
+export const OPTIMIZATION_DIR = '_temp/optimization';
 
 export enum DB_TABLE {
   thumbnail = 'thumbnail',

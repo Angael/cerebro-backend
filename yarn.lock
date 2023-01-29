@@ -1316,10 +1316,10 @@
   resolved "https://registry.yarnpkg.com/@vanih/cerebro-contracts/-/cerebro-contracts-0.0.5.tgz#361d9ac9328231562e29d53d7e2c0d806d6cc2df"
   integrity sha512-usleQaSw3ZCboPWx1OUSeWWqRIEPm/EyhPiLusbzReGYbl4/cuqWhsd7xAaoKlP6E2eOzX87lgYbkZoyW2Mjdw==
 
-"@vanih/dunes-node@2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@vanih/dunes-node/-/dunes-node-2.1.1.tgz#5c0c7500996d4b7d3f61c342ea3affd3094a7698"
-  integrity sha512-7logdA2SlIMn+QtjqZlkFyGknZVIItZVRB/QdrxYEHVd8Cc+N/fvToe9m0Gmc33/MF3YoYxBtm3sAxksu5RyNw==
+"@vanih/dunes-node@3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@vanih/dunes-node/-/dunes-node-3.2.0.tgz#352a637b8da582f9d0d40995bab78f55bad9179f"
+  integrity sha512-MfOc7ifv21m1GdDUFYpic6Ls2jsB1RAiVly5g5tCH2dGOalWEnlO0HH43raKMgM0lXB/Ca22U7hxJ+AUJWEJOA==
   dependencies:
     ffmpeg-static "^5.1.0"
     ffprobe-static "^3.1.0"
