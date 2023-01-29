@@ -1,16 +1,15 @@
 import { Scheduler } from 'modern-async';
-import logger from '../../utils/log.js';
 import { findUncompressedVideoItem } from './findUncompressedVideoItem.js';
 import { prisma } from '../../db/db.js';
 import { S3Download, S3SimpleUpload } from '../../aws/s3-helpers.js';
 import { decideSettings } from './decideSettings.js';
 import path from 'path';
 import { OPTIMIZATION_DIR } from '../../utils/consts.js';
-import { nanoid } from 'nanoid';
 import { analyzeVideo, compressVideo, VideoStats } from '@vanih/dunes-node';
 import { makeS3Path } from '../../utils/makeS3Path.js';
 import { Item } from '@prisma/client';
 import { betterUnlink } from '../../utils/betterUnlink.js';
+import { changeExtension } from '../../utils/changeExtension.js';
 
 const insertIntoDb = (itemId: Item['id'], outputStats: VideoStats, s3path: string): Promise<any> =>
   prisma.video.create({
@@ -37,7 +36,6 @@ const videoCompressor = new Scheduler(
   async () => {
     const [item, video] = await findUncompressedVideoItem();
     if (!item || !video) {
-      logger.debug('everything is compressed');
       return;
     }
 
@@ -46,7 +44,7 @@ const videoCompressor = new Scheduler(
     const srcVidPath = await S3Download(video.path);
 
     const requireCompression = !['.webm', '.mp4'].includes(path.extname(video.path));
-    const filename = `${nanoid()}.webm`;
+    const filename = changeExtension(path.parse(video.path).name, 'webm');
     const outVidPath = path.join(OPTIMIZATION_DIR, filename);
     const s3KeyPath = makeS3Path(item.userUid, 'optimized', filename);
     const decided = decideSettings(video);
