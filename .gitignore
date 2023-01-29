@@ -36,3 +36,5 @@ build/
 /temp/*
 /dist/*
 /build/*
+
+__local__
