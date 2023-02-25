@@ -11,7 +11,7 @@ export function getFrontItem(item: ParamItem, userUid: string | null): FrontItem
     item.Image.find((e) => e.mediaType === 'SOURCE')
   const sourceVideo =
     item.Video.find((e) => e.mediaType === 'SOURCE')
-  // @ts-ignore
+
   const compressedVideo =
     item.Video.find((e) => e.mediaType === 'COMPRESSED')
 

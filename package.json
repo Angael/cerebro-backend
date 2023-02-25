@@ -14,7 +14,9 @@
     "db:start": "docker start cerebro",
     "prebuild": "rimraf build",
     "build": "cross-env NODE_ENV=production tsc -p tsconfig.json",
-    "prisma:seed": "prisma db seed"
+    "prisma:seed": "prisma db seed",
+    "prisma:deploy": "dotenv -e .env.production -- prisma migrate deploy",
+    "prisma:studio": "prisma studio"
   },
   "prisma": {
     "seed": "npx tsx .\\prisma\\seed.ts"
