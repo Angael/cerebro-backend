@@ -12,13 +12,16 @@ export function getFrontItem(item: ParamItem, userUid: string | null): FrontItem
   const sourceVideo =
     item.Video.find((e) => e.mediaType === 'SOURCE')
 
+  const compressedVideo =
+    item.Video.find((e) => e.mediaType === 'COMPRESSED')
+
   if(!sourceImage?.size && !sourceVideo?.size){
     throw new HttpError(404);
   }
 
   const size = sourceImage?.size ?? sourceVideo?.size ?? 0;
-  const thumbnail: Thumbnail | undefined = item.thumbnails.find((e) => e.type === 'MD');
-  const icon: Thumbnail | undefined = item.thumbnails.find((e) => e.type === 'XS');
+  const thumbnail = item.thumbnails.find((e) => e.type === 'MD');
+  const icon = item.thumbnails.find((e) => e.type === 'XS');
 
   const baseItem: BaseItem = {
     id: item.id,
@@ -41,20 +44,22 @@ export function getFrontItem(item: ParamItem, userUid: string | null): FrontItem
         animated: sourceImage.animated
       },
     } satisfies ImageItem;
-  } else if(item.type === 'VIDEO' && sourceVideo){
+  } else if(item.type === 'VIDEO' && compressedVideo){
+    // TODO: tutaj jest problem jak cos nie jest jeszcze zoptymalizowane :/
     return {
       ...baseItem,
       type: 'VIDEO',
       video: {
-        src: s3PathToUrl(sourceVideo.path),
-        height: sourceVideo.height,
-        width: sourceVideo.width,
-        durationMs: sourceVideo.durationMs,
-        bitrateKb: sourceVideo.bitrateKb
+        src: s3PathToUrl(compressedVideo.path),
+        height: compressedVideo.height,
+        width: compressedVideo.width,
+        durationMs: compressedVideo.durationMs,
+        bitrateKb: compressedVideo.bitrateKb
       },
     } satisfies VideoItem;
   } else {
     logger.error('Error when converting item to FrontItem, itemId: %i', item.id);
+    // TODO: Maybe queue item for fixing?
     throw new HttpError(500);
   }
 }

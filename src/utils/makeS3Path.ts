@@ -10,9 +10,11 @@ export const replaceFileWithHash = (filename: string, hash?: string) => {
   }
 };
 
-export const makeS3Path = (userId: string, type: ThumbnailType | 'source', filename: string) => {
-  return `u/${userId}/${type}/${filename}`;
-};
+export const makeS3Path = (
+  userId: string,
+  type: ThumbnailType | 'source' | 'optimized',
+  filename: string,
+) => `u/${userId}/${type}/${filename}`;
 
 export const getNameFromS3Path = (s3Path: string) => {
   const index = s3Path.lastIndexOf('/');
