@@ -15,7 +15,13 @@ const startRouter = () => {
   const port = Number(process.env.PORT ?? 3000);
 
   router.use(express.json());
-  router.use(cors());
+  router.use(
+    cors({
+      origin: process.env.CORS_URL,
+      credentials: true,
+      maxAge: 600,
+    }),
+  );
   router.use(addAuth);
   router.get('/', (req, res) => 'v1');
 
