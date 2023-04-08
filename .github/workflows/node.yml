@@ -72,7 +72,10 @@ jobs:
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: 22
+          script_stop: true
           script: |
+            which -a node
+            echo $PATH
             cd ${{ secrets.FTP_DIST_TEMP_DIR }}/
             tar -xzvf artifacts.tar.gz
             rm artifacts.tar.gz
