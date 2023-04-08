@@ -54,7 +54,7 @@ jobs:
           npm run build
 
       - name: Prisma deploy
-        with:
+        env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           npm run prisma:generate
