@@ -14,11 +14,7 @@ jobs:
     permissions:
       contents: none
     runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Development'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
+    environment: 'production'
     steps:
       - uses: actions/checkout@v3
 
