@@ -10,11 +10,10 @@ permissions:
   contents: read
 
 jobs:
-  deploy:
+  build:
     permissions:
       contents: none
     runs-on: ubuntu-latest
-    environment: 'production'
     steps:
       - uses: actions/checkout@v3
 
