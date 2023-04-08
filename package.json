@@ -16,7 +16,8 @@
     "build": "cross-env NODE_ENV=production tsc -p tsconfig.json",
     "prisma:seed": "prisma db seed",
     "prisma:deploy": "dotenv -e .env.production -- prisma migrate deploy",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "lint": "tsc"
   },
   "prisma": {
     "seed": "npx tsx .\\prisma\\seed.ts"
