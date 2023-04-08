@@ -42,7 +42,7 @@ jobs:
       - name: Rename .env.template to .env.production
         run: |
           mv artifacts/.env.template artifacts/.env.production
-          tar -czvf artifacts.tar.gz /artifacts
+          tar -czvf artifacts.tar.gz artifacts
 
       - name: SSH - Ensure temp folder for upload
         uses: appleboy/ssh-action@v0.1.9
