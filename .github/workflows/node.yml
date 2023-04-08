@@ -63,7 +63,7 @@ jobs:
 
       - name: Compress build
         run: |
-          tar --exclude='node_modules' -czvf artifacts.tar.gz ./*
+          tar --exclude='node_modules' -czvf artifacts.tar.gz ./* .[!.]*
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
@@ -123,9 +123,8 @@ jobs:
             service mysql stop
             rm -r ${{ secrets.FTP_DIST_DIR }} | exit 0
             
-            mv ${{ secrets.FTP_DIST_TEMP_DIR }}/artifacts ${{ secrets.FTP_DIST_DIR }} 
+            mv ${{ secrets.FTP_DIST_TEMP_DIR }} ${{ secrets.FTP_DIST_DIR }} 
             cd ${{ secrets.FTP_DIST_DIR }}
-            yarn prisma:deploy
             pm2 start cerebro_api
             service mysql start
 
