@@ -63,7 +63,7 @@ jobs:
 
       - name: Compress build
         run: |
-          tar --exclude='node_modules' -czvf artifacts.tar.gz artifacts
+          tar --exclude='node_modules' -czvf artifacts.tar.gz ./*
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
@@ -116,7 +116,6 @@ jobs:
             cd ${{ secrets.FTP_DIST_TEMP_DIR }}/
             tar -xzvf artifacts.tar.gz
             rm artifacts.tar.gz
-            cd artifacts
             yarn install --production
       
             cd /
