@@ -42,6 +42,7 @@ jobs:
       - name: Rename .env.template to .env.production
         run: |
           mv artifacts/.env.template artifacts/.env.production
+          tar -czvf artifacts.tar.gz /artifacts
 
       - name: SSH - Ensure temp folder for upload
         uses: appleboy/ssh-action@v0.1.9
@@ -59,7 +60,7 @@ jobs:
           username: ${{ secrets.FTP_USER }}
           server: ${{ secrets.FTP_HOST }}
           port: 22
-          local_path: './*'
+          local_path: './artifacts.tar.gz'
           remote_path: ${{ secrets.FTP_DIST_TEMP_DIR }}/
           sftp_only: true
           password: ${{ secrets.FTP_PASSWORD }}
@@ -72,7 +73,10 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 22
           script: |
-            cd ${{ secrets.FTP_DIST_TEMP_DIR }}/artifacts
+            cd ${{ secrets.FTP_DIST_TEMP_DIR }}/
+            tar -xzvf artifacts.tar.gz
+            rm artifacts.tar.gz
+            cd artifacts
             yarn install
       
             cd /
