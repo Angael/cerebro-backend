@@ -14,7 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        path: artifacts
+        with:
+          path: artifacts
 
       - name: Debug - pwd / ls
         run: |
