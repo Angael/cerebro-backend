@@ -1,7 +1,8 @@
+name: Deployment
+
 on:
   push:
     branches: [ "master" ]
-  workflow_dispatch:
 
 env:
   NODE_VERSION: '18.12.1'
@@ -12,6 +13,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: 'production'
     steps:
       - uses: actions/checkout@v3
 
