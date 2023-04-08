@@ -18,7 +18,7 @@ jobs:
       - name: Debug - pwd / ls
         run: |
           pwd
-          ls
+          ls -a
 
       - uses: cschleiden/replace-tokens@v1
         with:
