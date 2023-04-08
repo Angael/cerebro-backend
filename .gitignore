@@ -19,8 +19,9 @@ build/
 # JetBrains IDEs
 .idea/
 
-.env*
-/env/*
+.env
+.env.development
+.env.production
 /notes/
 /file-uploads/
 /_temp/
