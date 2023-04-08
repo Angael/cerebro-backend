@@ -81,6 +81,7 @@ jobs:
             rm artifacts.tar.gz
             cd artifacts
             yarn install
+            yarn build
       
             cd /
             pm2 stop cerebro_api
