@@ -37,6 +37,7 @@ jobs:
           FB_KEY: ${{ secrets.FB_KEY }}
           FB_EMAIL: ${{ secrets.FB_EMAIL }}
           CORS_URL: ${{ secrets.CORS_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Rename .env.template to .env.production
         run: |
@@ -53,6 +54,8 @@ jobs:
           npm run build
 
       - name: Prisma deploy
+        with:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           npm run prisma:generate
           npm run prisma:validate
