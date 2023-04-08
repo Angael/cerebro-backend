@@ -72,7 +72,7 @@ jobs:
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: 22
-          script_stop: true
+          debug: true
           script: |
             which -a node
             echo $PATH
