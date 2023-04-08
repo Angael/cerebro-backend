@@ -12,21 +12,29 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      VITE_FIREBASE_KEY: ${{ secrets.VITE_FIREBASE_KEY }}
+      VITE_FIREBASE_DOMAIN: ${{ secrets.VITE_FIREBASE_DOMAIN }}
+      VITE_FIREBASE_DATABASE: ${{ secrets.VITE_FIREBASE_DATABASE }}
+      VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+      VITE_FIREBASE_BUCKET: ${{ secrets.VITE_FIREBASE_BUCKET }}
+      VITE_FIREBASE_SENDER_ID: ${{ secrets.VITE_FIREBASE_SENDER_ID }}
+      VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+      VITE_API_URL: ${{ secrets.VITE_API_URL }}
     steps:
       - uses: actions/checkout@v3
-        with:
-          path: artifacts
 
-      - name: Debug - pwd / ls
-        run: |
-          pwd
-          ls -a artifacts
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
       - uses: cschleiden/replace-tokens@v1
         with:
           tokenPrefix: '{'
           tokenSuffix: '}'
-          files: '["artifacts/.env.template"]'
+          files: '[".env.template"]'
         env:
           FIREBASE_DB_URL: ${{ secrets.FIREBASE_DB_URL }}
           AWS_USER: ${{ secrets.AWS_USER }}
@@ -41,8 +49,39 @@ jobs:
 
       - name: Rename .env.template to .env.production
         run: |
-          mv artifacts/.env.template artifacts/.env.production
-          tar -czvf artifacts.tar.gz artifacts
+          mv .env.template .env.production
+
+      - name: Yarn Install
+        uses: Borales/actions-yarn@v4.2.0
+        with:
+          cmd: install
+
+      - name: npm build
+        run: |
+          npm run lint 
+          npm run build
+
+      - name: Prisma deploy
+        run: |
+          npm run prisma:deploy
+
+      - name: Compress build
+        run: |
+          tar --exclude='node_modules' -czvf artifacts.tar.gz artifacts
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: node-app
+          path: artifacts.tar.gz
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: node-app
 
       - name: SSH - Ensure temp folder for upload
         uses: appleboy/ssh-action@v0.1.9
@@ -80,8 +119,7 @@ jobs:
             tar -xzvf artifacts.tar.gz
             rm artifacts.tar.gz
             cd artifacts
-            yarn install
-            yarn build
+            yarn install --production
       
             cd /
             pm2 stop cerebro_api
