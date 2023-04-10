@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express';
 
 type useCacheMiddleware = (duration?: number) => RequestHandler;
+
 export const useCache: useCacheMiddleware =
   (duration = 30) =>
   (req, res, next) => {

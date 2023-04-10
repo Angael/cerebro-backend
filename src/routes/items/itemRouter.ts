@@ -1,4 +1,4 @@
-import { deleteItem, getAllItems, getItem } from './fileFns.js';
+import { deleteItem, getAllItems, getAllItemsCount, getItem } from './itemFns.js';
 import express, { Request } from 'express';
 import { isPremium } from '../../middleware/isPremium.js';
 import multer from 'multer';
@@ -9,19 +9,32 @@ import { errorResponse } from '../../utils/errors/errorResponse.js';
 import { MyRoute } from '../express-helpers/routeType.js';
 import { useCache } from '../../middleware/expressCache.js';
 import { usedSpaceCache } from '../../cache/userCache.js';
+import z from 'zod';
 
 const router = express.Router({ mergeParams: true });
 
-router.get('/', useCache(), async (req, res) => {
+const limitZod = z.number().min(1).max(30);
+const cursorZod = z.number().min(0).max(Number.MAX_SAFE_INTEGER);
+
+router.get('/', async (req, res) => {
   try {
-    res.json(await getAllItems());
+    const limit = limitZod.parse(Number(req.query.limit));
+    const page = cursorZod.parse(Number(req.query.page));
+    res.json(await getAllItems(limit, page));
   } catch (e) {
-    console.log(e);
     errorResponse(res, e);
   }
 });
 
-router.get('/item/:id', useCache(), async (req: Request, res) => {
+router.get('/count', useCache(5), async (req, res) => {
+  try {
+    res.json(await getAllItemsCount());
+  } catch (e) {
+    errorResponse(res, e);
+  }
+});
+
+router.get('/item/:id', useCache(), async (req, res) => {
   try {
     const id = Number(req.params.id);
     res.json(await getItem(id));

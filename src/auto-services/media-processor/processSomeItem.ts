@@ -1,5 +1,5 @@
 import { prisma } from '../../db/db.js';
-import { updateItemProcessed } from '../../routes/items/fileFns.js';
+import { updateItemProcessed } from '../../routes/items/itemFns.js';
 import { processImage } from './image/processImage.js';
 import { processVideo } from './video/processVideo.js';
 import { Item, ItemType, Processed } from '@prisma/client';
