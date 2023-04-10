@@ -6,6 +6,7 @@ import { S3DeleteMany } from '../../aws/s3-helpers.js';
 import { HttpError } from '../../utils/errors/HttpError.js';
 import logger from '../../utils/log.js';
 import { getFrontItem } from '../../utils/getFrontItem.js';
+import { itemCache } from '../../cache/itemCache.js';
 
 export async function getAllItems(limit: number, page: number): Promise<FrontItem[]> {
   const items = await prisma.item.findMany({
@@ -28,6 +29,16 @@ export async function getAllItems(limit: number, page: number): Promise<FrontIte
       }
     })
     .filter(Boolean);
+}
+
+export async function getAllItemsCount(): Promise<number> {
+  if (itemCache.has('count')) {
+    return itemCache.get('count') as number;
+  } else {
+    const count = await prisma.item.count();
+    itemCache.set('count', count);
+    return count;
+  }
 }
 
 export async function getItem(id: number): Promise<FrontItem> {

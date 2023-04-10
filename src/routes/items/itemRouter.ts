@@ -1,4 +1,4 @@
-import { deleteItem, getAllItems, getItem } from './itemFns.js';
+import { deleteItem, getAllItems, getAllItemsCount, getItem } from './itemFns.js';
 import express, { Request } from 'express';
 import { isPremium } from '../../middleware/isPremium.js';
 import multer from 'multer';
@@ -26,7 +26,15 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/item/:id', useCache(), async (req: Request, res) => {
+router.get('/count', useCache(5), async (req, res) => {
+  try {
+    res.json(await getAllItemsCount());
+  } catch (e) {
+    errorResponse(res, e);
+  }
+});
+
+router.get('/item/:id', useCache(), async (req, res) => {
   try {
     const id = Number(req.params.id);
     res.json(await getItem(id));
