@@ -7,13 +7,16 @@ import { HttpError } from '../../utils/errors/HttpError.js';
 import logger from '../../utils/log.js';
 import { getFrontItem } from '../../utils/getFrontItem.js';
 
-export async function getAllItems(): Promise<FrontItem[]> {
+export async function getAllItems(limit: number, page: number): Promise<FrontItem[]> {
   const items = await prisma.item.findMany({
+    take: limit,
+    skip: page * limit,
     include: {
       Image: true,
       Video: true,
       thumbnails: true,
     },
+    orderBy: { createdAt: 'asc' },
   });
 
   return items
