@@ -45,7 +45,7 @@ router.get('/item/:id', useCache(), async (req, res) => {
   }
 });
 
-const tagsZod = z.string().array();
+const tagsZod = z.union([z.string(), z.array(z.string())]);
 
 const uploadMiddleware = multer(multerOptions);
 router.post(
@@ -55,7 +55,7 @@ router.post(
   async (req: Request, res) => {
     try {
       const file = req.file;
-      const tags = tagsZod.parse(req.body.tags);
+      const tags: string[] = [tagsZod.parse(req.body.tags)].flat();
 
       if (!file) {
         res.sendStatus(400);
