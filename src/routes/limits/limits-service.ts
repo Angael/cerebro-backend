@@ -63,3 +63,14 @@ export async function getLimitsForUser(user: firebase.auth.DecodedIdToken) {
     bytes: { used, max },
   };
 }
+
+export async function doesUserHaveSpaceLeftForFile(
+  user: firebase.auth.DecodedIdToken,
+  file: Express.Multer.File,
+) {
+  const limits = await getLimitsForUser(user);
+
+  const spaceLeft = limits.bytes.max - limits.bytes.used;
+
+  return spaceLeft - file.size > 0;
+}

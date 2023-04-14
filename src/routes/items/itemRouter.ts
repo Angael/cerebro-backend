@@ -10,6 +10,8 @@ import { MyRoute } from '../express-helpers/routeType.js';
 import { useCache } from '../../middleware/expressCache.js';
 import { usedSpaceCache } from '../../cache/userCache.js';
 import z from 'zod';
+import { doesUserHaveSpaceLeftForFile } from '../limits/limits-service.js';
+import { HttpError } from '../../utils/errors/HttpError.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -54,9 +56,15 @@ router.post(
       res.sendStatus(400);
       return;
     }
+
     try {
       if (file.size > MAX_UPLOAD_SIZE) {
         throw new Error('File too big');
+      }
+
+      const hasEnoughSpace = await doesUserHaveSpaceLeftForFile(req.user!, file);
+      if (!hasEnoughSpace) {
+        throw new HttpError(413);
       }
 
       await uploadFileForUser(file, req.user!);
