@@ -17,6 +17,7 @@
     "prisma:seed": "prisma db seed",
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate",
+    "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "dotenv -e .env.production -- prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "lint": "tsc"
