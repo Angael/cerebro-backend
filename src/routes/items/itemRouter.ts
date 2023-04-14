@@ -45,19 +45,23 @@ router.get('/item/:id', useCache(), async (req, res) => {
   }
 });
 
+const tagsZod = z.string().array();
+
 const uploadMiddleware = multer(multerOptions);
 router.post(
   '/upload/file',
   isPremium,
   uploadMiddleware.single('file'),
   async (req: Request, res) => {
-    const file = req.file;
-    if (!file) {
-      res.sendStatus(400);
-      return;
-    }
-
     try {
+      const file = req.file;
+      const tags = tagsZod.parse(req.body.tags);
+
+      if (!file) {
+        res.sendStatus(400);
+        return;
+      }
+
       if (file.size > MAX_UPLOAD_SIZE) {
         throw new Error('File too big');
       }
@@ -67,9 +71,8 @@ router.post(
         throw new HttpError(413);
       }
 
-      await uploadFileForUser(file, req.user!);
+      await uploadFileForUser({ file, user: req.user!, tags });
 
-      usedSpaceCache.del(req.user!.uid);
       res.status(200).send();
     } catch (e) {
       errorResponse(res, e);
