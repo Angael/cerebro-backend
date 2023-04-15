@@ -72,8 +72,6 @@ export async function processVideo(item: Item) {
   try {
     const generatedThumbs = await generateThumbnails(videoRow, download);
 
-    console.log(generatedThumbs);
-
     let thumbnails: IThumbnailBeforeUpload[] = generatedThumbs.map((t) => ({
       thumbnail: {
         itemId: item.id,

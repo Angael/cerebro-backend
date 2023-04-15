@@ -12,7 +12,7 @@ import { usedSpaceCache } from '../../cache/userCache.js';
 import z from 'zod';
 import { doesUserHaveSpaceLeftForFile } from '../limits/limits-service.js';
 import { HttpError } from '../../utils/errors/HttpError.js';
-import { upsertTags } from '../tags/tags.service.js';
+import { getItemTags, upsertTags } from '../tags/tags.service.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -23,6 +23,7 @@ router.get('/', async (req, res) => {
   try {
     const limit = limitZod.parse(Number(req.query.limit));
     const page = cursorZod.parse(Number(req.query.page));
+
     res.json(await getAllItems(limit, page));
   } catch (e) {
     errorResponse(res, e);
@@ -41,6 +42,16 @@ router.get('/item/:id', useCache(), async (req, res) => {
   try {
     const id = Number(req.params.id);
     res.json(await getItem(id));
+  } catch (e) {
+    errorResponse(res, e);
+  }
+});
+
+router.get('/item/:id/tags', useCache(), async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const tags = await getItemTags(id);
+    res.json(tags);
   } catch (e) {
     errorResponse(res, e);
   }

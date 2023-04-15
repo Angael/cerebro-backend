@@ -23,7 +23,11 @@ async function upsertTag(tagName: string): Promise<Tag> {
 export async function upsertTags(tagNames: string[]): Promise<Tag[]> {
   const tags: Tag[] = await mapSeries(tagNames, upsertTag);
 
-  console.log('tags', tags);
-
   return tags;
+}
+
+export async function getItemTags(itemId: number): Promise<Tag[]> {
+  return await prisma.tag.findMany({
+    where: { items: { some: { itemId } } },
+  });
 }
