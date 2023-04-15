@@ -3,7 +3,7 @@ import logger from '../../../utils/log.js';
 import { S3Delete, S3SimpleUpload } from '../../../aws/s3-helpers.js';
 import { makeS3Path, replaceFileWithHash } from '../../../utils/makeS3Path.js';
 import { prisma } from '../../../db/db.js';
-import { ItemType, Processed } from '@prisma/client';
+import { ItemType, Processed, Tag } from '@prisma/client';
 import { analyzeVideo, VideoStats } from '@vanih/dunes-node';
 import { HttpError } from '../../../utils/errors/HttpError.js';
 import { uploadPayload } from './upload.type.js';
@@ -13,7 +13,7 @@ async function insertIntoDb(
   videoData: VideoStats,
   file: Express.Multer.File,
   author: firebase.auth.DecodedIdToken,
-  tags: string[],
+  tags: Tag[],
 ) {
   return await prisma.item.create({
     data: {
@@ -32,9 +32,9 @@ async function insertIntoDb(
         },
       },
       tags: {
-        create: tags.map((name) => ({
-          tag: { create: { name } },
-        })),
+        createMany: {
+          data: tags.map((tag) => ({ tagId: tag.id })),
+        },
       },
     },
   });

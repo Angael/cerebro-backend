@@ -12,6 +12,7 @@ import { usedSpaceCache } from '../../cache/userCache.js';
 import z from 'zod';
 import { doesUserHaveSpaceLeftForFile } from '../limits/limits-service.js';
 import { HttpError } from '../../utils/errors/HttpError.js';
+import { upsertTags } from '../tags/tags.service.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -55,7 +56,7 @@ router.post(
   async (req: Request, res) => {
     try {
       const file = req.file;
-      const tags: string[] = [tagsZod.parse(req.body.tags)].flat();
+      const tagNames: string[] = [tagsZod.parse(req.body.tags)].flat();
 
       if (!file) {
         res.sendStatus(400);
@@ -71,6 +72,7 @@ router.post(
         throw new HttpError(413);
       }
 
+      const tags = await upsertTags(tagNames);
       await uploadFileForUser({ file, user: req.user!, tags });
 
       res.status(200).send();
