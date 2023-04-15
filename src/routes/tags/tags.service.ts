@@ -1,10 +1,10 @@
 import { Tag } from '@prisma/client';
 import { prisma } from '../../db/db.js';
 import { mapSeries } from 'modern-async';
-import { tagCache } from '../../cache/caches.js';
+import { itemTagsCache, tagCache } from '../../cache/caches.js';
 
 async function upsertTag(tagName: string): Promise<Tag> {
-  let cachedTag = tagCache.get(tagName);
+  const cachedTag = tagCache.get(tagName);
   if (cachedTag) {
     return cachedTag;
   }
@@ -27,7 +27,16 @@ export async function upsertTags(tagNames: string[]): Promise<Tag[]> {
 }
 
 export async function getItemTags(itemId: number): Promise<Tag[]> {
-  return await prisma.tag.findMany({
+  const cachedTags = itemTagsCache.get(itemId);
+  if (cachedTags) {
+    return cachedTags;
+  }
+
+  const tags = await prisma.tag.findMany({
     where: { items: { some: { itemId } } },
   });
+
+  itemTagsCache.set(itemId, tags);
+
+  return tags;
 }

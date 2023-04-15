@@ -47,7 +47,7 @@ router.get('/item/:id', useCache(), async (req, res) => {
   }
 });
 
-router.get('/item/:id/tags', useCache(), async (req, res) => {
+router.get('/item/:id/tags', useCache(600), async (req, res) => {
   try {
     const id = Number(req.params.id);
     const tags = await getItemTags(id);
