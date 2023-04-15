@@ -1,10 +1,11 @@
-import firebase from 'firebase-admin';
 import { betterUnlink } from '../../../utils/betterUnlink.js';
 import logger from '../../../utils/log.js';
 import { uploadImage } from './image.service.js';
 import { uploadVideo } from './video.service.js';
-import { ItemType } from '@prisma/client';
+import { Item, ItemType } from '@prisma/client';
 import { HttpError } from '../../../utils/errors/HttpError.js';
+import { usedSpaceCache } from '../../../cache/userCache.js';
+import { uploadPayload } from './upload.type.js';
 
 function getFileType(file: Express.Multer.File): ItemType {
   const { mimetype } = file;
@@ -19,18 +20,19 @@ function getFileType(file: Express.Multer.File): ItemType {
   }
 }
 
-export async function uploadFileForUser(
-  file: Express.Multer.File,
-  user: firebase.auth.DecodedIdToken,
-): Promise<void> {
+export async function uploadFileForUser({ file, user, tags }: uploadPayload): Promise<Item> {
+  let item: Item | undefined;
+
   try {
     const itemType = getFileType(file);
+
     if (itemType === ItemType.IMAGE) {
-      await uploadImage(file, user);
+      item = await uploadImage({ file, user, tags });
     } else if (itemType === ItemType.VIDEO) {
-      await uploadVideo(file, user);
+      item = await uploadVideo({ file, user, tags });
     }
     logger.verbose('uploaded file %s', file.filename);
+    usedSpaceCache.del(user.uid);
   } catch (e) {
     logger.error(e);
     throw new HttpError(400);
@@ -38,5 +40,9 @@ export async function uploadFileForUser(
     betterUnlink(file.path);
   }
 
-  return;
+  if (!item) {
+    throw new HttpError(500);
+  }
+
+  return item;
 }

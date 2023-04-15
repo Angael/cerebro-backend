@@ -12,6 +12,7 @@ import { usedSpaceCache } from '../../cache/userCache.js';
 import z from 'zod';
 import { doesUserHaveSpaceLeftForFile } from '../limits/limits-service.js';
 import { HttpError } from '../../utils/errors/HttpError.js';
+import { getItemTags, upsertTags } from '../tags/tags.service.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -22,6 +23,7 @@ router.get('/', async (req, res) => {
   try {
     const limit = limitZod.parse(Number(req.query.limit));
     const page = cursorZod.parse(Number(req.query.page));
+
     res.json(await getAllItems(limit, page));
   } catch (e) {
     errorResponse(res, e);
@@ -45,19 +47,33 @@ router.get('/item/:id', useCache(), async (req, res) => {
   }
 });
 
+router.get('/item/:id/tags', useCache(600), async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const tags = await getItemTags(id);
+    res.json(tags);
+  } catch (e) {
+    errorResponse(res, e);
+  }
+});
+
+const tagsZod = z.union([z.string(), z.array(z.string())]);
+
 const uploadMiddleware = multer(multerOptions);
 router.post(
   '/upload/file',
   isPremium,
   uploadMiddleware.single('file'),
   async (req: Request, res) => {
-    const file = req.file;
-    if (!file) {
-      res.sendStatus(400);
-      return;
-    }
-
     try {
+      const file = req.file;
+      const tagNames: string[] = [tagsZod.parse(req.body.tags)].flat();
+
+      if (!file) {
+        res.sendStatus(400);
+        return;
+      }
+
       if (file.size > MAX_UPLOAD_SIZE) {
         throw new Error('File too big');
       }
@@ -67,9 +83,9 @@ router.post(
         throw new HttpError(413);
       }
 
-      await uploadFileForUser(file, req.user!);
+      const tags = await upsertTags(tagNames);
+      await uploadFileForUser({ file, user: req.user!, tags });
 
-      usedSpaceCache.del(req.user!.uid);
       res.status(200).send();
     } catch (e) {
       errorResponse(res, e);

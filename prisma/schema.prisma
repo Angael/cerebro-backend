@@ -47,12 +47,13 @@ model Item {
   userUid   String
   type      ItemType
 
-  processed Processed // Are thumbnails generated
+  processed Processed @default(NO) // Are thumbnails generated
   optimized Processed @default(NO) // Is original video optimized for viewing
 
   thumbnails Thumbnail[]
   Image      Image[]
   Video      Video[]
+  tags       TagsOnItems[]
 }
 
 enum ThumbnailType {
@@ -109,4 +110,20 @@ model Video {
   height     Int       @db.UnsignedSmallInt
   durationMs Int       @db.UnsignedInt
   bitrateKb  Int       @db.UnsignedSmallInt
+}
+
+model Tag {
+  id    Int           @id @default(autoincrement())
+  name  String        @unique // lowercase always
+  items TagsOnItems[]
+}
+
+model TagsOnItems {
+  item       Item     @relation(fields: [itemId], references: [id])
+  itemId     Int
+  tag        Tag      @relation(fields: [tagId], references: [id])
+  tagId      Int
+  assignedAt DateTime @default(now())
+
+  @@id([itemId, tagId])
 }

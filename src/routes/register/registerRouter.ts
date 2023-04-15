@@ -15,7 +15,6 @@ const registerBody = z.object({
 router.post('/', isAuth, async (req: Request, res) => {
   try {
     const { email, uid } = registerBody.parse(req.body);
-    console.log({ email, uid });
     res.json(await registerUser(uid, email));
   } catch (e) {
     errorResponse(res, e);
