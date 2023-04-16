@@ -17,7 +17,7 @@ export async function getAllItems(limit: number, page: number): Promise<FrontIte
       Video: true,
       thumbnails: true,
     },
-    orderBy: { createdAt: 'asc' },
+    orderBy: { createdAt: 'desc' },
   });
 
   return items
