@@ -8,8 +8,20 @@ import logger from '../../utils/log.js';
 import { getFrontItem } from '../../utils/getFrontItem.js';
 import { itemCache } from '../../cache/itemCache.js';
 
-export async function getAllItems(limit: number, page: number): Promise<FrontItem[]> {
+export async function getAllItems(
+  limit: number,
+  page: number,
+  tagIds: number[],
+): Promise<FrontItem[]> {
+  console.log(tagIds);
   const items = await prisma.item.findMany({
+    where: {
+      ...(tagIds.length
+        ? {
+            tags: { some: { tagId: { in: tagIds } } },
+          }
+        : {}),
+    },
     take: limit,
     skip: page * limit,
     include: {
