@@ -44,17 +44,18 @@ export function getFrontItem(item: ParamItem, userUid: string | null): FrontItem
         animated: sourceImage.animated
       },
     } satisfies ImageItem;
-  } else if(item.type === 'VIDEO' && compressedVideo){
-    // TODO: tutaj jest problem jak cos nie jest jeszcze zoptymalizowane :/
+  } else if(item.type === 'VIDEO' && sourceVideo){
+    const vid = compressedVideo ?? sourceVideo;
+
     return {
       ...baseItem,
       type: 'VIDEO',
       video: {
-        src: s3PathToUrl(compressedVideo.path),
-        height: compressedVideo.height,
-        width: compressedVideo.width,
-        durationMs: compressedVideo.durationMs,
-        bitrateKb: compressedVideo.bitrateKb
+        src: s3PathToUrl(vid.path),
+        height: vid.height,
+        width: vid.width,
+        durationMs: vid.durationMs,
+        bitrateKb: vid.bitrateKb
       },
     } satisfies VideoItem;
   } else {

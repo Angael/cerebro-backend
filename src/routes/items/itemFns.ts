@@ -13,7 +13,6 @@ export async function getAllItems(
   page: number,
   tagIds: number[],
 ): Promise<FrontItem[]> {
-  console.log(tagIds);
   const items = await prisma.item.findMany({
     where: {
       ...(tagIds.length
