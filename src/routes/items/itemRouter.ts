@@ -14,6 +14,7 @@ import { doesUserHaveSpaceLeftForFile } from '../limits/limits-service.js';
 import { HttpError } from '../../utils/errors/HttpError.js';
 import { getItemTags, upsertTags } from '../tags/tags.service.js';
 import { arrayFromString } from '../../utils/arrayFromString.js';
+import { QueryItems } from '@vanih/cerebro-contracts';
 
 const router = express.Router({ mergeParams: true });
 
@@ -27,7 +28,9 @@ router.get('/', async (req, res) => {
     const tags: number[] =
       typeof req.query.tagIds === 'string' ? arrayFromString(req.query.tagIds).map(Number) : [];
 
-    res.json(await getAllItems(limit, page, tags));
+    const responseJson: QueryItems = await getAllItems(limit, page, tags);
+
+    res.json(responseJson);
   } catch (e) {
     errorResponse(res, e);
   }

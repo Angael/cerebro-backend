@@ -28,7 +28,7 @@
   "dependencies": {
     "@prisma/client": "4.12",
     "@types/fs-extra": "^9.0.13",
-    "@vanih/cerebro-contracts": "0.0.6",
+    "@vanih/cerebro-contracts": "0.0.7",
     "@vanih/dunes-node": "3.2.0",
     "async": "^3.2.4",
     "aws-sdk": "^2.1282.0",

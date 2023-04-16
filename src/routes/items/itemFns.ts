@@ -1,5 +1,5 @@
 import { Item } from '@prisma/client';
-import { FrontItem } from '@vanih/cerebro-contracts';
+import { FrontItem, QueryItems } from '@vanih/cerebro-contracts';
 import { prisma } from '../../db/db.js';
 import firebase from 'firebase-admin';
 import { S3DeleteMany } from '../../aws/s3-helpers.js';
@@ -12,15 +12,16 @@ export async function getAllItems(
   limit: number,
   page: number,
   tagIds: number[],
-): Promise<FrontItem[]> {
-  const items = await prisma.item.findMany({
-    where: {
-      ...(tagIds.length
-        ? {
-            tags: { some: { tagId: { in: tagIds } } },
-          }
-        : {}),
-    },
+): Promise<QueryItems> {
+  const where = {
+    ...(tagIds.length
+      ? {
+          tags: { some: { tagId: { in: tagIds } } },
+        }
+      : {}),
+  };
+  const _items = await prisma.item.findMany({
+    where,
     take: limit,
     skip: page * limit,
     include: {
@@ -31,7 +32,11 @@ export async function getAllItems(
     orderBy: { createdAt: 'desc' },
   });
 
-  return items
+  const count = await prisma.item.count({
+    where,
+  });
+
+  const items = _items
     .map((item) => {
       try {
         return getFrontItem(item, null);
@@ -40,6 +45,8 @@ export async function getAllItems(
       }
     })
     .filter(Boolean);
+
+  return { items, count };
 }
 
 export async function getAllItemsCount(): Promise<number> {
