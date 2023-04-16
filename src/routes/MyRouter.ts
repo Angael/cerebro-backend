@@ -6,9 +6,10 @@ import { addAuth } from '../middleware/addAuth.js';
 import itemRouter from './items/itemRouter.js';
 import registerRouter from './register/registerRouter.js';
 import limitsRouter from './limits/limitsRouter.js';
+import tagsRouter from './tags/tagsRouter.js';
 import { MyRoute } from './express-helpers/routeType.js';
 
-const routes3: MyRoute[] = [itemRouter, registerRouter, limitsRouter];
+const routes3: MyRoute[] = [itemRouter, registerRouter, limitsRouter, tagsRouter];
 
 const startRouter = () => {
   const router = express();

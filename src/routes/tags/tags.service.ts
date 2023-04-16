@@ -26,6 +26,14 @@ export async function upsertTags(tagNames: string[]): Promise<Tag[]> {
   return tags;
 }
 
+export async function getAllTags(): Promise<Tag[]> {
+  const tags = await prisma.tag.findMany({
+    take: 100,
+  });
+
+  return tags;
+}
+
 export async function getItemTags(itemId: number): Promise<Tag[]> {
   const cachedTags = itemTagsCache.get(itemId);
   if (cachedTags) {
