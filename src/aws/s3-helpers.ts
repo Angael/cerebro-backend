@@ -7,6 +7,7 @@ import { DOWNLOADS_DIR } from '../utils/consts.js';
 import { downloadFile } from '../utils/downloadFile.js';
 import { s3PathToUrl } from '../utils/s3PathToUrl.js';
 import { nanoid } from 'nanoid';
+import { getContentType } from './getContentType.js';
 
 export async function S3CreateBucket(bucketName: string) {
   const bucket = bucketName;
@@ -50,6 +51,7 @@ export function S3SimpleUpload({
     Key: key,
     Body: fs.createReadStream(filePath),
     ACL: 'public-read',
+    ContentType: getContentType(filePath),
   };
 
   return new Promise((res, rej) =>
