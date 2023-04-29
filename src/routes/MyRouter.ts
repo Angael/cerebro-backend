@@ -8,8 +8,16 @@ import registerRouter from './register/registerRouter.js';
 import limitsRouter from './limits/limitsRouter.js';
 import tagsRouter from './tags/tagsRouter.js';
 import { MyRoute } from './express-helpers/routeType.js';
+import localFsRouter from './local-fs/localFsRouter.js';
+import { isProd } from '../utils/env.js';
 
-const routes3: MyRoute[] = [itemRouter, registerRouter, limitsRouter, tagsRouter];
+const routes3: MyRoute[] = [
+  itemRouter,
+  registerRouter,
+  limitsRouter,
+  tagsRouter,
+  !isProd && localFsRouter,
+].filter((router): router is MyRoute => !!router);
 
 const startRouter = () => {
   const router = express();
