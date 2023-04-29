@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import fg from 'fast-glob';
 import { HttpError } from '../../utils/errors/HttpError.js';
+import path from 'path';
 
 type LocalFile = {
   path: string;
@@ -49,5 +50,16 @@ export async function ensureIsFile(path: string): Promise<boolean> {
     return fs.lstat(path).then((stat) => stat.isFile());
   } catch (e) {
     throw new HttpError(400);
+  }
+}
+
+export async function moveFiles(files: string[], dist: string): Promise<void> {
+  if (!dist) throw new HttpError(400);
+  const isFolder = fs.lstatSync(dist).isDirectory();
+  if (!isFolder) throw new HttpError(400);
+
+  for (const file of files) {
+    const filename = path.basename(file);
+    await fs.move(file, path.join(dist, filename), { overwrite: false });
   }
 }

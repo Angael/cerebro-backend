@@ -2,7 +2,7 @@ import express from 'express';
 import { MyRoute } from '../express-helpers/routeType.js';
 import z from 'zod';
 import { errorResponse } from '../../utils/errors/errorResponse.js';
-import { ensureIsFile, getFileListFromFolder } from './localFsFns.js';
+import { ensureIsFile, getFileListFromFolder, moveFiles } from './localFsFns.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -25,6 +25,31 @@ router.get('/file', async (req, res) => {
     await ensureIsFile(path);
 
     res.sendFile(path);
+  } catch (e) {
+    errorResponse(res, e);
+  }
+});
+
+// validate with zod
+const payloadZod = z.object({
+  type: z.enum(['upload', 'move', 'delete']),
+  filePaths: z.array(z.string()),
+  tags: z.array(z.string()).optional(),
+  moveDist: z.string().optional(),
+});
+
+router.post('/files', async (req, res) => {
+  try {
+    const payload = payloadZod.parse(req.body);
+
+    switch (payload.type) {
+      case 'move':
+        await moveFiles(payload.filePaths, payload.moveDist ?? '');
+        break;
+      default:
+        break;
+    }
+    res.sendStatus(204);
   } catch (e) {
     errorResponse(res, e);
   }
