@@ -1,12 +1,43 @@
 import fs from 'fs-extra';
+import fg from 'fast-glob';
 import { HttpError } from '../../utils/errors/HttpError.js';
 
-export function getFileListFromFolder(path: string): Promise<string[]> {
+type LocalFile = {
+  path: string;
+  type: 'image' | 'video' | 'unknown';
+};
+
+const imageExtensions = ['png', 'gif', 'webp', 'jpeg', 'jpg'];
+const videoExtensions = ['mp4', 'webm', 'mkv'];
+
+const getFileType = (path: string) => {
+  const extension = path.split('.').pop();
+
+  if (imageExtensions.includes(extension as any)) {
+    return 'image';
+  } else if (videoExtensions.includes(extension as any)) {
+    return 'video';
+  } else {
+    return 'unknown';
+  }
+};
+
+export async function getFileListFromFolder(path: string): Promise<LocalFile[]> {
   // Check if path is a folder
   const isFolder = fs.lstatSync(path).isDirectory();
   // If it is, return the list of files
   if (isFolder) {
-    return fs.readdir(path);
+    const fileList: string[] = await fg('*', {
+      onlyFiles: true,
+      deep: 1,
+      cwd: path,
+      absolute: true,
+    });
+
+    return fileList.map((path) => ({
+      path,
+      type: getFileType(path),
+    }));
   } else {
     throw new HttpError(400);
   }
