@@ -2,6 +2,7 @@ import fs from 'fs-extra';
 import fg from 'fast-glob';
 import { HttpError } from '../../utils/errors/HttpError.js';
 import path from 'path';
+import { forEach } from 'modern-async';
 
 type LocalFile = {
   path: string;
@@ -55,11 +56,17 @@ export async function ensureIsFile(path: string): Promise<boolean> {
 
 export async function moveFiles(files: string[], dist: string): Promise<void> {
   if (!dist) throw new HttpError(400);
-  const isFolder = fs.lstatSync(dist).isDirectory();
+  const isFolder = (await fs.lstat(dist)).isDirectory();
   if (!isFolder) throw new HttpError(400);
 
-  for (const file of files) {
+  return forEach(files, async (file: string) => {
     const filename = path.basename(file);
-    await fs.move(file, path.join(dist, filename), { overwrite: false });
-  }
+    try {
+      await fs.move(file, path.join(dist, filename), { overwrite: false });
+
+      console.log('moved file ' + file);
+    } catch (e) {
+      console.log('failed to move file ' + file);
+    }
+  }).catch(() => undefined);
 }
