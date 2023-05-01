@@ -3,6 +3,7 @@ import { MyRoute } from '../express-helpers/routeType.js';
 import z from 'zod';
 import { errorResponse } from '../../utils/errors/errorResponse.js';
 import { ensureIsFile, getFileListFromFolder, moveFiles } from './localFsFns.js';
+import { betterUnlink } from '../../utils/betterUnlink.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -32,7 +33,7 @@ router.get('/file', async (req, res) => {
 
 // validate with zod
 const payloadZod = z.object({
-  type: z.enum(['upload', 'move', 'delete']),
+  type: z.enum(['upload', 'move']),
   filePaths: z.array(z.string()),
   tags: z.array(z.string()).optional(),
   moveDist: z.string().optional(),
@@ -49,6 +50,21 @@ router.post('/files', async (req, res) => {
       default:
         break;
     }
+    res.sendStatus(204);
+  } catch (e) {
+    errorResponse(res, e);
+  }
+});
+
+const deleteFilesZod = z.object({
+  paths: z.string().array().min(1).max(1000),
+});
+
+router.delete('/files', async (req, res) => {
+  try {
+    const { paths } = deleteFilesZod.parse(req.body);
+
+    await betterUnlink(paths);
     res.sendStatus(204);
   } catch (e) {
     errorResponse(res, e);
