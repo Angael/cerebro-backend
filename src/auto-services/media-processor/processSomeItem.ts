@@ -21,6 +21,7 @@ export async function processSomeItem(): Promise<Item['id'] | null> {
 
   try {
     await updateItemProcessed(item.id, Processed.STARTED);
+
     logger.verbose('processing item %i', item.id);
     if (item.type === ItemType.IMAGE) {
       await processImage(item);
