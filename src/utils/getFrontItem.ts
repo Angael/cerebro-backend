@@ -12,6 +12,8 @@ export function getFrontItem(item: ParamItem, userUid: string | null): FrontItem
   const sourceVideo =
     item.Video.find((e) => e.mediaType === 'SOURCE')
 
+  const compressedImage =
+    item.Image.find((e) => e.mediaType === 'COMPRESSED')
   const compressedVideo =
     item.Video.find((e) => e.mediaType === 'COMPRESSED')
 
@@ -34,14 +36,15 @@ export function getFrontItem(item: ParamItem, userUid: string | null): FrontItem
   };
 
   if (item.type === 'IMAGE' && sourceImage) {
+    const img = compressedImage ?? sourceImage;
     return {
       ...baseItem,
       type: 'IMAGE',
       image: {
-        src: s3PathToUrl(sourceImage.path),
-        height: sourceImage.height,
-        width: sourceImage.width,
-        animated: sourceImage.animated
+        src: s3PathToUrl(img.path),
+        height: img.height,
+        width: img.width,
+        animated: img.animated
       },
     } satisfies ImageItem;
   } else if(item.type === 'VIDEO' && sourceVideo){
