@@ -8,10 +8,13 @@ export const betterUnlink = (paths: string | string[]) => {
   const pathsToUnlink = [paths].flat(1);
 
   return forEachSeries(pathsToUnlink, (path) => {
-    promiseRetry(config, (retry) =>
-      fs.unlink(path).catch((e) => {
+    promiseRetry(config, async (retry) => {
+      // if file doesn't exist, don't retry
+      if (!(await fs.pathExists(path))) return Promise.resolve();
+
+      return fs.unlink(path).catch((e) => {
         retry();
-      }),
-    );
+      });
+    });
   });
 };
