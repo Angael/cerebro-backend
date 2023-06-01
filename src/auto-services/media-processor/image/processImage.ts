@@ -24,6 +24,11 @@ export async function processImage(item: Item) {
 
   // Optimized src
   try {
+    await prisma.item.update({
+      where: { id: item.id },
+      data: { optimized: 'STARTED' },
+    });
+
     const { diskPath, width, height, size, animated } = await generateOptimizedSrc(download);
 
     const s3Path = makeS3Path(item.userUid, 'optimized', changeExtension(sourceFileName, 'webp'));
@@ -45,10 +50,19 @@ export async function processImage(item: Item) {
       filePath: diskPath,
     });
 
+    await prisma.item.update({
+      where: { id: item.id },
+      data: { optimized: 'V1' },
+    });
+
     betterUnlink(diskPath);
   } catch (e) {
     logger.error('Failed to generate optimized src for item.id %i', item.id);
     error = true;
+    await prisma.item.update({
+      where: { id: item.id },
+      data: { optimized: 'FAIL' },
+    });
   }
 
   // TODO if src fails, thumbnails are not generated, is this a problem?

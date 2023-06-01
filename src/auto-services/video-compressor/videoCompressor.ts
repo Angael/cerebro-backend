@@ -31,7 +31,6 @@ const updateStatus = (itemId: number, status: Item['optimized']) =>
     data: { optimized: status },
   });
 
-// import './compressTests.js';
 const videoCompressor = new Scheduler(
   async () => {
     const [item, video] = await findUncompressedVideoItem();
