@@ -119,9 +119,9 @@ model Tag {
 }
 
 model TagsOnItems {
-  item       Item     @relation(fields: [itemId], references: [id])
+  item       Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId     Int
-  tag        Tag      @relation(fields: [tagId], references: [id])
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
   tagId      Int
   assignedAt DateTime @default(now())
 

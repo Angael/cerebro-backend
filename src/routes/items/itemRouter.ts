@@ -21,14 +21,14 @@ const router = express.Router({ mergeParams: true });
 const limitZod = z.number().min(1).max(30);
 const cursorZod = z.number().min(0).max(Number.MAX_SAFE_INTEGER);
 
-router.get('/', async (req, res) => {
+router.get('/', async (req: Request, res) => {
   try {
     const limit = limitZod.parse(Number(req.query.limit));
     const page = cursorZod.parse(Number(req.query.page));
     const tags: number[] =
       typeof req.query.tagIds === 'string' ? arrayFromString(req.query.tagIds).map(Number) : [];
 
-    const responseJson: QueryItems = await getAllItems(limit, page, tags);
+    const responseJson: QueryItems = await getAllItems(limit, page, tags, req.user?.uid);
 
     res.json(responseJson);
   } catch (e) {
@@ -44,10 +44,10 @@ router.get('/count', useCache(5), async (req, res) => {
   }
 });
 
-router.get('/item/:id', useCache(), async (req, res) => {
+router.get('/item/:id', useCache(), async (req: Request, res) => {
   try {
     const id = Number(req.params.id);
-    res.json(await getItem(id));
+    res.json(await getItem(id, req.user?.uid));
   } catch (e) {
     errorResponse(res, e);
   }

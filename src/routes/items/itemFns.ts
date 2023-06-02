@@ -1,4 +1,4 @@
-import { Item } from '@prisma/client';
+import { Item, User } from '@prisma/client';
 import { FrontItem, QueryItems } from '@vanih/cerebro-contracts';
 import { prisma } from '../../db/db.js';
 import firebase from 'firebase-admin';
@@ -12,6 +12,7 @@ export async function getAllItems(
   limit: number,
   page: number,
   tagIds: number[],
+  userUid?: User['uid'],
 ): Promise<QueryItems> {
   const where = {
     ...(tagIds.length
@@ -39,7 +40,7 @@ export async function getAllItems(
   const items = _items
     .map((item) => {
       try {
-        return getFrontItem(item, null);
+        return getFrontItem(item, userUid);
       } catch (e) {
         return null as any;
       }
@@ -59,7 +60,7 @@ export async function getAllItemsCount(): Promise<number> {
   }
 }
 
-export async function getItem(id: number): Promise<FrontItem> {
+export async function getItem(id: number, userUid?: User['uid']): Promise<FrontItem> {
   const item = await prisma.item.findFirst({
     include: {
       Image: true,
@@ -70,7 +71,7 @@ export async function getItem(id: number): Promise<FrontItem> {
   });
 
   if (item) {
-    return getFrontItem(item, null);
+    return getFrontItem(item, userUid);
   } else {
     throw new HttpError(404);
   }
