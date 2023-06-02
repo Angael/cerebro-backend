@@ -40,7 +40,7 @@ const mediaProcessor = new BaseProcessor<Item>({
   },
 
   async onItemError(item, error) {
-    logger.error('Error processing item %i', item.id);
+    logger.error('Error processing item %i, %o', item.id, error);
     await prisma.item.update({
       where: { id: item.id },
       data: { processed: Processed.FAIL },
