@@ -31,7 +31,7 @@ async function resizeFileAndSave({
 }: resizeArgs): Promise<{ info: OutputInfo; path: string }> {
   const outPath = join(THUMBNAILS_DIR, nanoid() + '.webp');
   return pipeline
-    .withMetadata()
+    .rotate()
     .resize(width, height)
     .webp()
     .toFile(outPath)
@@ -98,7 +98,7 @@ export async function generateOptimizedSrc(filePath: string): Promise<OptimizedS
     }
 
     const outPath = join(OPTIMIZATION_DIR, nanoid() + '.webp');
-    await pipeline.withMetadata().webp().toFile(outPath);
+    await pipeline.rotate().webp().toFile(outPath);
     const metadata = await sharp(outPath).metadata();
     const size = await fs.stat(outPath).then((stat) => stat.size);
 
