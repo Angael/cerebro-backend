@@ -76,22 +76,6 @@ export async function getItem(id: number): Promise<FrontItem> {
   }
 }
 
-export async function updateItemProcessed(
-  itemId: Item['id'],
-  processed: Item['processed'],
-): Promise<void> {
-  await prisma.item.update({
-    data: {
-      processed,
-    },
-    where: {
-      id: itemId,
-    },
-  });
-
-  return;
-}
-
 export async function deleteItem(itemId: Item['id'], userId: firebase.auth.DecodedIdToken['uid']) {
   // const row = (await db.select('account_uid').from(DB_TABLE.item).where({ id: itemId }))[0];
   const row = await prisma.item.findFirst({
