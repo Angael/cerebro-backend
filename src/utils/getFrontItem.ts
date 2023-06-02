@@ -1,4 +1,4 @@
-import { Image, Item, Thumbnail, Video } from '@prisma/client';
+import { Image, Item, Thumbnail, User, Video } from "@prisma/client";
 import { BaseItem, FrontItem, ImageItem, VideoItem } from "@vanih/cerebro-contracts";
 import { s3PathToUrl } from './s3PathToUrl.js';
 import { HttpError } from "./errors/HttpError.js";
@@ -6,7 +6,7 @@ import logger from "./log.js";
 
 type ParamItem = Item & { Image: Image[]; Video: Video[]; thumbnails: Thumbnail[] };
 
-export function getFrontItem(item: ParamItem, userUid: string | null): FrontItem {
+export function getFrontItem(item: ParamItem, userUid?: User['uid']): FrontItem {
   const sourceImage  =
     item.Image.find((e) => e.mediaType === 'SOURCE')
   const sourceVideo =
