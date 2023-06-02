@@ -7,33 +7,20 @@ export class BaseProcessor<T extends { id: string | number }> {
   queue: queueAsPromised<T>;
   scheduler: Scheduler;
 
-  constructor(options: BaseProcessorOptions<T>) {
-    const {
-      checkInterval,
-      concurrency,
-      processItem,
-      getItems,
-      canProcessItem,
-      setItemStarted,
-      setItemProcessed,
-      onItemError,
-    } = options;
+  processItem: BaseProcessorOptions<T>['processItem'];
+  setItemStarted: BaseProcessorOptions<T>['setItemStarted'];
+  setItemProcessed: BaseProcessorOptions<T>['setItemProcessed'];
+  canProcessItem: BaseProcessorOptions<T>['canProcessItem'];
+  onItemError: BaseProcessorOptions<T>['onItemError'];
 
-    async function asyncWorker(item: T) {
-      try {
-        if (await canProcessItem(item)) {
-          await setItemStarted(item);
-          await processItem(item);
-          await setItemProcessed(item);
-        } else {
-          throw new Error('Item cannot be processed');
-        }
-      } catch (err) {
-        await onItemError(item, err);
-      }
-    }
+  constructor(params: BaseProcessorOptions<T>) {
+    this.processItem = params.processItem;
+    this.setItemStarted = params.setItemStarted;
+    this.setItemProcessed = params.setItemProcessed;
+    this.canProcessItem = params.canProcessItem;
+    this.onItemError = params.onItemError;
 
-    this.queue = fastq.promise(asyncWorker, concurrency);
+    this.queue = fastq.promise(this.asyncWorker, params.concurrency);
 
     this.scheduler = new Scheduler(
       async () => {
@@ -41,7 +28,7 @@ export class BaseProcessor<T extends { id: string | number }> {
           return;
         }
 
-        const items = await getItems();
+        const items = await params.getItems();
         const itemsInQueue = this.queue.getQueue();
 
         items.forEach((item) => {
@@ -51,12 +38,26 @@ export class BaseProcessor<T extends { id: string | number }> {
           }
         });
       },
-      checkInterval,
+      params.checkInterval,
       {
         concurrency: 1,
         maxPending: 0,
       },
     );
+  }
+
+  async asyncWorker(item: T) {
+    try {
+      if (await this.canProcessItem(item)) {
+        await this.setItemStarted(item);
+        await this.processItem(item);
+        await this.setItemProcessed(item);
+      } else {
+        throw new Error('Item cannot be processed');
+      }
+    } catch (err) {
+      await this.onItemError(item, err);
+    }
   }
 
   start() {
