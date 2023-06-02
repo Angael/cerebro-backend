@@ -16,9 +16,15 @@ type resizeArgs = {
 
 async function measure(sharpPipeline): Promise<IThumbnailMeasure[]> {
   return sharpPipeline.metadata().then((metadata) => {
-    const frameHeight = metadata.pageHeight || metadata.height;
-    const frameWidth = metadata.width;
-    // const isAnimated = metadata.pages > 1;
+    let frameHeight = metadata.pageHeight || metadata.height;
+    let frameWidth = metadata.width;
+
+    // Swap width and height if orientation is portrait
+    if ([6, 8, 5, 7].includes(metadata.orientation)) {
+      const temp = frameHeight;
+      frameHeight = frameWidth;
+      frameWidth = temp;
+    }
 
     return calculateThumbnailDimensions(frameWidth, frameHeight);
   });

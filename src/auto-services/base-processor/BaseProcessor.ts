@@ -46,7 +46,7 @@ export class BaseProcessor<T extends { id: string | number }> {
     );
   }
 
-  async asyncWorker(item: T) {
+  asyncWorker = async (item: T) => {
     try {
       if (await this.canProcessItem(item)) {
         await this.setItemStarted(item);
@@ -58,7 +58,7 @@ export class BaseProcessor<T extends { id: string | number }> {
     } catch (err) {
       await this.onItemError(item, err);
     }
-  }
+  };
 
   start() {
     this.scheduler.start();

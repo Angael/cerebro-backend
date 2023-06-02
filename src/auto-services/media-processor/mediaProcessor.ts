@@ -9,14 +9,14 @@ const mediaProcessor = new BaseProcessor<Item>({
   processItem: processSomeItem,
   checkInterval: 5000,
 
-  getItems() {
+  getItems: () => {
     return prisma.item.findMany({
       take: 10,
       where: { processed: Processed.NO },
     });
   },
 
-  async canProcessItem(item) {
+  canProcessItem: async (item) => {
     const itemRow = await prisma.item.findFirst({
       where: { id: item.id },
     });
@@ -24,14 +24,14 @@ const mediaProcessor = new BaseProcessor<Item>({
     return itemRow?.processed === Processed.NO;
   },
 
-  async setItemStarted(item) {
+  setItemStarted: async (item) => {
     await prisma.item.update({
       where: { id: item.id },
       data: { processed: Processed.STARTED },
     });
   },
 
-  async setItemProcessed(item) {
+  setItemProcessed: async (item) => {
     logger.verbose('Processed item %i', item.id);
     await prisma.item.update({
       where: { id: item.id },
@@ -39,7 +39,7 @@ const mediaProcessor = new BaseProcessor<Item>({
     });
   },
 
-  async onItemError(item, error) {
+  onItemError: async (item, error) => {
     logger.error('Error processing item %i, %o', item.id, error);
     await prisma.item.update({
       where: { id: item.id },
