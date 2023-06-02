@@ -1,12 +1,21 @@
 import logger from '../../utils/log.js';
-import { processSomeItem } from './processSomeItem.js';
 import { BaseProcessor } from '../base-processor/BaseProcessor.js';
-import { Item, Processed } from '@prisma/client';
+import { Item, ItemType, Processed } from '@prisma/client';
 import { prisma } from '../../db/db.js';
+import { processImage } from './image/processImage.js';
+import { processVideo } from './video/processVideo.js';
 
 const mediaProcessor = new BaseProcessor<Item>({
   concurrency: 1,
-  processItem: processSomeItem,
+  processItem: async (item: Item) => {
+    if (item.type === ItemType.IMAGE) {
+      await processImage(item);
+    } else if (item.type === ItemType.VIDEO) {
+      await processVideo(item);
+    } else {
+      throw new Error('Tried to optimize unsupported unknown filetype');
+    }
+  },
   checkInterval: 5000,
 
   getItems: () => {
