@@ -35,6 +35,11 @@ export function getFrontItem(item: ParamItem, userUid?: User['uid']): FrontItem 
     icon: s3PathToUrl(icon?.path),
   };
 
+  // Last worst case scenario check
+  if(!baseItem.isMine && baseItem.private){
+    throw new HttpError(404);
+  }
+
   if (item.type === 'IMAGE' && sourceImage) {
     const img = compressedImage ?? sourceImage;
     return {

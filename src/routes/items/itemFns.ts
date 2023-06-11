@@ -14,13 +14,19 @@ export async function getAllItems(
   tagIds: number[],
   userUid?: User['uid'],
 ): Promise<QueryItems> {
+  const tagsWhere = tagIds.length
+    ? {
+        tags: { some: { tagId: { in: tagIds } } },
+      }
+    : {};
+
   const where = {
-    ...(tagIds.length
-      ? {
-          tags: { some: { tagId: { in: tagIds } } },
-        }
-      : {}),
+    OR: [
+      { private: false, ...tagsWhere },
+      { userUid, ...tagsWhere },
+    ],
   };
+
   const _items = await prisma.item.findMany({
     where,
     take: limit,
