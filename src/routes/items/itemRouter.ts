@@ -139,7 +139,7 @@ const addTagsZod = z.object({
   tags: tagsZod,
 });
 
-router.post('/item/:id/tags', isPremium, async (req: Request, res) => {
+router.post('/item/many/tags', isPremium, async (req: Request, res) => {
   try {
     const { itemIds, tags } = addTagsZod.parse(req.body);
     if (!(await areItemsOwnedByUser(itemIds, req.user!.uid))) {
