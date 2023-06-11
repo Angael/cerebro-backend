@@ -21,6 +21,7 @@ declare global {
       FB_KEY: string;
       FB_EMAIL: string;
       DATABASE_URL: string;
+      MOCK_UPLOADS: 'true' | 'false' | undefined;
     }
   }
 }

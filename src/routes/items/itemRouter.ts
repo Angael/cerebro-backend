@@ -15,6 +15,7 @@ import { HttpError } from '../../utils/errors/HttpError.js';
 import { getItemTags, upsertTags } from '../tags/tags.service.js';
 import { arrayFromString } from '../../utils/arrayFromString.js';
 import { QueryItems } from '@vanih/cerebro-contracts';
+import { betterUnlink } from '../../utils/betterUnlink.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -71,8 +72,8 @@ router.post(
   isPremium,
   uploadMiddleware.single('file'),
   async (req: Request, res) => {
+    const file = req.file;
     try {
-      const file = req.file;
       const tagNames: string[] = [tagsZod.parse(req.body.tags)].flat();
 
       if (!file) {
@@ -82,6 +83,12 @@ router.post(
 
       if (file.size > MAX_UPLOAD_SIZE) {
         throw new Error('File too big');
+      }
+
+      if (process.env.MOCK_UPLOADS === 'true') {
+        betterUnlink(file.path);
+        res.status(200).send();
+        return;
       }
 
       const hasEnoughSpace = await doesUserHaveSpaceLeftForFile(req.user!, file);
@@ -94,6 +101,9 @@ router.post(
 
       res.status(200).send();
     } catch (e) {
+      if (file) {
+        betterUnlink(file?.path);
+      }
       errorResponse(res, e);
     }
   },
