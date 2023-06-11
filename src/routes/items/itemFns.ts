@@ -1,4 +1,4 @@
-import { Item, User } from '@prisma/client';
+import { Item, User, Tag } from '@prisma/client';
 import { FrontItem, QueryItems } from '@vanih/cerebro-contracts';
 import { prisma } from '../../db/db.js';
 import firebase from 'firebase-admin';
@@ -120,4 +120,40 @@ export async function deleteItem(itemId: Item['id'], userId: firebase.auth.Decod
   } else {
     throw new HttpError(404);
   }
+}
+
+export async function addTagsToItems(itemIds: Item['id'][], tags: Tag[]): Promise<void> {
+  const tagIds = tags.map((t) => t.id);
+
+  // find already added tags
+  const existingTags = await prisma.tagsOnItems.findMany({
+    where: { itemId: { in: itemIds }, tagId: { in: tagIds } },
+    select: { itemId: true, tagId: true },
+  });
+
+  // const actualToAdd;
+
+  await prisma.tagsOnItems.createMany({
+    data: itemIds
+      .map((itemId) =>
+        tagIds.map((tagId) => ({
+          tagId,
+          itemId,
+        })),
+      )
+      .flat()
+      .filter((TOI) => !existingTags.find((t) => t.itemId === TOI.itemId && t.tagId === TOI.tagId)),
+  });
+}
+
+export async function areItemsOwnedByUser(
+  itemIds: Item['id'][],
+  userId: firebase.auth.DecodedIdToken['uid'],
+): Promise<boolean> {
+  const items = await prisma.item.findMany({
+    where: { id: { in: itemIds } },
+    select: { userUid: true },
+  });
+
+  return items.every((item) => item.userUid === userId);
 }
