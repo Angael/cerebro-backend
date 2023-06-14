@@ -2,6 +2,7 @@ import { Tag } from '@prisma/client';
 import { prisma } from '../../db/db.js';
 import { mapSeries } from 'modern-async';
 import { itemTagsCache, tagCache } from '../../cache/caches.js';
+import { HttpError } from '../../utils/errors/HttpError.js';
 
 async function upsertTag(tagName: string): Promise<Tag> {
   const cachedTag = tagCache.get(tagName);
@@ -21,8 +22,13 @@ async function upsertTag(tagName: string): Promise<Tag> {
 }
 
 export async function upsertTags(tagNames: string[]): Promise<Tag[]> {
-  const tags: Tag[] = await mapSeries(tagNames, upsertTag);
+  if (tagNames.some((t) => t.includes(','))) {
+    throw new HttpError(400);
+  }
 
+  const formattedTagNames = tagNames.map((t) => t.trim().toLowerCase());
+
+  const tags: Tag[] = await mapSeries(formattedTagNames, upsertTag);
   return tags;
 }
 
