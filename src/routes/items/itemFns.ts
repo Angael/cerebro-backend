@@ -131,8 +131,6 @@ export async function addTagsToItems(itemIds: Item['id'][], tags: Tag[]): Promis
     select: { itemId: true, tagId: true },
   });
 
-  // const actualToAdd;
-
   await prisma.tagsOnItems.createMany({
     data: itemIds
       .map((itemId) =>

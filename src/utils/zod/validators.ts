@@ -1,4 +1,3 @@
-// zod validation
 import z from 'zod';
 
 // Technically max length is like 191 or something, but I don't want to deal with that right now
