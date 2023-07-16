@@ -13,7 +13,6 @@ router.use(express.raw({ type: 'application/json' }));
 
 router.post('/', async (req: Request, res) => {
   try {
-    console.log(req.headers['stripe-signature']);
     const sig = req.headers['stripe-signature'];
 
     let event;
@@ -21,7 +20,7 @@ router.post('/', async (req: Request, res) => {
     try {
       event = stripe.webhooks.constructEvent(req.body, sig!, STRIPE_ENDPOINT_SECRET);
     } catch (err) {
-      console.log(err);
+      logger.error(err.message);
       res.status(400).send(`Webhook Error: ${err.message}`);
       return;
     }
@@ -30,7 +29,7 @@ router.post('/', async (req: Request, res) => {
 
     switch (event.type) {
       case 'customer.subscription.created':
-        stripeSubCreated(event.data.object);
+        await stripeSubCreated(event.data.object);
         // const customerSubscriptionCreated = event.data.object;
         break;
 

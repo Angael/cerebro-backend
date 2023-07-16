@@ -5,16 +5,20 @@ import logger from '../../utils/log.js';
 export const stripeSubCreated = async (sub: Stripe.Subscription) => {
   console.log('stripeSubCreated', sub);
   const subUntil = new Date(sub.current_period_end * 1000);
-  const uid = sub.metadata.uid;
+  const stripCustomerId = sub.customer;
 
-  // TODO: METADATA not coming with subscription created hook
-  if (!uid) {
-    logger.error('stripeSubCreated: Uid not found %s', uid);
-    throw new Error('uid not found');
+  const user = await prisma.user.findUnique({
+    where: { stripeCustomerId: stripCustomerId.toString() },
+    select: { uid: true },
+  });
+
+  if (!user) {
+    logger.error('stripeSubCreated: user not found stripeCustomerId %s', stripCustomerId);
+    throw new Error('user not found');
   }
 
   prisma.user.update({
-    where: { uid },
+    where: { uid: user.uid },
     data: {
       stripeCustomerId: sub.customer.toString(),
       subEndsAt: subUntil,

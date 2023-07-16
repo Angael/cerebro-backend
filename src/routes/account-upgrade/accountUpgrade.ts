@@ -1,6 +1,7 @@
 import { stripe } from '../../stripe/stripe.js';
 import { HttpError } from '../../utils/errors/HttpError.js';
 import { prisma } from '../../db/db.js';
+import logger from '../../utils/log.js';
 
 export const getProducts = async () => {
   const stripeProductsQuery = await stripe.products.list();
@@ -28,10 +29,13 @@ const getOrCreateStripeCustomer = async (uid) => {
     const customer = await stripe.customers.create({
       metadata: { uid },
     });
+
+    // Just in case the user didn't have a stripeCustomerId
     await prisma.user.update({
       where: { uid },
       data: { stripeCustomerId: customer.id },
     });
+
     return customer.id;
   }
 };
@@ -46,7 +50,7 @@ const userHasActiveSubscription = async (uid) => {
 };
 
 export const generateCheckout = async ({ uid, productId }) => {
-  console.log('generateCheckout');
+  logger.verbose('generateCheckout for uid %s , productId %s', uid, productId);
 
   const stripeCustomerId = await getOrCreateStripeCustomer(uid);
 
@@ -56,6 +60,7 @@ export const generateCheckout = async ({ uid, productId }) => {
 
   const product = await stripe.products.retrieve(productId);
 
+  // Only allow products with a default price, no support for multiple prices per product
   if (product.default_price) {
     const session = await stripe.checkout.sessions.create({
       success_url: 'https://example.com/success',
@@ -71,5 +76,3 @@ export const generateCheckout = async ({ uid, productId }) => {
     throw new HttpError(400);
   }
 };
-
-stripe.customers.create({});

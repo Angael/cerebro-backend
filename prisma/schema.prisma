@@ -25,7 +25,7 @@ model User {
   type      UserType
   items     Item[]
 
-  stripeCustomerId String?
+  stripeCustomerId String? @unique
   trialEndsAt DateTime?
   subEndsAt   DateTime?
 }
