@@ -6,6 +6,7 @@ import { MyRoute } from '../express-helpers/routeType.js';
 import { assertUser } from '../../utils/assertUser.js';
 
 const router = express.Router({ mergeParams: true });
+router.use(express.json());
 
 router.get('/', isAuth, async (req: Request, res) => {
   try {

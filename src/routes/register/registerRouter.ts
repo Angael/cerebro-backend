@@ -6,6 +6,7 @@ import { isAuth } from '../../middleware/isAuth.js';
 import { MyRoute } from '../express-helpers/routeType.js';
 
 const router = express.Router({ mergeParams: true });
+router.use(express.json());
 
 const registerBody = z.object({
   email: z.string().email(),

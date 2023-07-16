@@ -10,6 +10,8 @@ import tagsRouter from './tags/tagsRouter.js';
 import { MyRoute } from './express-helpers/routeType.js';
 import localFsRouter from './local-fs/localFsRouter.js';
 import { isProd } from '../utils/env.js';
+import accountUpgradeRouter from './account-upgrade/accountUpgradeRouter.js';
+import stripeWebhookRouter from './stripe-webhooks/stripeWebhookRouter.js';
 
 const routes3: MyRoute[] = [
   itemRouter,
@@ -17,13 +19,14 @@ const routes3: MyRoute[] = [
   limitsRouter,
   tagsRouter,
   !isProd && localFsRouter,
+  accountUpgradeRouter,
+  stripeWebhookRouter,
 ].filter((router): router is MyRoute => !!router);
 
 const startRouter = () => {
   const router = express();
   const port = Number(process.env.PORT ?? 3000);
 
-  router.use(express.json());
   router.use(
     cors({
       origin: process.env.CORS_URL,

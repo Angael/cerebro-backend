@@ -24,6 +24,10 @@ model User {
   name      String?  @db.VarChar(64)
   type      UserType
   items     Item[]
+
+  stripeCustomerId String?
+  trialEndsAt DateTime?
+  subEndsAt   DateTime?
 }
 
 enum ItemType {

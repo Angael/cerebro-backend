@@ -7,6 +7,7 @@ import logger from '../../utils/log.js';
 import { tagsZod } from '../../utils/zod/validators.js';
 
 const router = express.Router({ mergeParams: true });
+router.use(express.json());
 
 // Return all tags - depricate this later when walls are implemented
 router.get('/', useCache(), async (req, res) => {

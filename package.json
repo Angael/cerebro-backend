@@ -21,7 +21,8 @@
     "prisma:deploy": "dotenv -e .env.production -- prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "lint": "tsc",
-    "ngrok": "ngrok http 3000"
+    "ngrok": "ngrok http 3000",
+    "stripe-cli": "stripe listen --forward-to localhost:3000/stripe-webhook"
   },
   "prisma": {
     "seed": "npx tsx .\\prisma\\seed.ts"
@@ -49,6 +50,7 @@
     "promise-retry": "^2.0.1",
     "sharp": "^0.31.3",
     "stripe": "^12.13.0",
+    "stripe-event-types": "^2.4.0",
     "winston": "^3.8.2",
     "zod": "^3.20.2"
   },

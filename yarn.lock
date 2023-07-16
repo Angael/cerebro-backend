@@ -3102,6 +3102,11 @@ strip-json-comments@~2.0.1:
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
   integrity sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==
 
+stripe-event-types@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/stripe-event-types/-/stripe-event-types-2.4.0.tgz#75ef84d60bc14545e836c3ebfca6aa1cfd23e580"
+  integrity sha512-5ORZMW/WKjc31nsGMCUECOS+xVjtHhAFJJ8833ft3471hIjQrMbLMPBEb5AcJM8mKRRULpKmCVMDU0lLYrxERQ==
+
 stripe@^12.13.0:
   version "12.13.0"
   resolved "https://registry.yarnpkg.com/stripe/-/stripe-12.13.0.tgz#7a8b5705a6f633384e901f512fe1a834277f3123"

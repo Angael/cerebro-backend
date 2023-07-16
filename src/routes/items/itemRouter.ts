@@ -26,6 +26,7 @@ import { betterUnlink } from '../../utils/betterUnlink.js';
 import { tagsZod } from '../../utils/zod/validators.js';
 
 const router = express.Router({ mergeParams: true });
+router.use(express.json());
 
 const limitZod = z.number().min(1).max(30);
 const pageZod = z.number().min(0).max(Number.MAX_SAFE_INTEGER);

@@ -1,8 +1,8 @@
-import { limitsConfig } from '../../utils/limits.js';
 import firebase from '../../firebase/firebase-params.js';
 import { prisma } from '../../db/db.js';
 import { usedSpaceCache, userTypeCache } from '../../cache/userCache.js';
 import { UserType } from '@prisma/client';
+import { userTypes } from '../../stripe/userTypes.js';
 
 export const getSpaceUsedByUser = async (uid: string): Promise<number> => {
   let used: number;
@@ -54,7 +54,7 @@ export async function getUserType(uid: string): Promise<UserType> {
 
 export async function getLimitsForUser(user: firebase.auth.DecodedIdToken) {
   const type = await getUserType(user.uid);
-  const max = limitsConfig[type];
+  const max = userTypes[type].limitBytes;
 
   const used: number = await getSpaceUsedByUser(user.uid);
 
