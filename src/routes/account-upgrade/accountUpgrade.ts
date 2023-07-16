@@ -2,19 +2,33 @@ import { stripe } from '../../stripe/stripe.js';
 import { HttpError } from '../../utils/errors/HttpError.js';
 import { prisma } from '../../db/db.js';
 import logger from '../../utils/log.js';
+import { API_URL } from '../../utils/env.js';
+import { AccountProduct } from '@vanih/cerebro-contracts/lib/accountProduct.js';
 
-export const getProducts = async () => {
-  const stripeProductsQuery = await stripe.products.list();
+export const getProducts = async (): Promise<AccountProduct[]> => {
+  const stripeProductsReq = stripe.products.list();
 
-  const products = stripeProductsQuery.data.map((product) => {
+  const pricesReq = stripe.prices.list({
+    active: true,
+    type: 'recurring',
+  });
+
+  const [stripeProducts, prices] = await Promise.all([stripeProductsReq, pricesReq]);
+
+  const products: AccountProduct[] = stripeProducts.data.map((product) => {
+    const price = prices.data.find((price) => price.product === product.id);
+
     return {
       id: product.id,
       object: product.object,
       active: product.active,
       name: product.name,
-      description: product.description,
-      default_price: product.default_price,
-      metadata: product.metadata,
+      description: product.description ?? '',
+      price: {
+        amount: price?.unit_amount ?? 0,
+        currency: price?.currency ?? '',
+      },
+      metadata: product.metadata as any, // Sad pepe noises :(
     };
   });
 
@@ -63,7 +77,7 @@ export const generateCheckout = async ({ uid, productId }) => {
   // Only allow products with a default price, no support for multiple prices per product
   if (product.default_price) {
     const session = await stripe.checkout.sessions.create({
-      success_url: 'https://example.com/success',
+      success_url: API_URL + '/account',
       // TODO verify toString() is correct
       line_items: [{ price: product.default_price.toString(), quantity: 1 }],
       mode: 'subscription',

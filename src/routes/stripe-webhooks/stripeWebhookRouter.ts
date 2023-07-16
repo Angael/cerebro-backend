@@ -4,8 +4,9 @@ import { MyRoute } from '../express-helpers/routeType.js';
 import { stripe } from '../../stripe/stripe.js';
 import { STRIPE_ENDPOINT_SECRET } from '../../utils/env.js';
 import logger from '../../utils/log.js';
-import { stripeSubCreated } from './stripeWebhook.js';
+// import { hookSubCreated } from './hookSubCreated.js';
 import { HttpError } from '../../utils/errors/HttpError.js';
+import { hookPaymentSucceeded } from './hookPaymentSucceeded.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -28,10 +29,10 @@ router.post('/', async (req: Request, res) => {
     logger.verbose(`Received event %s`, event.type);
 
     switch (event.type) {
-      case 'customer.subscription.created':
-        await stripeSubCreated(event.data.object);
-        // const customerSubscriptionCreated = event.data.object;
-        break;
+      // case 'customer.subscription.created':
+      //   await hookSubCreated(event.data.object);
+      //   // const customerSubscriptionCreated = event.data.object;
+      //   break;
 
       case 'customer.subscription.updated':
         // const customerSubscriptionUpdated = event.data.object;
@@ -58,6 +59,7 @@ router.post('/', async (req: Request, res) => {
         break;
 
       case 'invoice.payment_succeeded':
+        await hookPaymentSucceeded(event.data.object);
         // const invoicePaymentSucceeded = event.data.object;
         break;
 

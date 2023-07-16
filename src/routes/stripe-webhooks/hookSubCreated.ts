@@ -2,7 +2,8 @@ import Stripe from 'stripe';
 import { prisma } from '../../db/db.js';
 import logger from '../../utils/log.js';
 
-export const stripeSubCreated = async (sub: Stripe.Subscription) => {
+// TODO: This hook is potentially harmful, as subscribtion creation doesnt mean its paid for
+export const hookSubCreated = async (sub: Stripe.Subscription) => {
   console.log('stripeSubCreated', sub);
   const subUntil = new Date(sub.current_period_end * 1000);
   const stripCustomerId = sub.customer;

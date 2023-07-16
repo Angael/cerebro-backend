@@ -1,8 +1,14 @@
 import { GB } from '../utils/consts.js';
 import { UserType } from '@prisma/client';
 
+type UserTypes = {
+  [key in UserType]: {
+    limitBytes: number;
+  };
+};
+
 // TODO: Move to DB?
-export const userTypes = {
+export const userTypes: UserTypes = {
   [UserType.FREE]: {
     limitBytes: 0,
   },
