@@ -3,47 +3,76 @@ import { HttpError } from '../../utils/errors/HttpError.js';
 import { prisma } from '../../db/db.js';
 import logger from '../../utils/log.js';
 import { API_URL } from '../../utils/env.js';
-import { AccountProduct } from '@vanih/cerebro-contracts/lib/accountProduct.js';
+import { AccountProduct, AccountStatus } from '@vanih/cerebro-contracts/lib/accountProduct.js';
+import { UserType } from '@prisma/client';
+import Stripe from 'stripe';
 
-export const getProducts = async (): Promise<AccountProduct[]> => {
-  const stripeProductsReq = stripe.products.list();
+export const getAccountStatus = async (uid: string): Promise<AccountStatus> => {
+  const user = await prisma.user.findUnique({ where: { uid } });
+  const type = user?.type ?? 'FREE';
+  if (!user || !user.stripeCustomerId || !user.subEndsAt) {
+    return { type, sub: null };
+  }
 
-  const pricesReq = stripe.prices.list({
+  const subs = await stripe.subscriptions.list({ customer: user.stripeCustomerId });
+
+  const activeSubs = subs.data.filter((sub) => sub.status === 'active');
+
+  // find sub with newest date
+  const sub = activeSubs.reduce((prev: Stripe.Subscription | null, current) => {
+    return (prev?.current_period_end ?? 0) > current.current_period_end ? prev : current;
+  }, null);
+
+  return {
+    type,
+    sub: sub
+      ? {
+          endsAt: user.subEndsAt,
+          status: sub.status,
+          renews: !sub.cancel_at_period_end,
+        }
+      : null,
+  };
+};
+
+export const getPremium = async (): Promise<AccountProduct> => {
+  const stripeProducts = await stripe.products.list({
     active: true,
-    type: 'recurring',
   });
 
-  const [stripeProducts, prices] = await Promise.all([stripeProductsReq, pricesReq]);
+  const product = stripeProducts.data.find(
+    (product) => product.metadata.userType === UserType.PREMIUM,
+  );
 
-  const products: AccountProduct[] = stripeProducts.data.map((product) => {
-    const price = prices.data.find((price) => price.product === product.id);
+  if (!product) {
+    throw new HttpError(500);
+  }
 
-    return {
-      id: product.id,
-      object: product.object,
-      active: product.active,
-      name: product.name,
-      description: product.description ?? '',
-      price: {
-        amount: price?.unit_amount ?? 0,
-        currency: price?.currency ?? '',
-      },
-      metadata: product.metadata as any, // Sad pepe noises :(
-    };
-  });
+  const price = await stripe.prices.retrieve(product.default_price as string);
 
-  return products;
+  return {
+    id: product.id,
+    object: product.object,
+    active: product.active,
+    name: product.name,
+    description: product.description ?? '',
+    price: {
+      amount: price?.unit_amount ?? 0,
+      currency: price?.currency ?? '',
+    },
+    metadata: product.metadata as any, // Sad pepe noises :(
+  };
 };
 
 const getOrCreateStripeCustomer = async (uid) => {
-  const user = await prisma.user.findUnique({ where: { uid } });
+  const user = await prisma.user.findUnique({ where: { uid }, select: { stripeCustomerId: true } });
+  logger.verbose('user %s', user?.stripeCustomerId);
   if (user?.stripeCustomerId) {
     return user.stripeCustomerId;
   } else {
     const customer = await stripe.customers.create({
       metadata: { uid },
     });
-
     // Just in case the user didn't have a stripeCustomerId
     await prisma.user.update({
       where: { uid },
@@ -54,13 +83,11 @@ const getOrCreateStripeCustomer = async (uid) => {
   }
 };
 
-const userHasActiveSubscription = async (uid) => {
-  const user = await prisma.user.findUnique({ where: { uid } });
-  if (user?.subEndsAt) {
-    return user.subEndsAt > new Date();
-  } else {
-    return false;
-  }
+const userHasActiveSubscription = async (stripeCustomerId: string) => {
+  const stripeSub = await stripe.subscriptions.list({ customer: stripeCustomerId });
+  const activeSub = stripeSub.data.find((sub) => sub.status === 'active');
+
+  return !!activeSub;
 };
 
 export const generateCheckout = async ({ uid, productId }) => {
@@ -68,7 +95,8 @@ export const generateCheckout = async ({ uid, productId }) => {
 
   const stripeCustomerId = await getOrCreateStripeCustomer(uid);
 
-  if (await userHasActiveSubscription(uid)) {
+  // Dont allow 2 subscriptions in stripe
+  if (await userHasActiveSubscription(stripeCustomerId)) {
     throw new HttpError(400);
   }
 
@@ -78,7 +106,6 @@ export const generateCheckout = async ({ uid, productId }) => {
   if (product.default_price) {
     const session = await stripe.checkout.sessions.create({
       success_url: API_URL + '/account',
-      // TODO verify toString() is correct
       line_items: [{ price: product.default_price.toString(), quantity: 1 }],
       mode: 'subscription',
       metadata: { uid },

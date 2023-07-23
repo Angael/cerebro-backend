@@ -623,10 +623,10 @@
     "@typescript-eslint/types" "5.47.0"
     eslint-visitor-keys "^3.3.0"
 
-"@vanih/cerebro-contracts@^0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@vanih/cerebro-contracts/-/cerebro-contracts-0.0.8.tgz#e981ab278ae13eb7e48a2cae6f8309b1549330f3"
-  integrity sha512-IJDhZxYREPBP9CR171AEWlkggOfaWD8OhG9+8aq0UURTIU9v+4Uslym769zh0+ZMKpASEOQAKdL24Mtk+nNpbQ==
+"@vanih/cerebro-contracts@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@vanih/cerebro-contracts/-/cerebro-contracts-0.0.9.tgz#4271c5c7e10148042832e241bd9a2cdd4cf3bb2e"
+  integrity sha512-OrVCStDfgBiPWLayvuvqB3CzunNLPFzBaSgl5XAOkJzwy9E5l5kVuUdYixiH/b4l2tPzfAYDgB1qr5Iq8fg7Aw==
 
 "@vanih/dunes-node@3.2.0":
   version "3.2.0"

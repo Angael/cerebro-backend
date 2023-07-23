@@ -44,7 +44,20 @@ export async function getUserType(uid: string): Promise<UserType> {
   if (userTypeCache.has(uid)) {
     return userTypeCache.get(uid) as UserType;
   } else {
-    const user = await prisma.user.findFirstOrThrow({ where: { uid }, select: { type: true } });
+    const user = await prisma.user.findFirstOrThrow({
+      where: { uid },
+      select: { type: true, subEndsAt: true },
+    });
+
+    if (user.subEndsAt && user.subEndsAt < new Date()) {
+      userTypeCache.set(uid, UserType.FREE);
+      await prisma.user.update({
+        where: { uid },
+        data: { type: UserType.FREE },
+      });
+      return UserType.FREE;
+    }
+
     if (user.type) {
       userTypeCache.set(uid, user.type);
     }

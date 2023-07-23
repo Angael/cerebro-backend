@@ -7,6 +7,7 @@ import logger from '../../utils/log.js';
 // import { hookSubCreated } from './hookSubCreated.js';
 import { HttpError } from '../../utils/errors/HttpError.js';
 import { hookPaymentSucceeded } from './hookPaymentSucceeded.js';
+import { hookSubUpdated } from './hookSubUpdated.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -35,28 +36,28 @@ router.post('/', async (req: Request, res) => {
       //   break;
 
       case 'customer.subscription.updated':
-        // const customerSubscriptionUpdated = event.data.object;
+        await hookSubUpdated(event.data.object);
         break;
 
-      case 'customer.subscription.deleted':
-        // const customerSubscriptionDeleted = event.data.object;
-        break;
-
-      case 'customer.subscription.paused':
-        // const customerSubscriptionPaused = event.data.object;
-        break;
-
-      case 'customer.subscription.resumed':
-        // const customerSubscriptionResumed = event.data.object;
-        break;
-
-      case 'customer.subscription.trial_will_end':
-        // const customerSubscriptionTrialWillEnd = event.data.object;
-        break;
-
-      case 'invoice.payment_failed':
-        // const invoicePaymentFailed = event.data.object;
-        break;
+      // case 'customer.subscription.deleted':
+      //   // const customerSubscriptionDeleted = event.data.object;
+      //   break;
+      //
+      // case 'customer.subscription.paused':
+      //   // const customerSubscriptionPaused = event.data.object;
+      //   break;
+      //
+      // case 'customer.subscription.resumed':
+      //   // const customerSubscriptionResumed = event.data.object;
+      //   break;
+      //
+      // case 'customer.subscription.trial_will_end':
+      //   // const customerSubscriptionTrialWillEnd = event.data.object;
+      //   break;
+      //
+      // case 'invoice.payment_failed':
+      //   // const invoicePaymentFailed = event.data.object;
+      //   break;
 
       case 'invoice.payment_succeeded':
         await hookPaymentSucceeded(event.data.object);
@@ -64,7 +65,7 @@ router.post('/', async (req: Request, res) => {
         break;
 
       default:
-        console.log(`Unhandled event type ${event.type}`);
+        logger.error(`Unhandled event type %s`, event.type);
         throw new HttpError(500);
     }
 
