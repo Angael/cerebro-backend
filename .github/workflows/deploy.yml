@@ -40,6 +40,9 @@ jobs:
           FB_EMAIL: ${{ secrets.FB_EMAIL }}
           CORS_URL: ${{ secrets.CORS_URL }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          API_URL: ${{ vars.API_URL }}
+          STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
+          STRIPE_ENDPOINT_SECRET: ${{ secrets.STRIPE_ENDPOINT_SECRET }}
 
       - name: Rename .env.template to .env.production
         run: |
