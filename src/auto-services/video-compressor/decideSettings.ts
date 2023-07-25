@@ -23,17 +23,18 @@ export function decideSettings(video: VideoStats): DecideSettings {
     newHeight *= howMuchSmaller;
   }
 
-  let maxBitrateKbs: number = 700;
+  let maxBitrateKbs: number = 1600;
   if (newWidth * newHeight < p720) {
     maxBitrateKbs = convertRange(newWidth * newHeight, [0, p720], [100, maxBitrateKbs]);
   }
 
-  let crf = 45;
-  if (video.size < 100_000) {
-    crf = Math.round(convertRange(video.size, [0, 100_000], [39, crf]));
+  let crf = 37;
+  const bigSize = 2000_000; // 2mb
+  if (video.size < bigSize) {
+    crf = Math.round(convertRange(video.size, [0, bigSize], [30, crf]));
   }
 
-  const shouldCompress = maxBitrateKbs < video.bitrateKb * 0.9;
+  const shouldCompress = video.size > 900_000 || video.width * video.height > p720;
 
   return {
     shouldCompress,
