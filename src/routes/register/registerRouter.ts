@@ -4,6 +4,7 @@ import z from 'zod';
 import { registerUser } from './register-service.js';
 import { isAuth } from '../../middleware/isAuth.js';
 import { MyRoute } from '../express-helpers/routeType.js';
+import logger from '../../utils/log.js';
 
 const router = express.Router({ mergeParams: true });
 router.use(express.json());
@@ -16,6 +17,7 @@ const registerBody = z.object({
 router.post('/', isAuth, async (req: Request, res) => {
   try {
     const { email, uid } = registerBody.parse(req.body);
+    logger.verbose(`register ${email} ${uid}`);
     res.json(await registerUser(uid, email));
   } catch (e) {
     errorResponse(res, e);
