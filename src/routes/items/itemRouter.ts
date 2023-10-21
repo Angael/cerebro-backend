@@ -1,3 +1,13 @@
+import express, { Request } from 'express';
+import multer from 'multer';
+import z from 'zod';
+import { QueryItems } from '@vanih/cerebro-contracts';
+import { downloadVideo } from 'easy-yt-dlp';
+import { nanoid } from 'nanoid';
+import fs from 'fs-extra';
+import mime from 'mime-types';
+import { parse } from 'path';
+
 import {
   addTagsToItems,
   areItemsOwnedByUser,
@@ -6,24 +16,23 @@ import {
   getAllItemsCount,
   getItem,
 } from './itemFns.js';
-import express, { Request } from 'express';
 import { isPremium } from '../../middleware/isPremium.js';
-import multer from 'multer';
 import { multerOptions } from './multerConfig.js';
-import { MAX_UPLOAD_SIZE } from '../../utils/consts.js';
+import { DOWNLOADS_DIR, MAX_UPLOAD_SIZE } from '../../utils/consts.js';
 import { uploadFileForUser } from './upload/upload.service.js';
 import { errorResponse } from '../../utils/errors/errorResponse.js';
 import { MyRoute } from '../express-helpers/routeType.js';
 import { useCache } from '../../middleware/expressCache.js';
 import { usedSpaceCache } from '../../cache/userCache.js';
-import z from 'zod';
 import { doesUserHaveSpaceLeftForFile } from '../limits/limits-service.js';
 import { HttpError } from '../../utils/errors/HttpError.js';
 import { getItemTags, upsertTags } from '../tags/tags.service.js';
 import { arrayFromString } from '../../utils/arrayFromString.js';
-import { QueryItems } from '@vanih/cerebro-contracts';
 import { betterUnlink } from '../../utils/betterUnlink.js';
 import { tagsZod } from '../../utils/zod/validators.js';
+import { YT_DLP_PATH } from '../../utils/env.js';
+import { MyFile } from './upload/upload.type.js';
+import logger from '../../utils/log.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -83,6 +92,7 @@ router.post(
   async (req: Request, res) => {
     const file = req.file;
     try {
+      // Formdata is weird, so we have to do this
       const tagNames: string[] = [tagsGETZod.parse(req.body.tags)].flat();
 
       if (!file) {
@@ -100,8 +110,7 @@ router.post(
         return;
       }
 
-      const hasEnoughSpace = await doesUserHaveSpaceLeftForFile(req.user!, file);
-      if (!hasEnoughSpace) {
+      if (!(await doesUserHaveSpaceLeftForFile(req.user!, file))) {
         throw new HttpError(413);
       }
 
@@ -117,6 +126,66 @@ router.post(
     }
   },
 );
+
+const fileFromLinkZod = z.object({
+  link: z.string().url(),
+  tags: tagsZod,
+});
+
+router.post('/upload/file-from-link', isPremium, async (req: Request, res) => {
+  try {
+    const { link, tags: _tags } = fileFromLinkZod.parse(req.body);
+    logger.verbose(`Downloading from link ${link}`);
+
+    if (!link) {
+      res.sendStatus(400);
+      return;
+    }
+
+    if (process.env.MOCK_UPLOADS === 'true') {
+      res.status(200).send();
+      return;
+    }
+
+    const filenameNoExtension = nanoid();
+    let { createdFilePath } = await downloadVideo({
+      ytDlpPath: YT_DLP_PATH,
+      link,
+      filename: filenameNoExtension,
+      outputDir: DOWNLOADS_DIR,
+      maxFileSize: 10 * 1024 * 1024, // 10mb
+    });
+
+    try {
+      const filename = parse(createdFilePath).base;
+      const file: MyFile = {
+        path: createdFilePath,
+        size: (await fs.stat(createdFilePath)).size,
+        originalname: filename,
+        mimetype: mime.lookup(createdFilePath),
+        filename,
+      };
+
+      const hasEnoughSpace = await doesUserHaveSpaceLeftForFile(req.user!, file);
+      if (!hasEnoughSpace) {
+        throw new HttpError(413);
+      }
+
+      const tags = await upsertTags(_tags);
+      await uploadFileForUser({ file, user: req.user!, tags });
+
+      res.status(200).send();
+    } catch (e) {
+      throw e;
+    } finally {
+      if (createdFilePath) {
+        await betterUnlink(createdFilePath);
+      }
+    }
+  } catch (e) {
+    errorResponse(res, e);
+  }
+});
 
 router.delete('/item/:id', isPremium, async (req: Request, res) => {
   const id = Number(req.params.id);

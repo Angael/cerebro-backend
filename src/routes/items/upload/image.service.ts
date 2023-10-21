@@ -7,7 +7,7 @@ import { makeS3Path, replaceFileWithHash } from '../../../utils/makeS3Path.js';
 import { prisma } from '../../../db/db.js';
 import { ItemType, Processed, Tag } from '@prisma/client';
 import { HttpError } from '../../../utils/errors/HttpError.js';
-import { uploadPayload } from './upload.type.js';
+import { MyFile, uploadPayload } from './upload.type.js';
 
 type Analysis = {
   width: number;
@@ -18,7 +18,7 @@ type Analysis = {
 async function insertIntoDb(
   s3Key: string,
   itemData: Analysis,
-  file: Express.Multer.File,
+  file: MyFile,
   author: firebase.auth.DecodedIdToken,
   tags: Tag[],
 ) {
@@ -46,7 +46,7 @@ async function insertIntoDb(
   });
 }
 
-async function analyze(file: Express.Multer.File): Promise<Analysis> {
+async function analyze(file: MyFile): Promise<Analysis> {
   const pipeline = sharp(file.path);
 
   return pipeline.metadata().then(async (metadata) => {
