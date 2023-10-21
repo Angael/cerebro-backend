@@ -40,7 +40,7 @@ jobs:
           FB_EMAIL: ${{ secrets.FB_EMAIL }}
           CORS_URL: ${{ secrets.CORS_URL }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          YT_DLP_PATH: ${{ variables.YT_DLP_PATH }}
+          YT_DLP_PATH: ${{ vars.YT_DLP_PATH }}
 
       - name: Rename .env.template to .env.production
         run: |
