@@ -143,6 +143,7 @@ router.post('/upload/file-from-link', isPremium, async (req: Request, res) => {
     }
 
     if (process.env.MOCK_UPLOADS === 'true') {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       res.status(200).send();
       return;
     }
