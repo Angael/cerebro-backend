@@ -153,7 +153,7 @@ router.post('/upload/file-from-link', isPremium, async (req: Request, res) => {
       link,
       filename: filenameNoExtension,
       outputDir: DOWNLOADS_DIR,
-      maxFileSize: 10 * 1024 * 1024, // 10mb
+      maxFileSize: MAX_UPLOAD_SIZE,
     });
 
     try {
@@ -166,7 +166,12 @@ router.post('/upload/file-from-link', isPremium, async (req: Request, res) => {
         filename,
       };
 
+      if (file.size > MAX_UPLOAD_SIZE) {
+        throw new HttpError(413);
+      }
+
       const hasEnoughSpace = await doesUserHaveSpaceLeftForFile(req.user!, file);
+
       if (!hasEnoughSpace) {
         throw new HttpError(413);
       }
@@ -176,6 +181,7 @@ router.post('/upload/file-from-link', isPremium, async (req: Request, res) => {
 
       res.status(200).send();
     } catch (e) {
+      logger.error(e);
       throw e;
     } finally {
       if (createdFilePath) {
