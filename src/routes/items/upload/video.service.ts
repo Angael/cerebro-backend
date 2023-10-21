@@ -6,12 +6,12 @@ import { prisma } from '../../../db/db.js';
 import { ItemType, Processed, Tag } from '@prisma/client';
 import { analyzeVideo, VideoStats } from '@vanih/dunes-node';
 import { HttpError } from '../../../utils/errors/HttpError.js';
-import { uploadPayload } from './upload.type.js';
+import { MyFile, uploadPayload } from './upload.type.js';
 
 async function insertIntoDb(
   s3Key: string,
   videoData: VideoStats,
-  file: Express.Multer.File,
+  file: MyFile,
   author: firebase.auth.DecodedIdToken,
   tags: Tag[],
 ) {

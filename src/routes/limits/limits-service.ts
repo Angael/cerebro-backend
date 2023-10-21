@@ -3,6 +3,7 @@ import firebase from '../../firebase/firebase-params.js';
 import { prisma } from '../../db/db.js';
 import { usedSpaceCache, userTypeCache } from '../../cache/userCache.js';
 import { UserType } from '@prisma/client';
+import { MyFile } from '../items/upload/upload.type.js';
 
 export const getSpaceUsedByUser = async (uid: string): Promise<number> => {
   let used: number;
@@ -66,7 +67,7 @@ export async function getLimitsForUser(user: firebase.auth.DecodedIdToken) {
 
 export async function doesUserHaveSpaceLeftForFile(
   user: firebase.auth.DecodedIdToken,
-  file: Express.Multer.File,
+  file: MyFile,
 ) {
   const limits = await getLimitsForUser(user);
 

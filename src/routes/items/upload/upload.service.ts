@@ -5,9 +5,9 @@ import { uploadVideo } from './video.service.js';
 import { Item, ItemType } from '@prisma/client';
 import { HttpError } from '../../../utils/errors/HttpError.js';
 import { usedSpaceCache } from '../../../cache/userCache.js';
-import { uploadPayload } from './upload.type.js';
+import { MyFile, uploadPayload } from './upload.type.js';
 
-function getFileType(file: Express.Multer.File): ItemType {
+function getFileType(file: MyFile): ItemType {
   const { mimetype } = file;
 
   if (['image/png', 'image/gif', 'image/webp', 'image/jpeg'].includes(mimetype)) {

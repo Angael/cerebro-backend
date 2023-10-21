@@ -35,6 +35,7 @@
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.3",
+    "easy-yt-dlp": "0.3",
     "express": "^4.18.2",
     "fast-glob": "^3.2.12",
     "fastq": "^1.15.0",
