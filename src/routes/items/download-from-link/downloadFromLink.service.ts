@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { downloadVideo } from 'easy-yt-dlp';
+import { downloadVideo, getVideoStats } from 'easy-yt-dlp';
 import { YT_DLP_PATH } from '../../../utils/env.js';
 import { DOWNLOADS_DIR, MAX_UPLOAD_SIZE } from '../../../utils/consts.js';
 import { MyFile } from '../upload/upload.type.js';
@@ -11,6 +11,7 @@ import logger from '../../../utils/log.js';
 import { betterUnlink } from '../../../utils/betterUnlink.js';
 import { DecodedIdToken } from 'firebase-admin/auth';
 import mime from 'mime-types';
+import { linkStatsCache } from '../../../cache/caches.js';
 
 export const downloadFromLinkService = async (
   link: string,
@@ -53,5 +54,15 @@ export const downloadFromLinkService = async (
     if (createdFilePath) {
       await betterUnlink(createdFilePath);
     }
+  }
+};
+
+export const getStatsFromLink = async (link: string) => {
+  if (linkStatsCache.has(link)) {
+    return linkStatsCache.get(link);
+  } else {
+    const stats = (await getVideoStats(YT_DLP_PATH, link)) as any;
+    linkStatsCache.set(link, stats);
+    return stats;
   }
 };

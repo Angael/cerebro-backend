@@ -26,7 +26,10 @@ import { arrayFromString } from '../../utils/arrayFromString.js';
 import { betterUnlink } from '../../utils/betterUnlink.js';
 import { tagsZod } from '../../utils/zod/validators.js';
 import logger from '../../utils/log.js';
-import { downloadFromLinkService } from './download-from-link/downloadFromLink.service.js';
+import {
+  downloadFromLinkService,
+  getStatsFromLink,
+} from './download-from-link/downloadFromLink.service.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -154,6 +157,23 @@ router.post('/upload/file-from-link', isPremium, async (req: Request, res) => {
       logger.error(e);
       throw e;
     }
+  } catch (e) {
+    errorResponse(res, e);
+  }
+});
+
+const fileFromLinkParamsZod = z.object({
+  link: z.string().url(),
+});
+
+router.get('/upload/file-from-link', isPremium, async (req: Request, res) => {
+  try {
+    const { link } = fileFromLinkParamsZod.parse(req.query);
+    logger.verbose('Stats for link %s', link);
+
+    const stats = await getStatsFromLink(link);
+
+    res.status(200).json(stats);
   } catch (e) {
     errorResponse(res, e);
   }
