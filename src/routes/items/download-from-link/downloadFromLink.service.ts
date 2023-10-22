@@ -57,12 +57,24 @@ export const downloadFromLinkService = async (
   }
 };
 
+// Move to contracts?
+// @ts-ignore
+type ReturnedVideoStats = {
+  title: string;
+  description: string;
+  thumbnail: string;
+  duration: number;
+  uploadDate: string;
+};
+
 export const getStatsFromLink = async (link: string) => {
   if (linkStatsCache.has(link)) {
     return linkStatsCache.get(link);
   } else {
     const stats = (await getVideoStats(YT_DLP_PATH, link)) as any;
-    linkStatsCache.set(link, stats);
+    if (stats) {
+      linkStatsCache.set(link, stats);
+    }
     return stats;
   }
 };

@@ -166,7 +166,7 @@ const fileFromLinkParamsZod = z.object({
   link: z.string().url(),
 });
 
-router.get('/upload/file-from-link', isPremium, async (req: Request, res) => {
+router.get('/upload/file-from-link', isPremium, useCache(60), async (req: Request, res) => {
   try {
     const { link } = fileFromLinkParamsZod.parse(req.query);
     logger.verbose('Stats for link %s', link);
