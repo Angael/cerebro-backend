@@ -2,11 +2,6 @@ import express, { Request } from 'express';
 import multer from 'multer';
 import z from 'zod';
 import { QueryItems } from '@vanih/cerebro-contracts';
-import { downloadVideo } from 'easy-yt-dlp';
-import { nanoid } from 'nanoid';
-import fs from 'fs-extra';
-import mime from 'mime-types';
-import { parse } from 'path';
 
 import {
   addTagsToItems,
@@ -18,7 +13,7 @@ import {
 } from './itemFns.js';
 import { isPremium } from '../../middleware/isPremium.js';
 import { multerOptions } from './multerConfig.js';
-import { DOWNLOADS_DIR, MAX_UPLOAD_SIZE } from '../../utils/consts.js';
+import { MAX_UPLOAD_SIZE } from '../../utils/consts.js';
 import { uploadFileForUser } from './upload/upload.service.js';
 import { errorResponse } from '../../utils/errors/errorResponse.js';
 import { MyRoute } from '../express-helpers/routeType.js';
@@ -30,9 +25,8 @@ import { getItemTags, upsertTags } from '../tags/tags.service.js';
 import { arrayFromString } from '../../utils/arrayFromString.js';
 import { betterUnlink } from '../../utils/betterUnlink.js';
 import { tagsZod } from '../../utils/zod/validators.js';
-import { YT_DLP_PATH } from '../../utils/env.js';
-import { MyFile } from './upload/upload.type.js';
 import logger from '../../utils/log.js';
+import { downloadFromLinkService } from './download-from-link/downloadFromLink.service.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -105,6 +99,7 @@ router.post(
       }
 
       if (process.env.MOCK_UPLOADS === 'true') {
+        await new Promise((resolve) => setTimeout(resolve, 200));
         betterUnlink(file.path);
         res.status(200).send();
         return;
@@ -148,35 +143,9 @@ router.post('/upload/file-from-link', isPremium, async (req: Request, res) => {
       return;
     }
 
-    const filenameNoExtension = nanoid();
-    let { createdFilePath } = await downloadVideo({
-      ytDlpPath: YT_DLP_PATH,
-      link,
-      filename: filenameNoExtension,
-      outputDir: DOWNLOADS_DIR,
-      maxFileSize: MAX_UPLOAD_SIZE,
-    });
+    const file = await downloadFromLinkService(link, req.user!);
 
     try {
-      const filename = parse(createdFilePath).base;
-      const file: MyFile = {
-        path: createdFilePath,
-        size: (await fs.stat(createdFilePath)).size,
-        originalname: filename,
-        mimetype: mime.lookup(createdFilePath),
-        filename,
-      };
-
-      if (file.size > MAX_UPLOAD_SIZE) {
-        throw new HttpError(413);
-      }
-
-      const hasEnoughSpace = await doesUserHaveSpaceLeftForFile(req.user!, file);
-
-      if (!hasEnoughSpace) {
-        throw new HttpError(413);
-      }
-
       const tags = await upsertTags(_tags);
       await uploadFileForUser({ file, user: req.user!, tags });
 
@@ -184,10 +153,6 @@ router.post('/upload/file-from-link', isPremium, async (req: Request, res) => {
     } catch (e) {
       logger.error(e);
       throw e;
-    } finally {
-      if (createdFilePath) {
-        await betterUnlink(createdFilePath);
-      }
     }
   } catch (e) {
     errorResponse(res, e);
