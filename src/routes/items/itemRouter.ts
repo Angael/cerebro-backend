@@ -128,17 +128,13 @@ router.post(
 const fileFromLinkZod = z.object({
   link: z.string().url(),
   tags: tagsZod,
+  format: z.string().optional(),
 });
 
 router.post('/upload/file-from-link', isPremium, async (req: Request, res) => {
   try {
-    const { link, tags: _tags } = fileFromLinkZod.parse(req.body);
+    const { link, tags: _tags, format } = fileFromLinkZod.parse(req.body);
     logger.verbose(`Downloading from link ${link}`);
-
-    if (!link) {
-      res.sendStatus(400);
-      return;
-    }
 
     if (process.env.MOCK_UPLOADS === 'true') {
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -146,7 +142,7 @@ router.post('/upload/file-from-link', isPremium, async (req: Request, res) => {
       return;
     }
 
-    const file = await downloadFromLinkService(link, req.user!);
+    const file = await downloadFromLinkService(link, req.user!, format);
 
     try {
       const tags = await upsertTags(_tags);

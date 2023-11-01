@@ -16,6 +16,7 @@ import { linkStatsCache } from '../../../cache/caches.js';
 export const downloadFromLinkService = async (
   link: string,
   user: DecodedIdToken,
+  format?: string,
 ): Promise<MyFile> => {
   const filenameNoExtension = nanoid();
   let { createdFilePath } = await downloadVideo({
@@ -24,6 +25,7 @@ export const downloadFromLinkService = async (
     filename: filenameNoExtension,
     outputDir: DOWNLOADS_DIR,
     maxFileSize: MAX_UPLOAD_SIZE,
+    format,
   });
 
   try {
