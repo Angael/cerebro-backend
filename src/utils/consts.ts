@@ -4,6 +4,7 @@ export const GB = 1024 * 1024 * 1024;
 export const MD_CELL_SIZE = 300;
 export const XS_CELL_SIZE = 32;
 
+/** Maximum size in MB */
 export const MAX_UPLOAD_SIZE = 30 * MB;
 export const TEMP_DIR = '_temp';
 export const UPLOADS_DIR = '_temp/file-uploads';

@@ -24,7 +24,7 @@ export const downloadFromLinkService = async (
     link,
     filename: filenameNoExtension,
     outputDir: DOWNLOADS_DIR,
-    maxFileSize: MAX_UPLOAD_SIZE + 'B',
+    // maxFileSize: Math.round(MAX_UPLOAD_SIZE / 1000) + 'K',
     format,
   });
 
