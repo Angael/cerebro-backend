@@ -1162,10 +1162,10 @@ duplexify@^4.0.0:
     readable-stream "^3.1.1"
     stream-shift "^1.0.0"
 
-easy-yt-dlp@0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/easy-yt-dlp/-/easy-yt-dlp-0.5.0.tgz#72f728acc41731ef9eabebc4400a5936a1ccb52c"
-  integrity sha512-N5OGZKtAAHuIOqrSgLo1+M0QMWf8clE6veJX99i8TQBa/3SnkigDWJFY33odomxRXHejTtQ6++9DRYkVZlbc2Q==
+easy-yt-dlp@0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/easy-yt-dlp/-/easy-yt-dlp-0.7.0.tgz#afcc46cc816780c9045069b940489085809ec640"
+  integrity sha512-JD1ih+L/jT8UFdm4CWbtD02L57XW1AOpXjoZll1bkJj5BVlMVoyn3/g9r+hu5JU+byvyytOIDcW4qnWZKCpDyw==
 
 ecdsa-sig-formatter@1.0.11, ecdsa-sig-formatter@^1.0.11:
   version "1.0.11"
