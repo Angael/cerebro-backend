@@ -2,11 +2,6 @@ import express, { Request } from 'express';
 import multer from 'multer';
 import z from 'zod';
 import { QueryItems } from '@vanih/cerebro-contracts';
-import { downloadVideo } from 'easy-yt-dlp';
-import { nanoid } from 'nanoid';
-import fs from 'fs-extra';
-import mime from 'mime-types';
-import { parse } from 'path';
 
 import {
   addTagsToItems,
@@ -18,7 +13,7 @@ import {
 } from './itemFns.js';
 import { isPremium } from '../../middleware/isPremium.js';
 import { multerOptions } from './multerConfig.js';
-import { DOWNLOADS_DIR, MAX_UPLOAD_SIZE } from '../../utils/consts.js';
+import { MAX_UPLOAD_SIZE } from '../../utils/consts.js';
 import { uploadFileForUser } from './upload/upload.service.js';
 import { errorResponse } from '../../utils/errors/errorResponse.js';
 import { MyRoute } from '../express-helpers/routeType.js';
@@ -30,9 +25,11 @@ import { getItemTags, upsertTags } from '../tags/tags.service.js';
 import { arrayFromString } from '../../utils/arrayFromString.js';
 import { betterUnlink } from '../../utils/betterUnlink.js';
 import { tagsZod } from '../../utils/zod/validators.js';
-import { YT_DLP_PATH } from '../../utils/env.js';
-import { MyFile } from './upload/upload.type.js';
 import logger from '../../utils/log.js';
+import {
+  downloadFromLinkService,
+  getStatsFromLink,
+} from './download-from-link/downloadFromLink.service.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -105,6 +102,7 @@ router.post(
       }
 
       if (process.env.MOCK_UPLOADS === 'true') {
+        await new Promise((resolve) => setTimeout(resolve, 200));
         betterUnlink(file.path);
         res.status(200).send();
         return;
@@ -130,17 +128,13 @@ router.post(
 const fileFromLinkZod = z.object({
   link: z.string().url(),
   tags: tagsZod,
+  format: z.string().optional(),
 });
 
 router.post('/upload/file-from-link', isPremium, async (req: Request, res) => {
   try {
-    const { link, tags: _tags } = fileFromLinkZod.parse(req.body);
+    const { link, tags: _tags, format } = fileFromLinkZod.parse(req.body);
     logger.verbose(`Downloading from link ${link}`);
-
-    if (!link) {
-      res.sendStatus(400);
-      return;
-    }
 
     if (process.env.MOCK_UPLOADS === 'true') {
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -148,47 +142,36 @@ router.post('/upload/file-from-link', isPremium, async (req: Request, res) => {
       return;
     }
 
-    const filenameNoExtension = nanoid();
-    let { createdFilePath } = await downloadVideo({
-      ytDlpPath: YT_DLP_PATH,
-      link,
-      filename: filenameNoExtension,
-      outputDir: DOWNLOADS_DIR,
-      maxFileSize: MAX_UPLOAD_SIZE,
-    });
+    const file = await downloadFromLinkService(link, req.user!, format);
 
     try {
-      const filename = parse(createdFilePath).base;
-      const file: MyFile = {
-        path: createdFilePath,
-        size: (await fs.stat(createdFilePath)).size,
-        originalname: filename,
-        mimetype: mime.lookup(createdFilePath),
-        filename,
-      };
-
-      if (file.size > MAX_UPLOAD_SIZE) {
-        throw new HttpError(413);
-      }
-
-      const hasEnoughSpace = await doesUserHaveSpaceLeftForFile(req.user!, file);
-
-      if (!hasEnoughSpace) {
-        throw new HttpError(413);
-      }
-
       const tags = await upsertTags(_tags);
+      console.log(3);
+      // TODO: file is probly deleted before this point????
       await uploadFileForUser({ file, user: req.user!, tags });
-
+      console.log(4);
       res.status(200).send();
     } catch (e) {
       logger.error(e);
       throw e;
-    } finally {
-      if (createdFilePath) {
-        await betterUnlink(createdFilePath);
-      }
     }
+  } catch (e) {
+    errorResponse(res, e);
+  }
+});
+
+const fileFromLinkParamsZod = z.object({
+  link: z.string().url(),
+});
+
+router.get('/upload/file-from-link', isPremium, useCache(60), async (req: Request, res) => {
+  try {
+    const { link } = fileFromLinkParamsZod.parse(req.query);
+    logger.verbose('Stats for link %s', link);
+
+    const stats = await getStatsFromLink(link);
+
+    res.status(200).json(stats);
   } catch (e) {
     errorResponse(res, e);
   }
