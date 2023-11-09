@@ -1,9 +1,7 @@
 import { format, createLogger, transports } from 'winston';
 
-const alignColorsAndTime = format.combine(
-  format.colorize({
-    all: true,
-  }),
+const timeAndPrintf = format.combine(
+  format.splat(),
   format.timestamp({
     format: 'YY-MM-DD HH:mm:ss.SSS',
   }),
@@ -14,7 +12,14 @@ export const logger = createLogger({
   level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
   transports: [
     new transports.Console({
-      format: format.combine(format.splat(), format.colorize(), alignColorsAndTime),
+      format: format.combine(format.colorize(), timeAndPrintf),
+    }),
+    new transports.File({
+      filename: 'logs/info.log',
+      level: 'info',
+      format: timeAndPrintf,
+      maxsize: 5242880, // 5MB
+      maxFiles: 5,
     }),
   ],
 });
