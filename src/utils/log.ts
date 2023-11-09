@@ -22,6 +22,13 @@ export const logger = createLogger({
       maxFiles: 5,
     }),
   ],
+  exceptionHandlers: [
+    new transports.File({
+      filename: 'logs/exceptions.log',
+      maxsize: 5242880, // 5MB
+      maxFiles: 5,
+    }),
+  ],
 });
 
 export default logger;
