@@ -1,11 +1,6 @@
-// https://stackoverflow.com/questions/39853825/how-to-extend-an-interface-declared-in-an-external-library-d-ts/44828876
-import firebase from 'firebase-admin';
-
-declare module 'express' {
-  export interface Request {
-    user?: firebase.auth.DecodedIdToken;
-  }
-}
+import { LooseAuthProp, RequireAuthProp } from '@clerk/clerk-sdk-node';
+import { SignedInAuthObject } from '@clerk/backend/dist/types/tokens/authObjects.js';
+import { Request } from 'express';
 
 declare global {
   namespace NodeJS {
@@ -24,4 +19,13 @@ declare global {
       MOCK_UPLOADS: 'true' | 'false' | undefined;
     }
   }
+
+  namespace Express {
+    interface Request extends LooseAuthProp {}
+  }
+
+  // Almost like RequireAuthProp
+  type ReqWithAuth = Request & {
+    auth: SignedInAuthObject;
+  };
 }

@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import log from '../utils/log.js';
-import { addAuth } from '../middleware/addAuth.js';
 
 import itemRouter from './items/itemRouter.js';
 import registerRouter from './register/registerRouter.js';
@@ -10,6 +9,7 @@ import tagsRouter from './tags/tagsRouter.js';
 import { MyRoute } from './express-helpers/routeType.js';
 import localFsRouter from './local-fs/localFsRouter.js';
 import { isProd } from '../utils/env.js';
+import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
 
 const routes3: MyRoute[] = [
   itemRouter,
@@ -31,7 +31,9 @@ const startRouter = () => {
       maxAge: 600,
     }),
   );
-  router.use(addAuth);
+
+  // TODO: This could be bad? maybe remove?
+  router.use(ClerkExpressWithAuth());
   router.get('/', (req, res) => 'v1');
 
   routes3.forEach((myRoute) => {

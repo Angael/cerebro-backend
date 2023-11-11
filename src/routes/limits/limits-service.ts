@@ -1,5 +1,4 @@
 import { limitsConfig } from '../../utils/limits.js';
-import firebase from '../../firebase/firebase-params.js';
 import { prisma } from '../../db/db.js';
 import { usedSpaceCache, userTypeCache } from '../../cache/userCache.js';
 import { UserType } from '@prisma/client';
@@ -53,11 +52,11 @@ export async function getUserType(uid: string): Promise<UserType> {
   }
 }
 
-export async function getLimitsForUser(user: firebase.auth.DecodedIdToken) {
-  const type = await getUserType(user.uid);
+export async function getLimitsForUser(userId: string) {
+  const type = await getUserType(userId);
   const max = limitsConfig[type];
 
-  const used: number = await getSpaceUsedByUser(user.uid);
+  const used: number = await getSpaceUsedByUser(userId);
 
   return {
     type,
@@ -65,11 +64,8 @@ export async function getLimitsForUser(user: firebase.auth.DecodedIdToken) {
   };
 }
 
-export async function doesUserHaveSpaceLeftForFile(
-  user: firebase.auth.DecodedIdToken,
-  file: MyFile,
-) {
-  const limits = await getLimitsForUser(user);
+export async function doesUserHaveSpaceLeftForFile(userId: string, file: MyFile) {
+  const limits = await getLimitsForUser(userId);
 
   const spaceLeft = limits.bytes.max - limits.bytes.used;
 

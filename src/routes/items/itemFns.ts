@@ -1,7 +1,6 @@
-import { Item, User, Tag } from '@prisma/client';
+import { Item, Tag } from '@prisma/client';
 import { FrontItem, QueryItems } from '@vanih/cerebro-contracts';
 import { prisma } from '../../db/db.js';
-import firebase from 'firebase-admin';
 import { S3DeleteMany } from '../../aws/s3-helpers.js';
 import { HttpError } from '../../utils/errors/HttpError.js';
 import logger from '../../utils/log.js';
@@ -12,7 +11,7 @@ export async function getAllItems(
   limit: number,
   page: number,
   tagIds: number[],
-  userUid?: User['uid'],
+  userUid?: string,
 ): Promise<QueryItems> {
   const tagsWhere = tagIds.length
     ? {
@@ -66,7 +65,7 @@ export async function getAllItemsCount(): Promise<number> {
   }
 }
 
-export async function getItem(id: number, userUid?: User['uid']): Promise<FrontItem> {
+export async function getItem(id: number, userUid?: string): Promise<FrontItem> {
   const item = await prisma.item.findFirst({
     include: {
       Image: true,
@@ -83,7 +82,7 @@ export async function getItem(id: number, userUid?: User['uid']): Promise<FrontI
   }
 }
 
-export async function deleteItem(itemId: Item['id'], userId: firebase.auth.DecodedIdToken['uid']) {
+export async function deleteItem(itemId: Item['id'], userId: string) {
   // const row = (await db.select('account_uid').from(DB_TABLE.item).where({ id: itemId }))[0];
   const row = await prisma.item.findFirst({
     where: { userUid: userId },
@@ -144,10 +143,7 @@ export async function addTagsToItems(itemIds: Item['id'][], tags: Tag[]): Promis
   });
 }
 
-export async function areItemsOwnedByUser(
-  itemIds: Item['id'][],
-  userId: firebase.auth.DecodedIdToken['uid'],
-): Promise<boolean> {
+export async function areItemsOwnedByUser(itemIds: Item['id'][], userId: string): Promise<boolean> {
   const items = await prisma.item.findMany({
     where: { id: { in: itemIds } },
     select: { userUid: true },

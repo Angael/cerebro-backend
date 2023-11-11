@@ -36,14 +36,14 @@ const router = express.Router({ mergeParams: true });
 const limitZod = z.number().min(1).max(30);
 const pageZod = z.number().min(0).max(Number.MAX_SAFE_INTEGER);
 
-router.get('/', async (req: Request, res) => {
+router.get('/', async (req: ReqWithAuth, res) => {
   try {
     const limit = limitZod.parse(Number(req.query.limit));
     const page = pageZod.parse(Number(req.query.page));
     const tags: number[] =
       typeof req.query.tagIds === 'string' ? arrayFromString(req.query.tagIds).map(Number) : [];
 
-    const responseJson: QueryItems = await getAllItems(limit, page, tags, req.user?.uid);
+    const responseJson: QueryItems = await getAllItems(limit, page, tags, req.auth?.userId);
 
     res.json(responseJson);
   } catch (e) {
