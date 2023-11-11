@@ -2,11 +2,11 @@ import express from 'express';
 import { errorResponse } from '../../utils/errors/errorResponse.js';
 import { getLimitsForUser } from './limits-service.js';
 import { MyRoute } from '../express-helpers/routeType.js';
-import { isAuth } from '../../middleware/isAuth.js';
+import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 
 const router = express.Router({ mergeParams: true });
 
-router.get('/', isAuth(), async (req: ReqWithAuth, res) => {
+router.get('/', ClerkExpressRequireAuth(), async (req: ReqWithAuth, res) => {
   try {
     res.json(await getLimitsForUser(req.auth.userId));
   } catch (e) {

@@ -11,7 +11,6 @@ import {
   getAllItemsCount,
   getItem,
 } from './itemFns.js';
-import { isPremium } from '../../middleware/isPremium.js';
 import { multerOptions } from './multerConfig.js';
 import { MAX_UPLOAD_SIZE } from '../../utils/consts.js';
 import { uploadFileForUser } from './upload/upload.service.js';
@@ -30,6 +29,8 @@ import {
   downloadFromLinkService,
   getStatsFromLink,
 } from './download-from-link/downloadFromLink.service.js';
+import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
+import { isPremium } from '../../middleware/isPremium.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -62,7 +63,7 @@ router.get('/count', useCache(5), async (req, res) => {
 router.get('/item/:id', useCache(), async (req: Request, res) => {
   try {
     const id = Number(req.params.id);
-    res.json(await getItem(id, req.user?.uid));
+    res.json(await getItem(id, req.auth?.userId || undefined));
   } catch (e) {
     errorResponse(res, e);
   }
@@ -84,9 +85,10 @@ const tagsGETZod = z.union([z.string(), z.array(z.string())]);
 const uploadMiddleware = multer(multerOptions);
 router.post(
   '/upload/file',
-  isPremium,
-  uploadMiddleware.single('file'),
-  async (req: Request, res) => {
+  ClerkExpressRequireAuth(),
+  // isPremium check?
+  uploadMiddleware.single('file') as any, // deal with it later, maybe version mismatch
+  async (req: ReqWithAuth, res) => {
     const file = req.file;
     try {
       // Formdata is weird, so we have to do this
@@ -108,12 +110,12 @@ router.post(
         return;
       }
 
-      if (!(await doesUserHaveSpaceLeftForFile(req.user!, file))) {
+      if (!(await doesUserHaveSpaceLeftForFile(req.auth.userId, file))) {
         throw new HttpError(413);
       }
 
       const tags = await upsertTags(tagNames);
-      await uploadFileForUser({ file, user: req.user!, tags });
+      await uploadFileForUser({ file, userId: req.auth.userId, tags });
 
       res.status(200).send();
     } catch (e) {
@@ -131,34 +133,39 @@ const fileFromLinkZod = z.object({
   format: z.string().optional(),
 });
 
-router.post('/upload/file-from-link', isPremium, async (req: Request, res) => {
-  try {
-    const { link, tags: _tags, format } = fileFromLinkZod.parse(req.body);
-    logger.verbose(`Downloading from link ${link}`);
-
-    if (process.env.MOCK_UPLOADS === 'true') {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      res.status(200).send();
-      return;
-    }
-
-    const file = await downloadFromLinkService(link, req.user!, format);
-
+router.post(
+  '/upload/file-from-link',
+  ClerkExpressRequireAuth(),
+  isPremium,
+  async (req: ReqWithAuth, res) => {
     try {
-      const tags = await upsertTags(_tags);
-      console.log(3);
-      // TODO: file is probly deleted before this point????
-      await uploadFileForUser({ file, user: req.user!, tags });
-      console.log(4);
-      res.status(200).send();
+      const { link, tags: _tags, format } = fileFromLinkZod.parse(req.body);
+      logger.verbose(`Downloading from link ${link}`);
+
+      if (process.env.MOCK_UPLOADS === 'true') {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        res.status(200).send();
+        return;
+      }
+
+      const file = await downloadFromLinkService(link, req.auth.userId, format);
+
+      try {
+        const tags = await upsertTags(_tags);
+        console.log(3);
+        // TODO: file is probly deleted before this point????
+        await uploadFileForUser({ file, userId: req.auth.userId, tags });
+        console.log(4);
+        res.status(200).send();
+      } catch (e) {
+        logger.error(e);
+        throw e;
+      }
     } catch (e) {
-      logger.error(e);
-      throw e;
+      errorResponse(res, e);
     }
-  } catch (e) {
-    errorResponse(res, e);
-  }
-});
+  },
+);
 
 const fileFromLinkParamsZod = z.object({
   link: z.string().url(),
@@ -177,16 +184,16 @@ router.get('/upload/file-from-link', isPremium, useCache(60), async (req: Reques
   }
 });
 
-router.delete('/item/:id', isPremium, async (req: Request, res) => {
+router.delete('/item/:id', ClerkExpressRequireAuth(), isPremium, async (req: ReqWithAuth, res) => {
   const id = Number(req.params.id);
 
   try {
     if (!id || isNaN(id)) {
       throw new Error('Bad id');
     }
-    await deleteItem(id, req.user!.uid);
+    await deleteItem(id, req.auth.userId);
 
-    usedSpaceCache.del(req.user!.uid);
+    usedSpaceCache.del(req.auth.userId);
     res.status(200).send();
   } catch (e) {
     errorResponse(res, e);
@@ -198,22 +205,27 @@ const addTagsZod = z.object({
   tags: tagsZod,
 });
 
-router.post('/item/many/tags', isPremium, async (req: Request, res) => {
-  try {
-    const { itemIds, tags } = addTagsZod.parse(req.body);
-    if (!(await areItemsOwnedByUser(itemIds, req.user!.uid))) {
-      throw new HttpError(403);
+router.post(
+  '/item/many/tags',
+  ClerkExpressRequireAuth(),
+  isPremium,
+  async (req: ReqWithAuth, res) => {
+    try {
+      const { itemIds, tags } = addTagsZod.parse(req.body);
+      if (!(await areItemsOwnedByUser(itemIds, req.auth.userId))) {
+        throw new HttpError(403);
+      }
+
+      const insertedTags = await upsertTags(tags);
+      await addTagsToItems(itemIds, insertedTags);
+
+      usedSpaceCache.del(req.auth.userId);
+      res.status(200).send();
+    } catch (e) {
+      errorResponse(res, e);
     }
-
-    const insertedTags = await upsertTags(tags);
-    await addTagsToItems(itemIds, insertedTags);
-
-    usedSpaceCache.del(req.user!.uid);
-    res.status(200).send();
-  } catch (e) {
-    errorResponse(res, e);
-  }
-});
+  },
+);
 
 const itemRouter: MyRoute = { path: '/items/', router };
 export default itemRouter;

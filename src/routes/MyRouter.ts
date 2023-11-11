@@ -3,7 +3,6 @@ import cors from 'cors';
 import log from '../utils/log.js';
 
 import itemRouter from './items/itemRouter.js';
-import registerRouter from './register/registerRouter.js';
 import limitsRouter from './limits/limitsRouter.js';
 import tagsRouter from './tags/tagsRouter.js';
 import { MyRoute } from './express-helpers/routeType.js';
@@ -11,13 +10,9 @@ import localFsRouter from './local-fs/localFsRouter.js';
 import { isProd } from '../utils/env.js';
 import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
 
-const routes3: MyRoute[] = [
-  itemRouter,
-  registerRouter,
-  limitsRouter,
-  tagsRouter,
-  !isProd && localFsRouter,
-].filter((router): router is MyRoute => !!router);
+const routes3: MyRoute[] = [itemRouter, limitsRouter, tagsRouter, !isProd && localFsRouter].filter(
+  (router): router is MyRoute => !!router,
+);
 
 const startRouter = () => {
   const router = express();
@@ -32,17 +27,15 @@ const startRouter = () => {
     }),
   );
 
-  // TODO: This could be bad? maybe remove?
   router.use(ClerkExpressWithAuth());
-  router.get('/', (req, res) => 'v1');
+  router.get('/', (req, res) => 'v0.2');
 
   routes3.forEach((myRoute) => {
     router.use(myRoute.path, myRoute.router);
   });
 
   router.listen(port, () => {
-    log.info(`Router started`);
-    log.info(`http://localhost:${port}/`);
+    log.info(`Router started on http://localhost:${port}/`);
   });
 };
 

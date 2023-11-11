@@ -9,13 +9,12 @@ import { HttpError } from '../../../utils/errors/HttpError.js';
 import { doesUserHaveSpaceLeftForFile } from '../../limits/limits-service.js';
 import logger from '../../../utils/log.js';
 import { betterUnlink } from '../../../utils/betterUnlink.js';
-import { DecodedIdToken } from 'firebase-admin/auth';
 import mime from 'mime-types';
 import { linkStatsCache } from '../../../cache/caches.js';
 
 export const downloadFromLinkService = async (
   link: string,
-  user: DecodedIdToken,
+  userId: string,
   format?: string,
 ): Promise<MyFile> => {
   const filenameNoExtension = nanoid();
@@ -42,7 +41,7 @@ export const downloadFromLinkService = async (
       throw new HttpError(413);
     }
 
-    const hasEnoughSpace = await doesUserHaveSpaceLeftForFile(user!, file);
+    const hasEnoughSpace = await doesUserHaveSpaceLeftForFile(userId, file);
 
     if (!hasEnoughSpace) {
       throw new HttpError(413);

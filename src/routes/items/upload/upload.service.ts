@@ -20,20 +20,20 @@ function getFileType(file: MyFile): ItemType {
   }
 }
 
-export async function uploadFileForUser({ file, user, tags }: uploadPayload): Promise<Item> {
+export async function uploadFileForUser({ file, userId, tags }: uploadPayload): Promise<Item> {
   let item: Item | undefined;
 
   try {
     const itemType = getFileType(file);
 
     if (itemType === ItemType.IMAGE) {
-      item = await uploadImage({ file, user, tags });
+      item = await uploadImage({ file, userId, tags });
     } else if (itemType === ItemType.VIDEO) {
       console.log('uploading video');
-      item = await uploadVideo({ file, user, tags });
+      item = await uploadVideo({ file, userId, tags });
     }
     logger.verbose('uploaded file %s', file.filename);
-    usedSpaceCache.del(user.uid);
+    usedSpaceCache.del(userId);
   } catch (e) {
     logger.error(e);
     throw new HttpError(400);

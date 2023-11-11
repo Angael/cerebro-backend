@@ -20,12 +20,9 @@ declare global {
     }
   }
 
+  type ReqWithAuth = Request & RequireAuthProp;
+
   namespace Express {
     interface Request extends LooseAuthProp {}
   }
-
-  // Almost like RequireAuthProp
-  type ReqWithAuth = Request & {
-    auth: SignedInAuthObject;
-  };
 }
