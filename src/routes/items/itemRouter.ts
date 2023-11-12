@@ -29,7 +29,7 @@ import {
   downloadFromLinkService,
   getStatsFromLink,
 } from './download-from-link/downloadFromLink.service.js';
-import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
+import { clerkClient, ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 import { isPremium } from '../../middleware/isPremium.js';
 
 const router = express.Router({ mergeParams: true });
@@ -39,6 +39,14 @@ const pageZod = z.number().min(0).max(Number.MAX_SAFE_INTEGER);
 
 router.get('/', async (req: ReqWithAuth, res) => {
   try {
+    console.log('Listing items for user', req.auth.userId);
+    if (req.auth.userId) {
+      console.log('Auth:', req.auth);
+
+      const user = await clerkClient.users.getUser(req.auth.userId);
+      console.log('User:', user);
+    }
+
     const limit = limitZod.parse(Number(req.query.limit));
     const page = pageZod.parse(Number(req.query.page));
     const tags: number[] =

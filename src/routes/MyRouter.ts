@@ -28,7 +28,9 @@ const startRouter = () => {
   );
 
   router.use(ClerkExpressWithAuth());
-  router.get('/', (req, res) => 'v0.2');
+  router.get('/', (req, res) => {
+    res.send('v0.2');
+  });
 
   routes3.forEach((myRoute) => {
     router.use(myRoute.path, myRoute.router);

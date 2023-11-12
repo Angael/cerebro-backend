@@ -20,7 +20,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "dotenv -e .env.production -- prisma migrate deploy",
     "prisma:studio": "prisma studio",
-    "lint": "tsc"
+    "lint": "tsc",
+    "ngrok": "ngrok http 3000"
   },
   "prisma": {
     "seed": "npx tsx .\\prisma\\seed.ts"
