@@ -29,15 +29,12 @@ jobs:
           tokenSuffix: '}'
           files: '[".env.template"]'
         env:
-          FIREBASE_DB_URL: ${{ secrets.FIREBASE_DB_URL }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           AWS_USER: ${{ secrets.AWS_USER }}
           AWS_KEY: ${{ secrets.AWS_KEY }}
           AWS_SECRET: ${{ secrets.AWS_SECRET }}
           AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          FB_PROJECT_ID: ${{ secrets.FB_PROJECT_ID }}
-          FB_KEY: ${{ secrets.FB_KEY }}
-          FB_EMAIL: ${{ secrets.FB_EMAIL }}
           CORS_URL: ${{ secrets.CORS_URL }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           YT_DLP_PATH: ${{ vars.YT_DLP_PATH }}
