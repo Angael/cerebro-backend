@@ -29,7 +29,7 @@ import {
   downloadFromLinkService,
   getStatsFromLink,
 } from './download-from-link/downloadFromLink.service.js';
-import { clerkClient, ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
+import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 import { isPremium } from '../../middleware/isPremium.js';
 
 const router = express.Router({ mergeParams: true });
@@ -37,22 +37,19 @@ const router = express.Router({ mergeParams: true });
 const limitZod = z.number().min(1).max(30);
 const pageZod = z.number().min(0).max(Number.MAX_SAFE_INTEGER);
 
-router.get('/', async (req: ReqWithAuth, res) => {
+router.get('/', async (req, res) => {
   try {
-    console.log('Listing items for user', req.auth.userId);
-    if (req.auth.userId) {
-      console.log('Auth:', req.auth);
-
-      const user = await clerkClient.users.getUser(req.auth.userId);
-      console.log('User:', user);
-    }
-
     const limit = limitZod.parse(Number(req.query.limit));
     const page = pageZod.parse(Number(req.query.page));
     const tags: number[] =
       typeof req.query.tagIds === 'string' ? arrayFromString(req.query.tagIds).map(Number) : [];
 
-    const responseJson: QueryItems = await getAllItems(limit, page, tags, req.auth?.userId);
+    const responseJson: QueryItems = await getAllItems(
+      limit,
+      page,
+      tags,
+      req.auth?.userId || undefined,
+    );
 
     res.json(responseJson);
   } catch (e) {
