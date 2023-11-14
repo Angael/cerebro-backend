@@ -91,8 +91,8 @@ const uploadMiddleware = multer(multerOptions);
 router.post(
   '/upload/file',
   ClerkExpressRequireAuth(),
-  // isPremium check?
-  uploadMiddleware.single('file') as any, // deal with it later, maybe version mismatch
+  isPremium,
+  uploadMiddleware.single('file') as any, // deal with it later, maybe version mismatch. Monkey-patching request type breaks stuff
   async (req: ReqWithAuth, res) => {
     const file = req.file;
     try {

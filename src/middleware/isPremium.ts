@@ -1,10 +1,3 @@
-import { NextFunction, Response } from 'express';
-import { UserType } from '@prisma/client';
+import { forRole } from './forRoles.js';
 
-export const isPremium = (req: ReqWithAuth, res: Response, next: NextFunction) => {
-  if (req.auth?.userId && req.auth.sessionClaims.roles.includes(UserType.PREMIUM)) {
-    next();
-  } else {
-    res.status(403).send();
-  }
-};
+export const isPremium = forRole('PREMIUM');
