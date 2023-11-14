@@ -157,10 +157,9 @@ router.post(
 
       try {
         const tags = await upsertTags(_tags);
-        console.log(3);
-        // TODO: file is probly deleted before this point????
+
         await uploadFileForUser({ file, userId: req.auth.userId, tags });
-        console.log(4);
+
         res.status(200).send();
       } catch (e) {
         logger.error(e);

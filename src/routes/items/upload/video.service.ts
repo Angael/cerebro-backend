@@ -14,7 +14,7 @@ async function insertIntoDb(
   userId: string,
   tags: Tag[],
 ) {
-  return await prisma.item.create({
+  return prisma.item.create({
     data: {
       userUid: userId,
       type: ItemType.VIDEO,
@@ -40,19 +40,14 @@ async function insertIntoDb(
 }
 
 export async function uploadVideo({ file, userId, tags }: uploadPayload) {
-  console.log('uploading video', file, userId, tags);
-  // TODO: files doesnt exist? BUG?
   const videoData = await analyzeVideo(file.path);
 
   const key = makeS3Path(userId, 'source', replaceFileWithHash(file.originalname));
-
-  console.log('S3SimpleUpload');
 
   await S3SimpleUpload({
     key,
     filePath: file.path,
   });
-  console.log('uploaded');
 
   try {
     return await insertIntoDb(key, videoData, file, userId, tags);
