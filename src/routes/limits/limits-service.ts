@@ -1,8 +1,9 @@
 import { limitsConfig } from '../../utils/limits.js';
 import { prisma } from '../../db/db.js';
 import { usedSpaceCache, userTypeCache } from '../../cache/userCache.js';
-import { UserType } from '@prisma/client';
+import { Prisma, UserType } from '@prisma/client';
 import { MyFile } from '../items/upload/upload.type.js';
+import { HttpError } from '../../utils/errors/HttpError.js';
 
 export const getSpaceUsedByUser = async (uid: string): Promise<number> => {
   let used: number;
@@ -44,11 +45,20 @@ export async function getUserType(uid: string): Promise<UserType> {
   if (userTypeCache.has(uid)) {
     return userTypeCache.get(uid) as UserType;
   } else {
-    const user = await prisma.user.findFirstOrThrow({ where: { uid }, select: { type: true } });
-    if (user.type) {
-      userTypeCache.set(uid, user.type);
+    try {
+      const user = await prisma.user.findFirstOrThrow({ where: { uid }, select: { type: true } });
+      if (user.type) {
+        userTypeCache.set(uid, user.type);
+      }
+      return user.type;
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2025') {
+          throw new HttpError(404);
+        }
+      }
+      throw e;
     }
-    return user.type;
   }
 }
 
