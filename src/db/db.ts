@@ -7,4 +7,5 @@ prisma.$on('beforeExit', () => {
   logger.error('Prisma shutdown');
 
   process.exitCode = 1;
+  process.exit();
 });
