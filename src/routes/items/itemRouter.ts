@@ -95,6 +95,7 @@ router.post(
   uploadMiddleware.single('file') as any, // deal with it later, maybe version mismatch. Monkey-patching request type breaks stuff
   async (req: ReqWithAuth, res) => {
     const file = req.file;
+    console.log({ file });
     try {
       // Formdata is weird, so we have to do this
       const tagNames: string[] = [tagsGETZod.parse(req.body.tags)].flat();
