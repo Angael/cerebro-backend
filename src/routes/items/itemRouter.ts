@@ -146,14 +146,13 @@ router.post('/upload/file-from-link', isPremium, async (req: Request, res) => {
 
     try {
       const tags = await upsertTags(_tags);
-      console.log(3);
-      // TODO: file is probly deleted before this point????
       await uploadFileForUser({ file, user: req.user!, tags });
-      console.log(4);
       res.status(200).send();
     } catch (e) {
       logger.error(e);
       throw e;
+    } finally {
+      await betterUnlink(file.path);
     }
   } catch (e) {
     errorResponse(res, e);

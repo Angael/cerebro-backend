@@ -41,19 +41,14 @@ async function insertIntoDb(
 }
 
 export async function uploadVideo({ file, user, tags }: uploadPayload) {
-  console.log('uploading video', file, user, tags);
-  // TODO: files doesnt exist? BUG?
   const videoData = await analyzeVideo(file.path);
 
   const key = makeS3Path(user.uid, 'source', replaceFileWithHash(file.originalname));
-
-  console.log('S3SimpleUpload');
 
   await S3SimpleUpload({
     key,
     filePath: file.path,
   });
-  console.log('uploaded');
 
   try {
     return await insertIntoDb(key, videoData, file, user, tags);

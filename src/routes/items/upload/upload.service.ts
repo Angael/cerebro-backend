@@ -29,7 +29,6 @@ export async function uploadFileForUser({ file, user, tags }: uploadPayload): Pr
     if (itemType === ItemType.IMAGE) {
       item = await uploadImage({ file, user, tags });
     } else if (itemType === ItemType.VIDEO) {
-      console.log('uploading video');
       item = await uploadVideo({ file, user, tags });
     }
     logger.verbose('uploaded file %s', file.filename);
