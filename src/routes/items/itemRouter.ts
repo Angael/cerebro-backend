@@ -165,6 +165,8 @@ router.post(
       } catch (e) {
         logger.error(e);
         throw e;
+      } finally {
+        await betterUnlink(file.path);
       }
     } catch (e) {
       errorResponse(res, e);

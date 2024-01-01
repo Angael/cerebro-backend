@@ -49,12 +49,11 @@ export const downloadFromLinkService = async (
 
     return file;
   } catch (e) {
-    logger.error(e);
-    throw e;
-  } finally {
     if (createdFilePath) {
       await betterUnlink(createdFilePath);
     }
+    logger.error(e);
+    throw e;
   }
 };
 
