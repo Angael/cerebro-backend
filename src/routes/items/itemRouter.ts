@@ -3,14 +3,7 @@ import multer from 'multer';
 import z from 'zod';
 import { QueryItems } from '@vanih/cerebro-contracts';
 
-import {
-  addTagsToItems,
-  areItemsOwnedByUser,
-  deleteItem,
-  getAllItems,
-  getAllItemsCount,
-  getItem,
-} from './itemFns.js';
+import { deleteItem, getAllItems, getAllItemsCount, getItem } from './itemFns.js';
 import { multerOptions } from './multerConfig.js';
 import { MAX_UPLOAD_SIZE } from '../../utils/consts.js';
 import { uploadFileForUser } from './upload/upload.service.js';
@@ -20,10 +13,9 @@ import { useCache } from '../../middleware/expressCache.js';
 import { usedSpaceCache } from '../../cache/userCache.js';
 import { doesUserHaveSpaceLeftForFile } from '../limits/limits-service.js';
 import { HttpError } from '../../utils/errors/HttpError.js';
-import { getItemTags, upsertTags } from '../tags/tags.service.js';
+import { getItemTags } from '../tags/tags.service.js';
 import { arrayFromString } from '../../utils/arrayFromString.js';
 import { betterUnlink } from '../../utils/betterUnlink.js';
-import { tagsZod } from '../../utils/zod/validators.js';
 import logger from '../../utils/log.js';
 import {
   downloadFromLinkService,
@@ -84,9 +76,6 @@ router.get('/item/:id/tags', useCache(60), async (req, res) => {
   }
 });
 
-// in GET, param can be string or array
-const tagsGETZod = z.union([z.string(), z.array(z.string())]);
-
 const uploadMiddleware = multer(multerOptions);
 router.post(
   '/upload/file',
@@ -97,9 +86,6 @@ router.post(
     const file = req.file;
     console.log({ file });
     try {
-      // Formdata is weird, so we have to do this
-      const tagNames: string[] = [tagsGETZod.parse(req.body.tags)].flat();
-
       if (!file) {
         res.sendStatus(400);
         return;
@@ -120,8 +106,7 @@ router.post(
         throw new HttpError(413);
       }
 
-      const tags = await upsertTags(tagNames);
-      await uploadFileForUser({ file, userId: req.auth.userId, tags });
+      await uploadFileForUser({ file, userId: req.auth.userId, tags: [] });
 
       res.status(200).send();
     } catch (e) {
@@ -135,7 +120,6 @@ router.post(
 
 const fileFromLinkZod = z.object({
   link: z.string().url(),
-  tags: tagsZod,
   format: z.string().optional(),
 });
 
@@ -145,7 +129,7 @@ router.post(
   isPremium,
   async (req: ReqWithAuth, res) => {
     try {
-      const { link, tags: _tags, format } = fileFromLinkZod.parse(req.body);
+      const { link, format } = fileFromLinkZod.parse(req.body);
       logger.verbose(`Downloading from link ${link}`);
 
       if (process.env.MOCK_UPLOADS === 'true') {
@@ -157,9 +141,7 @@ router.post(
       const file = await downloadFromLinkService(link, req.auth.userId, format);
 
       try {
-        const tags = await upsertTags(_tags);
-
-        await uploadFileForUser({ file, userId: req.auth.userId, tags });
+        await uploadFileForUser({ file, userId: req.auth.userId, tags: [] });
 
         res.status(200).send();
       } catch (e) {
@@ -206,33 +188,6 @@ router.delete('/item/:id', ClerkExpressRequireAuth(), isPremium, async (req: Req
     errorResponse(res, e);
   }
 });
-
-const addTagsZod = z.object({
-  itemIds: z.array(z.number()),
-  tags: tagsZod,
-});
-
-router.post(
-  '/item/many/tags',
-  ClerkExpressRequireAuth(),
-  isPremium,
-  async (req: ReqWithAuth, res) => {
-    try {
-      const { itemIds, tags } = addTagsZod.parse(req.body);
-      if (!(await areItemsOwnedByUser(itemIds, req.auth.userId))) {
-        throw new HttpError(403);
-      }
-
-      const insertedTags = await upsertTags(tags);
-      await addTagsToItems(itemIds, insertedTags);
-
-      usedSpaceCache.del(req.auth.userId);
-      res.status(200).send();
-    } catch (e) {
-      errorResponse(res, e);
-    }
-  },
-);
 
 const itemRouter: MyRoute = { path: '/items/', router };
 export default itemRouter;
