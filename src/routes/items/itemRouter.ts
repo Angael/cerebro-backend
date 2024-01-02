@@ -3,7 +3,7 @@ import multer from 'multer';
 import z from 'zod';
 import { QueryItems } from '@vanih/cerebro-contracts';
 
-import { deleteItem, getAllItems, getAllItemsCount, getItem } from './itemFns.js';
+import { deleteItem, getAllItems, getItem } from './itemFns.js';
 import { multerOptions } from './multerConfig.js';
 import { MAX_UPLOAD_SIZE } from '../../utils/consts.js';
 import { uploadFileForUser } from './upload/upload.service.js';
@@ -43,16 +43,10 @@ router.get('/', async (req, res) => {
       req.auth?.userId || undefined,
     );
 
+    logger.info('Listing items %o', { userId: req.auth?.userId, page, limit });
     res.json(responseJson);
   } catch (e) {
-    errorResponse(res, e);
-  }
-});
-
-router.get('/count', useCache(5), async (req, res) => {
-  try {
-    res.json(await getAllItemsCount());
-  } catch (e) {
+    logger.error('Failed to list items for user: %s', req.auth?.userId);
     errorResponse(res, e);
   }
 });
@@ -60,8 +54,12 @@ router.get('/count', useCache(5), async (req, res) => {
 router.get('/item/:id', useCache(), async (req: Request, res) => {
   try {
     const id = Number(req.params.id);
-    res.json(await getItem(id, req.auth?.userId || undefined));
+    const item = await getItem(id, req.auth?.userId || undefined);
+
+    logger.info('Getting item %o', { userId: req.auth?.userId, id });
+    res.json(item);
   } catch (e) {
+    logger.error('Failed to get item for user: %s', req.auth?.userId);
     errorResponse(res, e);
   }
 });
@@ -70,8 +68,10 @@ router.get('/item/:id/tags', useCache(60), async (req, res) => {
   try {
     const id = Number(req.params.id);
     const tags = await getItemTags(id);
+    logger.info('Getting tags for item %o', { userId: req.auth?.userId, id });
     res.json(tags);
   } catch (e) {
+    logger.error('Failed to get tags for user: %s', req.auth?.userId);
     errorResponse(res, e);
   }
 });
@@ -84,7 +84,7 @@ router.post(
   uploadMiddleware.single('file') as any, // deal with it later, maybe version mismatch. Monkey-patching request type breaks stuff
   async (req: ReqWithAuth, res) => {
     const file = req.file;
-    console.log({ file });
+
     try {
       if (!file) {
         res.sendStatus(400);
@@ -108,8 +108,10 @@ router.post(
 
       await uploadFileForUser({ file, userId: req.auth.userId, tags: [] });
 
+      logger.info('Uploaded file %o', { userId: req.auth?.userId, file });
       res.status(200).send();
     } catch (e) {
+      logger.error('Failed to upload file for user: %s', req.auth?.userId);
       if (file) {
         betterUnlink(file?.path);
       }
@@ -130,7 +132,6 @@ router.post(
   async (req: ReqWithAuth, res) => {
     try {
       const { link, format } = fileFromLinkZod.parse(req.body);
-      logger.verbose(`Downloading from link ${link}`);
 
       if (process.env.MOCK_UPLOADS === 'true') {
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -148,9 +149,11 @@ router.post(
         logger.error(e);
         throw e;
       } finally {
+        logger.info('Uploaded file from link %o', { userId: req.auth?.userId, link });
         await betterUnlink(file.path);
       }
     } catch (e) {
+      logger.error('Failed to upload file from link for user: %s', req.auth?.userId);
       errorResponse(res, e);
     }
   },
@@ -169,6 +172,7 @@ router.get('/upload/file-from-link', isPremium, useCache(60), async (req: Reques
 
     res.status(200).json(stats);
   } catch (e) {
+    logger.error('Failed to get stats from link for user: %s', req.auth?.userId);
     errorResponse(res, e);
   }
 });
@@ -185,6 +189,7 @@ router.delete('/item/:id', ClerkExpressRequireAuth(), isPremium, async (req: Req
     usedSpaceCache.del(req.auth.userId);
     res.status(200).send();
   } catch (e) {
+    logger.error('Failed to delete item for user: %s', req.auth?.userId);
     errorResponse(res, e);
   }
 });
