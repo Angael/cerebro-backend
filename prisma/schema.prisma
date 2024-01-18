@@ -112,12 +112,14 @@ model Video {
   bitrateKb  Int       @db.UnsignedSmallInt
 }
 
+// depricated
 model Tag {
   id    Int           @id @default(autoincrement())
   name  String        @unique // lowercase always
   items TagsOnItems[]
 }
 
+// depricated
 model TagsOnItems {
   item       Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId     Int

@@ -19,7 +19,7 @@
     "noImplicitThis": false,
     "strictNullChecks": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true // This is needed as long as there is error in importing with require in some firebase deps
+    "skipLibCheck": true // This is needed as long as there is error in importing with require in some clerk deps
   },
   "include": ["src/**/*", "__tests__/**/*"]
 }

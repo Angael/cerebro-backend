@@ -1,4 +1,3 @@
-import firebase from 'firebase-admin';
 import logger from '../../../utils/log.js';
 import { S3Delete, S3SimpleUpload } from '../../../aws/s3-helpers.js';
 import { makeS3Path, replaceFileWithHash } from '../../../utils/makeS3Path.js';
@@ -12,12 +11,12 @@ async function insertIntoDb(
   s3Key: string,
   videoData: VideoStats,
   file: MyFile,
-  author: firebase.auth.DecodedIdToken,
+  userId: string,
   tags: Tag[],
 ) {
-  return await prisma.item.create({
+  return prisma.item.create({
     data: {
-      userUid: author.uid,
+      userUid: userId,
       type: ItemType.VIDEO,
       private: false,
       processed: Processed.NO,
@@ -40,10 +39,10 @@ async function insertIntoDb(
   });
 }
 
-export async function uploadVideo({ file, user, tags }: uploadPayload) {
+export async function uploadVideo({ file, userId, tags }: uploadPayload) {
   const videoData = await analyzeVideo(file.path);
 
-  const key = makeS3Path(user.uid, 'source', replaceFileWithHash(file.originalname));
+  const key = makeS3Path(userId, 'source', replaceFileWithHash(file.originalname));
 
   await S3SimpleUpload({
     key,
@@ -51,7 +50,7 @@ export async function uploadVideo({ file, user, tags }: uploadPayload) {
   });
 
   try {
-    return await insertIntoDb(key, videoData, file, user, tags);
+    return await insertIntoDb(key, videoData, file, userId, tags);
   } catch (e) {
     logger.error('Failed to insert video into DB. Error: %o', e.message);
     S3Delete(file.path);

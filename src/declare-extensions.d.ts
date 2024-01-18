@@ -1,11 +1,22 @@
-// https://stackoverflow.com/questions/39853825/how-to-extend-an-interface-declared-in-an-external-library-d-ts/44828876
-import firebase from 'firebase-admin';
+import { LooseAuthProp, RequireAuthProp } from '@clerk/clerk-sdk-node';
+import { Request } from 'express';
+import { UserType } from '@prisma/client';
 
-declare module 'express' {
-  export interface Request {
-    user?: firebase.auth.DecodedIdToken;
-  }
-}
+export type SessionClaims = {
+  roles: Array<keyof typeof UserType>;
+};
+
+type LooseAuthPropWithSessionClaims = {
+  auth:
+    | {
+        userId: null;
+        sessionClaims?: null;
+      }
+    | {
+        userId: string;
+        sessionClaims: SessionClaims;
+      };
+} & LooseAuthProp;
 
 declare global {
   namespace NodeJS {
@@ -17,11 +28,14 @@ declare global {
       AWS_SECRET: string;
       AWS_BUCKET_NAME: string;
       AWS_REGION: string;
-      FB_PROJECT_ID: string;
-      FB_KEY: string;
-      FB_EMAIL: string;
       DATABASE_URL: string;
       MOCK_UPLOADS: 'true' | 'false' | undefined;
     }
+  }
+
+  type ReqWithAuth = Request & RequireAuthProp;
+
+  namespace Express {
+    interface Request extends LooseAuthPropWithSessionClaims {}
   }
 }

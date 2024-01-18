@@ -1,4 +1,3 @@
-import firebase from 'firebase-admin';
 import { Tag } from '@prisma/client';
 
 export type MyFile =
@@ -13,6 +12,6 @@ export type MyFile =
 
 export type uploadPayload = {
   file: MyFile;
-  user: firebase.auth.DecodedIdToken;
+  userId: string;
   tags: Tag[];
 };

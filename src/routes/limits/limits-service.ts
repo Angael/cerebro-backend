@@ -1,9 +1,9 @@
 import { limitsConfig } from '../../utils/limits.js';
-import firebase from '../../firebase/firebase-params.js';
 import { prisma } from '../../db/db.js';
 import { usedSpaceCache, userTypeCache } from '../../cache/userCache.js';
-import { UserType } from '@prisma/client';
+import { Prisma, UserType } from '@prisma/client';
 import { MyFile } from '../items/upload/upload.type.js';
+import { HttpError } from '../../utils/errors/HttpError.js';
 
 export const getSpaceUsedByUser = async (uid: string): Promise<number> => {
   let used: number;
@@ -45,19 +45,28 @@ export async function getUserType(uid: string): Promise<UserType> {
   if (userTypeCache.has(uid)) {
     return userTypeCache.get(uid) as UserType;
   } else {
-    const user = await prisma.user.findFirstOrThrow({ where: { uid }, select: { type: true } });
-    if (user.type) {
-      userTypeCache.set(uid, user.type);
+    try {
+      const user = await prisma.user.findFirstOrThrow({ where: { uid }, select: { type: true } });
+      if (user.type) {
+        userTypeCache.set(uid, user.type);
+      }
+      return user.type;
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2025') {
+          throw new HttpError(404);
+        }
+      }
+      throw e;
     }
-    return user.type;
   }
 }
 
-export async function getLimitsForUser(user: firebase.auth.DecodedIdToken) {
-  const type = await getUserType(user.uid);
+export async function getLimitsForUser(userId: string) {
+  const type = await getUserType(userId);
   const max = limitsConfig[type];
 
-  const used: number = await getSpaceUsedByUser(user.uid);
+  const used: number = await getSpaceUsedByUser(userId);
 
   return {
     type,
@@ -65,11 +74,8 @@ export async function getLimitsForUser(user: firebase.auth.DecodedIdToken) {
   };
 }
 
-export async function doesUserHaveSpaceLeftForFile(
-  user: firebase.auth.DecodedIdToken,
-  file: MyFile,
-) {
-  const limits = await getLimitsForUser(user);
+export async function doesUserHaveSpaceLeftForFile(userId: string, file: MyFile) {
+  const limits = await getLimitsForUser(userId);
 
   const spaceLeft = limits.bytes.max - limits.bytes.used;
 
