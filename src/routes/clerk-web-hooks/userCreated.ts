@@ -1,8 +1,6 @@
-import { prisma } from '../../db/db.js';
-import { UserType } from '@prisma/client';
-import { userTypeCache } from '../../cache/userCache.js';
 import { UserJSON } from '@clerk/clerk-sdk-node';
 import logger from '../../utils/log.js';
+import { User } from '../../models/User.js';
 
 export async function userCreated(data: UserJSON) {
   const { id, email_addresses } = data;
@@ -10,18 +8,12 @@ export async function userCreated(data: UserJSON) {
   const email: string | undefined = email_addresses[0]?.email_address;
 
   try {
-    await prisma.user.create({
-      data: {
-        uid: id,
-        email,
-        type: UserType.FREE,
-      },
-    });
+    await User.afterCreate(id, email);
 
-    userTypeCache.del(id);
     return;
-  } catch {
+  } catch (e) {
     logger.error('Failed to add account %s', id);
-    throw new Error();
+    console.log(e);
+    throw new Error(e);
   }
 }
